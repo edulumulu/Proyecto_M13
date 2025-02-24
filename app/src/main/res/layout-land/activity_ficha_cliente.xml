@@ -34,16 +34,33 @@
         android:id="@+id/tv_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
         android:text="589A"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tv_name"
-        app:layout_constraintTop_toTopOf="@id/tv_name" />
+        app:layout_constraintStart_toEndOf="@+id/et_name"
+        app:layout_constraintTop_toTopOf="@id/et_name" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:text="Nombre del cliente"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_horizontal_02"
+        app:layout_constraintEnd_toStartOf="@+id/tv_id"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@id/guideline_vertical_center"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--<TextView
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -56,6 +73,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/guideline_vertical_center"
         app:layout_constraintTop_toTopOf="parent" />
+    -->
 
     <TextView
         android:id="@+id/textView"
@@ -91,7 +109,6 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_2"
         app:layout_constraintTop_toBottomOf="@id/textView" />
-
 
 
     <TextView
@@ -601,7 +618,7 @@
         app:layout_constraintGuide_percent="0.8" />
 
     <Spinner
-        android:id="@+id/spinner2"
+        android:id="@+id/sp_clientes"
         android:layout_width="231dp"
         android:layout_height="24dp"
         android:layout_marginTop="10dp"
