@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Ficha_cliente">
+
+    <TextView
+        android:id="@+id/tv_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="589A"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/guideline_vertical_center"
+        app:layout_constraintHorizontal_bias="0.5"
+
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre del cliente"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/tv_id"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="15dp" />
+
+    <TextView
+        android:id="@+id/textView_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:textSize="10sp"
+
+        android:text="DNI/NIE/passaporte:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_02"/>
+
+    <TextView
+        android:id="@+id/tv_dni"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:textStyle="bold"
+        android:textSize="10sp"
+
+        android:text="55555555K"
+        app:layout_constraintStart_toEndOf="@id/textView_2"
+        app:layout_constraintTop_toTopOf="@id/textView_2"/>
+
+    <TextView
+        android:id="@+id/textView_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:textSize="10sp"
+        android:text="Edad:"
+       app:layout_constraintStart_toEndOf="@id/tv_dni"
+        app:layout_constraintTop_toTopOf="@id/textView_2"/>
+
+    <TextView
+        android:id="@+id/tv_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:textStyle="bold"
+        android:textSize="10sp"
+        android:text="13"
+        app:layout_constraintStart_toEndOf="@id/textView_1"
+        app:layout_constraintTop_toTopOf="@id/textView_2"/>
+
+    <TextView
+        android:id="@+id/textView_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:textSize="10sp"
+        android:text="Teléfono:"
+        app:layout_constraintTop_toBottomOf="@id/textView_2"
+        app:layout_constraintStart_toStartOf="@id/textView_2"/>
+
+    <TextView
+        android:id="@+id/tv_tlf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:textStyle="bold"
+        android:textSize="10sp"
+        android:text="666666666"
+        app:layout_constraintStart_toEndOf="@id/textView_3"
+        app:layout_constraintTop_toTopOf="@id/textView_3"/>
+
+    <TextView
+        android:id="@+id/textView_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:textSize="10sp"
+        android:text="Tutor:"
+        app:layout_constraintTop_toTopOf="@id/textView_3"
+        app:layout_constraintStart_toEndOf="@id/textView_2"/>
+
+    <TextView
+        android:id="@+id/tv_tutor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:textStyle="bold"
+        android:textSize="10sp"
+        android:text="Javier Perez"
+        app:layout_constraintStart_toEndOf="@id/textView_4"
+        app:layout_constraintTop_toTopOf="@id/textView_3"/>
+
+    <TextView
+        android:id="@+id/textView_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:textSize="10sp"
+        android:text="Email:"
+        app:layout_constraintTop_toBottomOf="@id/textView_3"
+        app:layout_constraintStart_toStartOf="@id/textView_2"/>
+
+    <TextView
+        android:id="@+id/tv_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:text="eduardolucasmunoz@gshdmail.com"
+        app:layout_constraintStart_toEndOf="@id/textView_5"
+        app:layout_constraintTop_toTopOf="@id/textView_5"/>
+
+    <TextView
+        android:id="@+id/textView_6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Dirección:"
+        android:textSize="8sp"
+        app:layout_constraintTop_toBottomOf="@id/textView_5"
+        app:layout_constraintStart_toStartOf="@id/textView_2"/>
+
+    <TextView
+        android:id="@+id/textView_7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="15dp"
+        android:text="Calle:"
+        android:textSize="10sp"
+        app:layout_constraintTop_toBottomOf="@id/textView_6"
+        app:layout_constraintStart_toStartOf="@id/textView_2"/>
+
+    <TextView
+        android:id="@+id/tv_street"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:textStyle="bold"
+        android:textSize="10sp"
+        android:text="Illescas"
+        app:layout_constraintStart_toEndOf="@id/textView_7"
+        app:layout_constraintTop_toTopOf="@id/textView_7"/>
+
+    <TextView
+        android:id="@+id/textView_8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="C.P.:"
+        android:textSize="10sp"
+        app:layout_constraintStart_toEndOf="@id/tv_street"
+        app:layout_constraintTop_toTopOf="@id/textView_7"/>
+
+    <TextView
+        android:id="@+id/tv_cp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:textStyle="bold"
+        android:textSize="10sp"
+        android:text="28047"
+        app:layout_constraintStart_toEndOf="@id/textView_8"
+        app:layout_constraintTop_toTopOf="@id/textView_7"/>
+
+    <TextView
+        android:id="@+id/textView_9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="C.P.:"
+        android:textSize="10sp"
+        app:layout_constraintStart_toEndOf="@id/tv_cp"
+        app:layout_constraintTop_toTopOf="@id/textView_7"/>
+
+    <TextView
+        android:id="@+id/tv_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:textStyle="bold"
+        android:textSize="10sp"
+        android:text="Madrid"
+        app:layout_constraintStart_toEndOf="@id/textView_9"
+        app:layout_constraintTop_toTopOf="@id/textView_7"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline_vertical_center"
+        tools:layout_editor_absoluteX="372dp"
+        tools:layout_editor_absoluteY="29dp"
+        tools:srcCompat="@tools:sample/avatars" />
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_vertical_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_horizontal_02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_horizontal_04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_horizontal_06"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_horizontal_08"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
+</androidx.constraintlayout.widget.ConstraintLayout>
