@@ -80,16 +80,19 @@
         app:layout_constraintStart_toStartOf="@id/guideline_vertical_center"
         app:layout_constraintTop_toBottomOf="@id/textView" />
 
-    <TextView
-        android:id="@+id/tv_dni"
+    <EditText
+        android:id="@+id/et_dni"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="32dp"
         android:layout_marginStart="7dp"
+
         android:text="55555555K"
         android:textSize="10sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_2"
-        app:layout_constraintTop_toTopOf="@id/textView_2" />
+        app:layout_constraintTop_toBottomOf="@id/textView" />
+
+
 
     <TextView
         android:id="@+id/textView_1"
@@ -98,31 +101,44 @@
         android:layout_marginStart="25dp"
         android:text="Edad:"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/tv_dni"
+        app:layout_constraintStart_toEndOf="@id/et_dni"
         app:layout_constraintTop_toTopOf="@id/textView_2" />
 
-    <TextView
-        android:id="@+id/tv_age"
+    <EditText
+        android:id="@+id/et_age"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="32dp"
         android:layout_marginStart="7dp"
         android:text="13"
         android:textSize="10sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_1"
-        app:layout_constraintTop_toTopOf="@id/textView_2" />
+        app:layout_constraintTop_toTopOf="@id/et_dni" />
+
 
     <TextView
         android:id="@+id/textView_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="13dp"
         android:text="Teléfono:"
         android:textSize="10sp"
         app:layout_constraintStart_toStartOf="@id/textView_2"
         app:layout_constraintTop_toBottomOf="@id/textView_2" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_tel"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="5dp"
+        android:text="666666666"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_3"
+        app:layout_constraintTop_toBottomOf="@id/textView_2" />
+
+    <!--<TextView
         android:id="@+id/tv_tlf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -132,6 +148,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_3"
         app:layout_constraintTop_toTopOf="@id/textView_3" />
+        -->
 
     <TextView
         android:id="@+id/textView_4"
@@ -140,10 +157,20 @@
         android:layout_marginStart="25dp"
         android:text="Tutor:"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/textView_2"
+        app:layout_constraintStart_toEndOf="@id/et_tel"
         app:layout_constraintTop_toTopOf="@id/textView_3" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_tutor"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="Javier Perez"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_4"
+        app:layout_constraintTop_toTopOf="@id/et_tel" />
+    <!--<TextView
         android:id="@+id/tv_tutor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -153,18 +180,31 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_4"
         app:layout_constraintTop_toTopOf="@id/textView_3" />
+        -->
 
     <TextView
         android:id="@+id/textView_5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="13dp"
         android:text="Email:"
         android:textSize="10sp"
         app:layout_constraintStart_toStartOf="@id/textView_2"
         app:layout_constraintTop_toBottomOf="@id/textView_3" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_mail"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="4dp"
+        android:text="eduardolucasmunoz@gshdmail.com"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_5"
+        app:layout_constraintTop_toBottomOf="@id/textView_3" />
+
+    <!--<TextView
         android:id="@+id/tv_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -174,14 +214,15 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_5"
         app:layout_constraintTop_toTopOf="@id/textView_5" />
+        -->
 
     <TextView
         android:id="@+id/textView_6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:text="Dirección:"
-        android:textSize="8sp"
+        android:textSize="10sp"
         app:layout_constraintStart_toStartOf="@id/textView"
         app:layout_constraintTop_toBottomOf="@id/textView_5" />
 
@@ -190,13 +231,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:text="Calle:"
         android:textSize="10sp"
         app:layout_constraintStart_toStartOf="@id/textView_6"
         app:layout_constraintTop_toBottomOf="@id/textView_6" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_street"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="Illescas"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_7"
+        app:layout_constraintTop_toBottomOf="@id/textView_6" />
+    <!--<TextView
         android:id="@+id/tv_street"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -206,6 +257,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_7"
         app:layout_constraintTop_toTopOf="@id/textView_7" />
+        -->
 
     <TextView
         android:id="@+id/textView_8"
@@ -214,10 +266,20 @@
         android:layout_marginStart="20dp"
         android:text="C.P.:"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/tv_street"
+        app:layout_constraintStart_toEndOf="@id/et_street"
         app:layout_constraintTop_toTopOf="@id/textView_7" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_cp"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="28047"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_8"
+        app:layout_constraintTop_toTopOf="@id/et_street" />
+    <!--<TextView
         android:id="@+id/tv_cp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -227,6 +289,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_8"
         app:layout_constraintTop_toTopOf="@id/textView_7" />
+        -->
 
     <TextView
         android:id="@+id/textView_9"
@@ -235,10 +298,21 @@
         android:layout_marginStart="20dp"
         android:text="Ciudad:"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/tv_cp"
+        app:layout_constraintStart_toEndOf="@id/et_cp"
         app:layout_constraintTop_toTopOf="@id/textView_7" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_city"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="Madrid"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_9"
+        app:layout_constraintTop_toTopOf="@id/et_cp" />
+
+    <!--<TextView
         android:id="@+id/tv_city"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -248,6 +322,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_9"
         app:layout_constraintTop_toTopOf="@id/textView_7" />
+        -->
 
     <TextView
         android:id="@+id/textview_10"
@@ -278,23 +353,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="20dp"
         android:text="Pruebas diagnósticas"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="@id/guideline_vertical_center"
-        app:layout_constraintBottom_toTopOf="@id/guideline_horizontal_06" />
+        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_06" />
 
     <TextView
         android:id="@+id/textView_13"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="8dp"
         android:text="Graduado:"
         android:textSize="10sp"
         app:layout_constraintStart_toStartOf="@id/textView_2"
-        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_06" />
+        app:layout_constraintTop_toBottomOf="@id/textView_12" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_graduado"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="true"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_13"
+        app:layout_constraintTop_toBottomOf="@id/textView_12" />
+
+    <!--<TextView
         android:id="@+id/tv_graduado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -304,6 +389,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_13"
         app:layout_constraintTop_toTopOf="@id/textView_13" />
+        -->
 
     <TextView
         android:id="@+id/textView_14"
@@ -312,10 +398,21 @@
         android:layout_marginStart="20dp"
         android:text="Última graduación:"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/tv_graduado"
+        app:layout_constraintStart_toEndOf="@id/et_graduado"
         app:layout_constraintTop_toTopOf="@id/textView_13" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_fecha_graduacion"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="13/02/2024"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_14"
+        app:layout_constraintTop_toTopOf="@id/et_graduado" />
+
+    <!--<TextView
         android:id="@+id/tv_fecha_graduacion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -325,6 +422,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_14"
         app:layout_constraintTop_toTopOf="@id/textView_14" />
+        -->
 
     <TextView
         android:id="@+id/textView_15"
@@ -333,10 +431,20 @@
         android:layout_marginStart="20dp"
         android:text="Tipo de lente:"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/tv_fecha_graduacion"
+        app:layout_constraintStart_toEndOf="@id/et_fecha_graduacion"
         app:layout_constraintTop_toTopOf="@id/textView_13" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_tipo_lente"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="Lentillas"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_15"
+        app:layout_constraintTop_toTopOf="@id/et_fecha_graduacion" />
+    <!--<TextView
         android:id="@+id/tv_tipo_lente"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -346,18 +454,30 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_15"
         app:layout_constraintTop_toTopOf="@id/textView_15" />
+        -->
 
     <TextView
         android:id="@+id/textView_16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="18dp"
         android:text="Test TVPS:"
         android:textSize="10sp"
         app:layout_constraintStart_toStartOf="@id/textView_2"
         app:layout_constraintTop_toBottomOf="@+id/textView_13" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_testsiono"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="10"
+        android:text="true"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_16"
+        app:layout_constraintTop_toBottomOf="@id/textView_13" />
+    <!--<TextView
         android:id="@+id/tv_testsiono"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -367,6 +487,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_16"
         app:layout_constraintTop_toTopOf="@id/textView_16" />
+        -->
 
     <TextView
         android:id="@+id/textView_17"
@@ -375,10 +496,21 @@
         android:layout_marginStart="20dp"
         android:text="Fecha:"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/tv_testsiono"
+        app:layout_constraintStart_toEndOf="@id/et_testsiono"
         app:layout_constraintTop_toTopOf="@id/textView_16" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_fecha_TVPS"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="13/02/2024"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_17"
+        app:layout_constraintTop_toTopOf="@id/et_testsiono" />
+
+    <!--<TextView
         android:id="@+id/tv_fecha_TVPS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -388,6 +520,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_17"
         app:layout_constraintTop_toTopOf="@id/textView_17" />
+        -->
 
     <TextView
         android:id="@+id/textView_18"
@@ -396,10 +529,21 @@
         android:layout_marginStart="20dp"
         android:text="Proxima revisión TVPS:"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/tv_fecha_TVPS"
+        app:layout_constraintStart_toEndOf="@id/et_fecha_TVPS"
         app:layout_constraintTop_toTopOf="@id/textView_17" />
 
-    <TextView
+    <EditText
+        android:id="@+id/et_fecha_proxTVPS"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginStart="7dp"
+        android:text="13/02/2024"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/textView_18"
+        app:layout_constraintTop_toTopOf="@id/et_testsiono" />
+
+    <!--<TextView
         android:id="@+id/tv_fecha_proxTVPS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -409,6 +553,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_18"
         app:layout_constraintTop_toTopOf="@id/textView_18" />
+        -->
 
     <ImageView
         android:id="@+id/imageView"
