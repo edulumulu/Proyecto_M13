@@ -89,7 +89,7 @@ public class GestionBBDD {
         }.execute();
     }
 
-    /*public interface ClienteCallback {
+    public interface ClienteCallback {
         void onClientesListados(ArrayList<Cliente> listaClientes);
     }
 
@@ -145,5 +145,188 @@ public class GestionBBDD {
                 }
             }
         }.execute();
-    }*/
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    public void insertarCliente(Context context, Cliente cliente) {
+        new AsyncTask<Void, Void, String>() {
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    URL url = new URL("http://ipservidor/nombrearchivo_insertar.php");
+                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+                    conexion.setRequestMethod("POST");
+                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
+                    conexion.setDoOutput(true);
+
+                    // Crear el objeto JSON con los datos del cliente
+                    JSONObject jsonInsertar = new JSONObject();
+                    jsonInsertar.put("nombre", cliente.getNombre());
+                    jsonInsertar.put("apellido", cliente.getApellido());
+                    jsonInsertar.put("email", cliente.getEmail());
+
+                    // Enviar el objeto JSON como cuerpo de la solicitud
+                    OutputStream os = conexion.getOutputStream();
+                    os.write(jsonInsertar.toString().getBytes("UTF-8"));
+                    os.close();
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    br.close();
+                    return response.toString();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            protected void onPostExecute(String response) {
+                if (response != null) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        String mensaje = jsonResponse.getString("mensaje");
+
+                        if ("correcto".equals(estado)) {
+                            Toast.makeText(context, "Cliente insertado correctamente", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
+                }
+            }
+        }.execute();
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    public void modificarCliente(Context context, Cliente cliente) {
+        new AsyncTask<Void, Void, String>() {
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    URL url = new URL("http://ipservidor/nombrearchivo_modificar.php");
+                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+                    conexion.setRequestMethod("POST");
+                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
+                    conexion.setDoOutput(true);
+
+                    // Crear el objeto JSON con los datos del cliente
+                    JSONObject jsonModificar = new JSONObject();
+                    jsonModificar.put("nombre", cliente.getNombre());
+                    jsonModificar.put("apellido", cliente.getApellido());
+                    jsonModificar.put("email", cliente.getEmail());
+
+                    // Enviar el objeto JSON como cuerpo de la solicitud
+                    OutputStream os = conexion.getOutputStream();
+                    os.write(jsonModificar.toString().getBytes("UTF-8"));
+                    os.close();
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    br.close();
+                    return response.toString();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            protected void onPostExecute(String response) {
+                if (response != null) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        String mensaje = jsonResponse.getString("mensaje");
+
+                        if ("correcto".equals(estado)) {
+                            Toast.makeText(context, "Cliente modificado correctamente", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
+                }
+            }
+        }.execute();
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    public void eliminarCliente(Context context, String idUsuario) {
+        new AsyncTask<Void, Void, String>() {
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    URL url = new URL("http://ipservidor/nombrearchivo_eliminar.php");
+                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+                    conexion.setRequestMethod("POST");
+                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
+                    conexion.setDoOutput(true);
+
+                    JSONObject jsonEliminar = new JSONObject();
+                    jsonEliminar.put("idUsuario", idUsuario);
+
+                    OutputStream os = conexion.getOutputStream();
+                    os.write(jsonEliminar.toString().getBytes("UTF-8"));
+                    os.close();
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    br.close();
+                    return response.toString();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            protected void onPostExecute(String response) {
+                if (response != null) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        String mensaje = jsonResponse.getString("mensaje");
+
+                        if ("correcto".equals(estado)) {
+                            Toast.makeText(context, "Cliente eliminado correctamente", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
+                }
+            }
+        }.execute();
+    }
 }

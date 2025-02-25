@@ -43,5 +43,19 @@ public class Ficha_cliente extends AppCompatActivity {
                 }
             }
         });*/
+
+        /*Codigo para insertar un cliente
+        Cliente nuevoCliente = new Cliente("usuario123", "contrasena123", "Juan", "Perez", "juan.perez@example.com");
+        GestionBBDD.insertarCliente(context, nuevoCliente);
+         */
+
+        /*Codigo para modificar un cliente
+        Cliente clienteModificado = new Cliente("usuario123", "nuevaContrasena", "Juan", "Perez", "juan.perez@nuevocliente.com");
+        GestionBBDD.modificarCliente(context, clienteModificado);
+         */
+
+        /*Codigo para eliminar un cliente
+        GestionBBDD.eliminarCliente(context, idUsuario);
+         */
     }
 }
