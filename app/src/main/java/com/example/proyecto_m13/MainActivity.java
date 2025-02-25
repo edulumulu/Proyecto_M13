@@ -1,18 +1,13 @@
 package com.example.proyecto_m13;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,12 +42,12 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "No puedes dejar ningún campo vacío", Toast.LENGTH_LONG).show();
         }else {
             /* si rellenan los datos lanzariamos un método que comprueba las credenciales con la BBDD
-            gestion_BBDD.comprobarCredenciales();
+            gestionBBDD.comprobarCredenciales();
             En este caso abriremos la siguiente actividad para empezar a hacer pruebas
             Y le paso el usuario por si quieres mostrar el nombre arriba a la izquierda*/
             Intent intent = new Intent(MainActivity.this,Ficha_cliente.class);
-            startActivity(intent);
             intent.putExtra("usuario", usuario);
+            startActivity(intent);
         }
     }
 }
