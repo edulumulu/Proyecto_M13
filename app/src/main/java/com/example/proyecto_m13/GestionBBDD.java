@@ -57,7 +57,7 @@ public class GestionBBDD {
                 }
             }
 
-            protected void onPostExecute (Context context, String response){
+            protected void onPostExecute (String response){
                 if (response != null){
                     try{
                         JSONObject jsonResponse = new JSONObject(response);
@@ -67,8 +67,8 @@ public class GestionBBDD {
                         if ("correcto".equals(estado)){
                             Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(context,Ficha_cliente.class);
-                            context.startActivity(intent);
                             intent.putExtra("usuario", usuario);
+                            context.startActivity(intent);
 
                             if (context instanceof android.app.Activity) {
                                 android.app.Activity activity = (android.app.Activity) context;
