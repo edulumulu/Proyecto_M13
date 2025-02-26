@@ -1,6 +1,8 @@
 package com.example.proyecto_m13;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -38,6 +40,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 
 
@@ -75,7 +78,30 @@ public class Ficha_cliente extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
 
-        /*Código que obtiene un arraylist de clientes, y obtiene los datos de cada cliente
+
+
+        /*Codigo para insertar un cliente
+        Cliente nuevoCliente = new Cliente("usuario123", "contrasena123", "Juan", "Perez", "juan.perez@example.com");
+        GestionBBDD.insertarCliente(context, nuevoCliente);
+         */
+
+
+
+        buscar_clientes = findViewById(R.id.autoct_buscador);
+        //sp_clientes = findViewById(R.id.sp_clientes);
+        tv_user = findViewById(R.id.tv_user);
+        title_seleciona = findViewById(R.id.textview_10);
+        title_acciones = findViewById(R.id.textview_11);
+        bt_insert = findViewById(R.id.bt_insert);
+        bt_update = findViewById(R.id.bt_update);
+        bt_delete = findViewById(R.id.bt_delete);
+        bt_test = findViewById(R.id.bt_test);
+        ib_exit = findViewById(R.id.ib_exit);
+        inicializar_componentes();
+
+
+        // Metodo que carga la lista en el arrayList
+         /*Código que obtiene un arraylist de clientes, y obtiene los datos de cada cliente
         y los mete en un arrayList de strings para mostrarlo en el adaptador
         GestionBBDD gestionBBDD = new GestionBBDD();
         gestionBBDD.listarClientes(this, new GestionBBDD.ClienteCallback() {
@@ -96,31 +122,6 @@ public class Ficha_cliente extends AppCompatActivity {
                 }
             }
         });*/
-
-        /*Codigo para insertar un cliente
-        Cliente nuevoCliente = new Cliente("usuario123", "contrasena123", "Juan", "Perez", "juan.perez@example.com");
-        GestionBBDD.insertarCliente(context, nuevoCliente);
-         */
-
-
-
-        /*Codigo para eliminar un cliente
-        GestionBBDD.eliminarCliente(context, idUsuario);
-         */
-
-        buscar_clientes = findViewById(R.id.autoct_buscador);
-        //sp_clientes = findViewById(R.id.sp_clientes);
-        tv_user = findViewById(R.id.tv_user);
-        title_seleciona = findViewById(R.id.textview_10);
-        title_acciones = findViewById(R.id.textview_11);
-        bt_insert = findViewById(R.id.bt_insert);
-        bt_update = findViewById(R.id.bt_update);
-        bt_delete = findViewById(R.id.bt_delete);
-        bt_test = findViewById(R.id.bt_test);
-        ib_exit = findViewById(R.id.ib_exit);
-        inicializar_componentes();
-
-
         lista_clientes = cargar_lista_empleados();
 
         actualizar_nombres_buscador(lista_clientes, buscar_clientes);
@@ -251,7 +252,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, false, null, null, false, street, cp, city);
 
-                if (modificarClienteEnLista(cliente_selecionado_id, cli)) {
+                if (modificar_Cliente_EnLista(cliente_selecionado_id, cli)) {
 
                     //Modificar base de datos
                     /*Codigo para modificar un cliente
@@ -275,31 +276,69 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_modificar_salir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                title_age.setText("Edad");
                 cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id));
+                title_age.setText("Edad");
+                bt_modificar_salir.setVisibility(View.GONE);
+                bt_modificar_aceptar.setVisibility(View.GONE);
+
+            }
+        });
+
+        bt_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(Ficha_cliente.this)
+                        .setTitle("Confirmación")  // Título del diálogo
+                        .setMessage("¿Estás seguro de que uqiere eliminar el cliente "+obtener_cliente_por_id(cliente_selecionado_id).getName()+" "+obtener_cliente_por_id(cliente_selecionado_id).getSurname()+"?")  // Mensaje que se mostrará
+                        .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Acción a realizar si el usuario presiona "Sí"
+                                if(eliminar_Cliente_PorId(cliente_selecionado_id)){
+
+                                    //Método de eliminacion BBDD
+                                     /*Codigo para eliminar un cliente
+                                        GestionBBDD.eliminarCliente(context, idUsuario);
+                                    */
+
+                                    Toast.makeText(getApplicationContext(), "Cliente borrado", Toast.LENGTH_SHORT).show();
+                                    actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                                    campos_ficha_visibilidad(false);
+                                }
+
+
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Acción a realizar si el usuario presiona "No"
+                                dialog.dismiss();  // Cierra el diálogo
+                            }
+                        })
+                        .show();
             }
         });
 
 
     }
 
-    public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView buscador) {
-
-        String[] nombres = new String[lista.size()];
-        for (int i = 0; i < lista.size(); i++) {
-            Cliente cli = lista.get(i);
-            //nombres[i] = cli.getName();
-            nombres[i] = cli.getName() + " " + cli.getSurname();
-
-            //AutoCompletText
-            ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, nombres);
-            buscador.setAdapter(adaptador);
-            buscador.setThreshold(1);
-
+    /**
+     * Método que elimina un cliente del array list por id
+     * @param clienteId
+     * @return
+     */
+    public boolean eliminar_Cliente_PorId(int clienteId) {
+        Iterator<Cliente> iterator = lista_clientes.iterator();
+        while (iterator.hasNext()) {
+            Cliente cliente = iterator.next();
+            if (cliente.getId() == clienteId) {
+                iterator.remove();
+                return true;
+            }
         }
+        return false;
     }
-
-
     /**
      * Metodo que retorna un cliente del ArrayList a partir de su id
      * @param id
@@ -347,11 +386,11 @@ public class Ficha_cliente extends AppCompatActivity {
                 title_fecha_gradu.setVisibility(View.GONE);
                 tv_tipo_lente.setVisibility(View.GONE);
                 title_tipo_lente.setVisibility(View.GONE);
-          }
+            }
 
 
-           tv_test_tvps.setText(cli.getGraduate() ? "True" : "False");
-           if (cli.getTest_TVPS()) {
+            tv_test_tvps.setText(cli.getGraduate() ? "True" : "False");
+            if (cli.getTest_TVPS()) {
                 tv_fecha_test_TVPS.setText("pruebaaaaaa");
                 tv_next_text.setText("pruebaaaaa");
                 //tv_fecha_test_TVPS.setText(cli.get_date_test_TVPS);
@@ -366,6 +405,53 @@ public class Ficha_cliente extends AppCompatActivity {
             Log.d("cliente nullo", "error cliente nulo - funcion cargar ficha cliente: ");
         }
     }
+
+    /**
+     * Modifica los nombres de los clientes en el buscador según se haya actualizado la lista de clientes
+     * @param lista
+     * @param buscador
+     */
+    public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView buscador) {
+
+        String[] nombres = new String[lista.size()];
+        for (int i = 0; i < lista.size(); i++) {
+            Cliente cli = lista.get(i);
+            //nombres[i] = cli.getName();
+            nombres[i] = cli.getName() + " " + cli.getSurname();
+
+            //AutoCompletText
+            ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, nombres);
+            buscador.setAdapter(adaptador);
+            buscador.setThreshold(1);
+
+        }
+    }
+
+
+    /**
+     * Modifica el cliente modificado en el Arraylista (lista de clientes en memoria)
+     * @param clienteId
+     * @param nuevoCliente
+     * @return
+     */
+    public boolean modificar_Cliente_EnLista(int clienteId, Cliente nuevoCliente) {
+
+        boolean ok = false;
+        for (int i = 0; i < lista_clientes.size(); i++) {
+            Cliente cliente = lista_clientes.get(i);
+
+            // Si encontramos al cliente con el ID correspondiente
+            if (cliente.getId() == clienteId) {
+                // Actualizar el cliente con los nuevos datos
+                lista_clientes.set(i, nuevoCliente);  // Reemplazar el cliente en la lista
+                ok = true;
+                break;  // Salir del bucle cuando encontramos al cliente
+            }
+        }
+        return ok;
+    }
+
+
 
     /**
      * Metodo que inicializa todos los componentes
@@ -504,7 +590,7 @@ public class Ficha_cliente extends AppCompatActivity {
             lista.add(new Cliente(1, "Eduardo", "Lucas", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco",true ,"10/05/2019", "gafas", false,  "Illescas 27", 28047, "Madird" ));
             lista.add(new Cliente(2, "Carlos", "Herrera", "520546567L", dateFormat.parse("06/02/2019"), 123456789, "paco@gmail", "Antonio Lucas",false ,null, null, false,  "Valmo 27", 28047, "Barcelona" ));
             lista.add(new Cliente(3, "Bibiana", "Martinez", "520546123G", dateFormat.parse("10/11/2022"), 123456789, "sara@gmail", null,true ,"10/11/2022", "lentillas", true,  "Oca 27", 28047, "Lugo" ));
-            lista.add(new Cliente(1, "Eduardo", "Jose", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco",true ,"10/05/2019", "gafas", false,  "Illescas 27", 28047, "Madird" ));
+            lista.add(new Cliente(4, "Eduardo", "Jose", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco",true ,"10/05/2019", "gafas", false,  "Illescas 27", 28047, "Madird" ));
 
             return lista;
         }catch (ParseException e){
@@ -581,29 +667,6 @@ public class Ficha_cliente extends AppCompatActivity {
         );
 
         datePickerDialog.show();
-    }
-
-    /**
-     * Modifica el cliente modificado en el Arraylista (lista de clientes en memoria)
-     * @param clienteId
-     * @param nuevoCliente
-     * @return
-     */
-    public boolean modificarClienteEnLista(int clienteId, Cliente nuevoCliente) {
-
-       boolean ok = false;
-        for (int i = 0; i < lista_clientes.size(); i++) {
-            Cliente cliente = lista_clientes.get(i);
-
-            // Si encontramos al cliente con el ID correspondiente
-            if (cliente.getId() == clienteId) {
-                // Actualizar el cliente con los nuevos datos
-                lista_clientes.set(i, nuevoCliente);  // Reemplazar el cliente en la lista
-                ok = true;
-                break;  // Salir del bucle cuando encontramos al cliente
-            }
-        }
-        return ok;
     }
 
 
