@@ -2,9 +2,12 @@ package com.example.proyecto_m13;
 
 import android.app.DatePickerDialog;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,6 +25,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -53,10 +57,11 @@ public class Ficha_cliente extends AppCompatActivity {
     private Button bt_insert, bt_delete, bt_update, bt_test;
     private Button bt_modificar_aceptar, bt_modificar_salir;
     private ImageButton ib_exit;
+    private ImageView iv_foto;
 
     //Variables parte derecha
 
-    private TextView tv_id, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail,title_direc, title_street, title_cp, title_city, title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_date_test, title_next_date_test;
+    private TextView tv_id, title_id, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail,title_direc, title_street, title_cp, title_city, title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_date_test, title_next_date_test;
     private EditText et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city;
     private EditText et_graduacion, et_fecha_gradu, et_tipo_lente, et_test_tvps, et_fecha_test_TVPS, et_next_text;
     private TextView tv_graduacion, tv_fecha_gradu, tv_tipo_lente, tv_test_tvps, tv_fecha_test_TVPS, tv_next_text;
@@ -97,34 +102,52 @@ public class Ficha_cliente extends AppCompatActivity {
         GestionBBDD.insertarCliente(context, nuevoCliente);
          */
 
-        /*Codigo para modificar un cliente
-        Cliente clienteModificado = new Cliente("usuario123", "nuevaContrasena", "Juan", "Perez", "juan.perez@nuevocliente.com");
-        GestionBBDD.modificarCliente(context, clienteModificado);
-         */
+
 
         /*Codigo para eliminar un cliente
         GestionBBDD.eliminarCliente(context, idUsuario);
          */
 
+        buscar_clientes = findViewById(R.id.autoct_buscador);
+        //sp_clientes = findViewById(R.id.sp_clientes);
+        tv_user = findViewById(R.id.tv_user);
+        title_seleciona = findViewById(R.id.textview_10);
+        title_acciones = findViewById(R.id.textview_11);
+        bt_insert = findViewById(R.id.bt_insert);
+        bt_update = findViewById(R.id.bt_update);
+        bt_delete = findViewById(R.id.bt_delete);
+        bt_test = findViewById(R.id.bt_test);
+        ib_exit = findViewById(R.id.ib_exit);
         inicializar_componentes();
-        campos_ficha_visibilidad(false);
+
 
         lista_clientes = cargar_lista_empleados();
-        String [] nombres = new String[lista_clientes.size()];
-        int contador = 0;
-        for (Cliente cli : lista_clientes){
-            nombres[contador] = cli.getName() + " " +cli.getSurname();
-            contador ++;
+
+        if (lista_clientes == null || lista_clientes.isEmpty()) {
+            Toast.makeText(this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        //Cargar spinner
-        //ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombres);
-        //sp_clientes.setAdapter(adaptador);
+        String[] nombres = new String[lista_clientes.size()];
+        for (int i = 0; i < lista_clientes.size(); i++) {
+            Cliente cli = lista_clientes.get(i);
+            //nombres[i] = cli.getName();
+            nombres[i] = cli.getName() + " " + cli.getSurname();
+
+        }
 
         //AutoCompletText
         ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, nombres);
         buscar_clientes.setAdapter(adaptador);
         buscar_clientes.setThreshold(1);
+
+        if(!buscar_clientes.isSelected()){
+                campos_ficha_visibilidad(false);
+        }
+
+        //Cargar spinner
+        //ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombres);
+        //sp_clientes.setAdapter(adaptador);
 
         buscar_clientes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -133,50 +156,18 @@ public class Ficha_cliente extends AppCompatActivity {
                 for (Cliente cli : lista_clientes){
                     if(eleccion.equalsIgnoreCase(cli.getName() + " " +cli.getSurname())){
                         cliente_selecionado = cli.getId();
+                            Log.d("Cliente seleccionado", "ID: " + cliente_selecionado);
                         //Hago visible los campos de la ficha y cargo los datos
-                        campos_ficha_visibilidad(true);
+                        cargar_cliente_en_ficha(cli);
                         campos_ficha_editables(false);
-                        et_name.setText(cli.getName());
-                        et_surname.setText(cli.getSurname());
-                        et_dni.setText(cli.getDni());
-                        et_city.setText(cli.getCiudad());
-                        et_cp.setText(cli.getCp());
-                        et_tlf.setText(cli.getTlf());
-                        et_mail.setText(cli.getEmail());
-                        et_tutor.setText(cli.getTutor());
-                        et_street.setText(cli.getStreet());
-                        et_age.setText(cli.calcularEdad());
-
-
-                        et_graduacion.setText(cli.getGraduate() ? "True" : "False");
-                        if(cli.getGraduate()){
-                            tv_fecha_gradu.setText(cli.getDate_graduacion());
-                            tv_tipo_lente.setText(cli.getTipo_lentes());
-                        }else{
-                            tv_fecha_gradu.setVisibility(View.GONE);
-                            title_fecha_gradu.setVisibility(View.GONE);
-                            tv_tipo_lente.setVisibility(View.GONE);
-                            title_tipo_lente.setVisibility(View.GONE);
-                        }
-
-                        et_graduacion.setText(cli.getGraduate() ? "True" : "False");
-                        if(cli.getTest_TVPS()){
-                            tv_fecha_test_TVPS.setText("pruebaaaaaa");
-                            tv_next_text.setText("pruebaaaaa");
-                            //tv_fecha_test_TVPS.setText(cli.get_date_test_TVPS);
-                            //tv_next_text.setText(cli.get_next_date_TVPS);
-                        }else{
-                            tv_fecha_test_TVPS.setVisibility(View.GONE);
-                            title_date_test.setVisibility(View.GONE);
-                            tv_next_text.setVisibility(View.GONE);
-                            title_next_date_test.setVisibility(View.GONE);
-                        }
-
+                            break;
                     }
 
                 }
             }
         });
+
+
 
         //Click botones
         bt_insert.setOnClickListener(new View.OnClickListener() {
@@ -241,15 +232,14 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 if(modificarClienteEnLista(cliente_selecionado, cli)){
                     //Modificar base de datos
+                    /*Codigo para modificar un cliente
+                    Cliente clienteModificado = new Cliente("usuario123", "nuevaContrasena", "Juan", "Perez", "juan.perez@nuevocliente.com");
+                    GestionBBDD.modificarCliente(context, clienteModificado);
+                     */
+
                 }
 
-
-
-
             }
-                //String age = et_name.getText().toString();
-                //String tutor = et_tutor.getText().toString();
-
 
         });
 
@@ -257,28 +247,91 @@ public class Ficha_cliente extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 title_age.setText("Edad");
+                cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado));
             }
         });
 
         
     }
+
+    /**
+     * Metodo que retorna un cliente del ArrayList a partir de su id
+     * @param id
+     * @return
+     */
+    public Cliente obtener_cliente_por_id(int id){
+        for (Cliente cliente : lista_clientes) {
+            if (cliente.getId() == id) {
+                return cliente; // Retorna el cliente si encuentra coincidencia
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Metodo que muestra los datos de un cliente en la ficha
+     * @param cli
+     */
+    public void cargar_cliente_en_ficha(Cliente cli){
+
+        if (cli != null) {
+            //Hago visible los campos de la ficha y cargo los datos
+            campos_ficha_visibilidad(true);
+            campos_ficha_editables(false);
+
+            et_name.setText(cli.getName());
+            et_surname.setText(cli.getSurname());
+            et_dni.setText(cli.getDni());
+            et_city.setText(cli.getCiudad());
+            et_cp.setText(String.valueOf(cli.getCp()));
+            et_tlf.setText(String.valueOf(cli.getTlf()));
+            et_mail.setText(cli.getEmail());
+            et_tutor.setText(cli.getTutor());
+            et_street.setText(cli.getStreet());
+            et_age.setText(String.valueOf(cli.calcularEdad()));
+
+
+            tv_graduacion.setText(cli.getGraduate() ? "True" : "False");
+
+            if (cli.getGraduate()) {
+                tv_fecha_gradu.setText(cli.getDate_graduacion());
+                tv_tipo_lente.setText(cli.getTipo_lentes());
+            } else {
+                tv_fecha_gradu.setVisibility(View.GONE);
+                title_fecha_gradu.setVisibility(View.GONE);
+                tv_tipo_lente.setVisibility(View.GONE);
+                title_tipo_lente.setVisibility(View.GONE);
+          }
+
+
+           tv_test_tvps.setText(cli.getGraduate() ? "True" : "False");
+           if (cli.getTest_TVPS()) {
+                tv_fecha_test_TVPS.setText("pruebaaaaaa");
+                tv_next_text.setText("pruebaaaaa");
+                //tv_fecha_test_TVPS.setText(cli.get_date_test_TVPS);
+                //tv_next_text.setText(cli.get_next_date_TVPS);
+            } else {
+                tv_fecha_test_TVPS.setVisibility(View.GONE);
+                title_date_test.setVisibility(View.GONE);
+                tv_next_text.setVisibility(View.GONE);
+                title_next_date_test.setVisibility(View.GONE);
+            }
+        }else {
+            Log.d("cliente nullo", "error cliente nulo - funcion cargar ficha cliente: ");
+        }
+    }
+
+    /**
+     * Metodo que inicializa todos los componentes
+     */
     public void inicializar_componentes(){
         //Inicializo los componentes parte izquierda
 
 
-        tv_user = findViewById(R.id.tv_user);
-        title_seleciona = findViewById(R.id.textview_10);
-        title_acciones = findViewById(R.id.textview_11);
-        bt_insert = findViewById(R.id.bt_insert);
-        bt_update = findViewById(R.id.bt_update);
-        bt_delete = findViewById(R.id.bt_delete);
-        bt_test = findViewById(R.id.bt_test);
         bt_modificar_aceptar =findViewById(R.id.bt_aceptar);
         bt_modificar_salir = findViewById(R.id.bt_salir);
         bt_modificar_aceptar.setVisibility(View.GONE);
         bt_modificar_salir.setVisibility(View.GONE);
-        buscar_clientes = findViewById(R.id.autoct_buscador);
-        //sp_clientes = findViewById(R.id.sp_clientes);
 
         //Inicializo componentes de la derecha
         title_datos_person = findViewById(R.id.textView);
@@ -298,11 +351,12 @@ public class Ficha_cliente extends AppCompatActivity {
         title_test_TVPS= findViewById(R.id.textView_16);
         title_date_test= findViewById(R.id.textView_17);
         title_next_date_test= findViewById(R.id.textView_18);
+        title_id = findViewById(R.id.textView_19);
 
         tv_id= findViewById(R.id.tv_id);
         et_dni = findViewById(R.id.et_dni);
         et_age= findViewById(R.id.et_age);
-        et_tlf= findViewById(R.id.et_mail);
+        et_tlf= findViewById(R.id.et_tel);
         et_tutor= findViewById(R.id.et_tutor);
         et_surname=findViewById(R.id.et_surname);
         et_name= findViewById(R.id.et_name);
@@ -316,6 +370,10 @@ public class Ficha_cliente extends AppCompatActivity {
         tv_test_tvps= findViewById(R.id.tv_testsiono);
         tv_fecha_test_TVPS= findViewById(R.id.tv_fecha_TVPS);
         tv_next_text= findViewById(R.id.tv_fecha_proxTVPS);
+        iv_foto = findViewById(R.id.iv_foto);
+        iv_foto.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.foto));
+
+
 
         /*et_graduacion= findViewById(R.id.et_graduado);
         et_fecha_gradu= findViewById(R.id.et_fecha_graduacion);
@@ -326,27 +384,32 @@ public class Ficha_cliente extends AppCompatActivity {
 
     }
 
+    /**
+     * Metodo para modificar que los campos de la ficha sean visibles o no
+     * @param mostrar
+     */
     public void campos_ficha_visibilidad(Boolean mostrar){
         int visibility = mostrar ? View.VISIBLE : View.GONE;
 
-        tv_id.setVisibility(visibility);
-        et_dni.setVisibility(visibility);
-        et_age.setVisibility(visibility);
-        et_tlf.setVisibility(visibility);
-        et_tutor.setVisibility(visibility);
-        et_name.setVisibility(visibility);
-        et_surname.setVisibility(visibility);
-        et_mail.setVisibility(visibility);
-        et_street.setVisibility(visibility);
-        et_cp.setVisibility(visibility);
-        et_city.setVisibility(visibility);
+        EditText[] editTexts = new EditText[]{
+                et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city
+        };
 
-        tv_graduacion.setVisibility(visibility);
-        tv_fecha_gradu.setVisibility(visibility);
-        tv_tipo_lente.setVisibility(visibility);
-        tv_test_tvps.setVisibility(visibility);
-        tv_fecha_test_TVPS.setVisibility(visibility);
-        tv_next_text.setVisibility(visibility);
+        TextView[] textviews = new TextView[]{
+                tv_id, tv_graduacion, tv_fecha_gradu, tv_tipo_lente,  tv_test_tvps, tv_fecha_test_TVPS, tv_next_text, title_datos_person,
+                title_dni, title_age, title_tlf, title_tutor,  title_mail, title_direc, title_street, title_cp, title_city, title_purebas,
+                title_graduacion, title_fecha_gradu,  title_tipo_lente, title_test_TVPS, title_date_test, title_next_date_test, title_id
+        };
+
+        for (EditText editText : editTexts) {
+            editText.setVisibility(visibility);
+        }
+        for (TextView textv : textviews){
+            textv.setVisibility(visibility);
+        }
+
+        iv_foto.setVisibility(visibility);
+
 
         /*et_graduacion.setVisibility(visibility);
         et_fecha_gradu.setVisibility(visibility);
@@ -356,30 +419,46 @@ public class Ficha_cliente extends AppCompatActivity {
         et_next_text.setVisibility(visibility);*/
     }
 
-    public void campos_ficha_editables(boolean editables){
+    /**
+     * Método que permite que los datos personales sean editables en la ficha
+     * @param editables
+     */
+    public void campos_ficha_editables(boolean editables) {
         int tipoinput = editables ? InputType.TYPE_CLASS_TEXT : InputType.TYPE_NULL;
 
-        et_dni.setInputType(tipoinput);
-        et_age.setInputType(tipoinput);
-        et_tlf.setInputType(tipoinput);
-        et_tutor.setInputType(tipoinput);
-        et_name.setInputType(tipoinput);
-        et_surname.setInputType(tipoinput);
-        et_mail.setInputType(tipoinput);
-        et_street.setInputType(tipoinput);
-        et_cp.setInputType(tipoinput);
-        et_city.setInputType(tipoinput);
+        // Lista de EditText en la actividad
+        EditText[] editTexts = new EditText[]{
+                et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city
+        };
 
+        // Iterar sobre cada EditText
+        for (EditText editText : editTexts) {
+            // Establecer tipo de entrada
+            editText.setInputType(tipoinput);
+
+            // Hacer editable o no
+            editText.setFocusable(editables);
+            editText.setTextIsSelectable(editables);
+            editText.setEnabled(editables);
+
+            // Cambiar color de texto y fondo
+            editText.setTextColor(editables ? Color.BLUE: Color.BLACK); // Cambiar a negro
+            editText.setBackgroundColor(editables ? Color.LTGRAY : Color.WHITE); // Fondo blanco o transparente
+        }
 
     }
 
+    /**
+     * Método que devuelve un ArrayList de empleados prefijado
+     * @return
+     */
     public ArrayList<Cliente> cargar_lista_empleados(){
         ArrayList<Cliente> lista = new ArrayList<>();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         try{
-            lista.add(new Cliente(1, "Eduardo", "Lucas", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", null,true ,"10/05/2019", "gafas", false,  "Illescas 27", 28047, "Madird" ));
+            lista.add(new Cliente(1, "Eduardo", "Lucas", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco",true ,"10/05/2019", "gafas", false,  "Illescas 27", 28047, "Madird" ));
             lista.add(new Cliente(2, "Pacp", "Martin", "520546567L", dateFormat.parse("06/02/2019"), 123456789, "paco@gmail", "Antonio Lucas",false ,null, null, false,  "Valmo 27", 28047, "Barcelona" ));
             lista.add(new Cliente(3, "Sara", "Lopez", "520546123G", dateFormat.parse("10/11/2022"), 123456789, "sara@gmail", null,true ,"10/11/2022", "lentillas", true,  "Oca 27", 28047, "Lugo" ));
 
@@ -391,6 +470,11 @@ public class Ficha_cliente extends AppCompatActivity {
 
     }
 
+    /**
+     * Método que comprba si los editText están vacios
+     * @param campos
+     * @return
+     */
     public boolean campos_estan_vacios(EditText... campos) {
         for (EditText campo : campos) {
             if (campo.getText().toString().trim().isEmpty()) {
@@ -421,6 +505,10 @@ public class Ficha_cliente extends AppCompatActivity {
         datePickerDialog.show();
     }*/
 
+    /**
+     * Método que muestra un desplpigable del campo fecha y guarda la fecha seleccionada en una variable
+     * @param callback
+     */
     private void mostrarDatePicker(final DatePickerCallback callback) {
         // Obtener la fecha actual
         final Calendar calendario = Calendar.getInstance();
@@ -451,7 +539,12 @@ public class Ficha_cliente extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-
+    /**
+     * Modifica el cliente modificado en el Arraylista (lista de clientes en memoria)
+     * @param clienteId
+     * @param nuevoCliente
+     * @return
+     */
     public boolean modificarClienteEnLista(int clienteId, Cliente nuevoCliente) {
 
        boolean ok = false;
@@ -468,7 +561,6 @@ public class Ficha_cliente extends AppCompatActivity {
         }
         return ok;
     }
-
 
 
 }

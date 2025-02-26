@@ -121,11 +121,13 @@ public class GestionBBDD {
                         JSONArray jsonListado = jsonObject.getJSONArray("datos");
                         for (int i = 0; i < jsonListado.length(); i++) {
                             JSONObject jsonCliente = jsonListado.getJSONObject(i);
-                            Cliente cliente = new Cliente(
+                           /* Cliente cliente = new Cliente(
                                     jsonCliente.getString("usuario"),
                                     jsonCliente.getString("contrasena")
-                            );
+
                             listaClientes.add(cliente);
+                            );
+                            */
                         }
                     }
 
@@ -162,8 +164,8 @@ public class GestionBBDD {
 
                     // Crear el objeto JSON con los datos del cliente
                     JSONObject jsonInsertar = new JSONObject();
-                    jsonInsertar.put("nombre", cliente.getNombre());
-                    jsonInsertar.put("apellido", cliente.getApellido());
+                    //jsonInsertar.put("nombre", cliente.getNombre());
+                    //jsonInsertar.put("apellido", cliente.getApellido());
                     jsonInsertar.put("email", cliente.getEmail());
 
                     // Enviar el objeto JSON como cuerpo de la solicitud
@@ -224,8 +226,8 @@ public class GestionBBDD {
 
                     // Crear el objeto JSON con los datos del cliente
                     JSONObject jsonModificar = new JSONObject();
-                    jsonModificar.put("nombre", cliente.getNombre());
-                    jsonModificar.put("apellido", cliente.getApellido());
+                    //jsonModificar.put("nombre", cliente.getNombre());
+                    //jsonModificar.put("apellido", cliente.getApellido());
                     jsonModificar.put("email", cliente.getEmail());
 
                     // Enviar el objeto JSON como cuerpo de la solicitud
