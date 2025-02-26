@@ -67,6 +67,8 @@ public class Ficha_cliente extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_ficha_cliente);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
 
         /*Código que obtiene un arraylist de clientes, y obtiene los datos de cada cliente
         y los mete en un arrayList de strings para mostrarlo en el adaptador
@@ -103,13 +105,6 @@ public class Ficha_cliente extends AppCompatActivity {
         /*Codigo para eliminar un cliente
         GestionBBDD.eliminarCliente(context, idUsuario);
          */
-
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         inicializar_componentes();
         campos_ficha_visibilidad(false);
