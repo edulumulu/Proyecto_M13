@@ -45,7 +45,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
     private static ArrayList<Cliente> lista_clientes = new ArrayList<>();
 
-    private int cliente_selecionado;
+    private int cliente_selecionado_id;
 
     private Date fecha_nacimiento_Seleccionada;
 
@@ -61,7 +61,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
     //Variables parte derecha
 
-    private TextView tv_id, title_id, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail,title_direc, title_street, title_cp, title_city, title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_date_test, title_next_date_test;
+    private TextView tv_id, title_id, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail, title_direc, title_street, title_cp, title_city, title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_date_test, title_next_date_test;
     private EditText et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city;
     private EditText et_graduacion, et_fecha_gradu, et_tipo_lente, et_test_tvps, et_fecha_test_TVPS, et_next_text;
     private TextView tv_graduacion, tv_fecha_gradu, tv_tipo_lente, tv_test_tvps, tv_fecha_test_TVPS, tv_next_text;
@@ -123,50 +123,40 @@ public class Ficha_cliente extends AppCompatActivity {
 
         lista_clientes = cargar_lista_empleados();
 
-        if (lista_clientes == null || lista_clientes.isEmpty()) {
-            Toast.makeText(this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
 
-        String[] nombres = new String[lista_clientes.size()];
-        for (int i = 0; i < lista_clientes.size(); i++) {
-            Cliente cli = lista_clientes.get(i);
-            //nombres[i] = cli.getName();
-            nombres[i] = cli.getName() + " " + cli.getSurname();
 
-        }
-
-        //AutoCompletText
-        ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, nombres);
-        buscar_clientes.setAdapter(adaptador);
-        buscar_clientes.setThreshold(1);
-
-        if(!buscar_clientes.isSelected()){
-                campos_ficha_visibilidad(false);
+        if (!buscar_clientes.isSelected()) {
+            campos_ficha_visibilidad(false);
         }
 
         //Cargar spinner
         //ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombres);
         //sp_clientes.setAdapter(adaptador);
 
+        buscar_clientes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buscar_clientes.setText(""); // Borra el texto cuando se hace clic
+            }
+        });
         buscar_clientes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String eleccion = (String) adapterView.getItemAtPosition(i);
-                for (Cliente cli : lista_clientes){
-                    if(eleccion.equalsIgnoreCase(cli.getName() + " " +cli.getSurname())){
-                        cliente_selecionado = cli.getId();
-                            Log.d("Cliente seleccionado", "ID: " + cliente_selecionado);
+                for (Cliente cli : lista_clientes) {
+                    if (eleccion.equalsIgnoreCase(cli.getName() + " " + cli.getSurname())) {
+                        cliente_selecionado_id = cli.getId();
+                        Log.d("Cliente seleccionado", "ID: " + cliente_selecionado_id);
                         //Hago visible los campos de la ficha y cargo los datos
                         cargar_cliente_en_ficha(cli);
                         campos_ficha_editables(false);
-                            break;
+                        break;
                     }
 
                 }
             }
         });
-
 
 
         //Click botones
@@ -187,17 +177,28 @@ public class Ficha_cliente extends AppCompatActivity {
                 title_age.setText("Fecha de nacimiento:");
                 //Aquí quiero que el piker pueda ser usado
 
-                // Mostrar el DatePicker y obtener la fecha seleccionada
-                mostrarDatePicker(new DatePickerCallback() {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                Date fechaNacimiento = obtener_cliente_por_id(cliente_selecionado_id).getDate_born();
+
+                et_age.setText(sdf.format(fechaNacimiento));
+
+                et_age.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onDateSelected(Date selectedDate) {
-                        // Guardar la fecha seleccionada en la variable
-                        fecha_nacimiento_Seleccionada = selectedDate;
-                        // Actualizar el campo EditText con la fecha seleccionada (por ejemplo, et_age)
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        et_age.setText(sdf.format(fecha_nacimiento_Seleccionada));
+                    public void onClick(View view) {
+                        // Mostrar el DatePicker y obtener la fecha seleccionada
+                        mostrarDatePicker(new DatePickerCallback() {
+                            @Override
+                            public void onDateSelected(Date selectedDate) {
+                                // Guardar la fecha seleccionada en la variable
+                                fecha_nacimiento_Seleccionada = selectedDate;
+                                // Actualizar el campo EditText con la fecha seleccionada (por ejemplo, et_age)
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                                et_age.setText(sdf.format(fecha_nacimiento_Seleccionada));
+                            }
+                        });
                     }
                 });
+
 
             }
         });
@@ -205,14 +206,35 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_modificar_aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(campos_estan_vacios(et_dni, et_age, et_tlf, et_name, et_surname, et_mail, et_street, et_cp, et_city)){
+                if (campos_estan_vacios(et_dni, et_age, et_tlf, et_name, et_surname, et_mail, et_street, et_cp, et_city)) {
                     Toast.makeText(Ficha_cliente.this, "Debes rellenar todos los campos editables antes de continuar", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 // Verificar si la fecha ha sido seleccionada
-                if (fecha_nacimiento_Seleccionada == null) {
+                if (et_age == null ) {
                     Toast.makeText(Ficha_cliente.this, "Debes seleccionar una fecha de nacimiento", Toast.LENGTH_SHORT).show();
                     return;
+                }
+
+                String textoFecha = et_age.getText().toString();
+                if (!textoFecha.isEmpty()) {
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); // Formato de la fecha
+                        fecha_nacimiento_Seleccionada = sdf.parse(textoFecha);  // Convertir el texto en un objeto Date
+
+                        // Si la conversión fue exitosa, ahora puedes usar la variable 'fecha_nacimiento'
+                        if (fecha_nacimiento_Seleccionada != null) {
+                            // Usar la fecha según sea necesario
+                            Log.d("Fecha Nacimiento", "Fecha: " + fecha_nacimiento_Seleccionada.toString());
+                        }
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        Toast.makeText(Ficha_cliente.this, "El formato de la fecha es incorrecto", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // Si el campo está vacío, manejarlo
+                    Toast.makeText(Ficha_cliente.this, "Por favor ingresa una fecha", Toast.LENGTH_SHORT).show();
                 }
                 String nombre = et_name.getText().toString();
                 String surname = et_surname.getText().toString();
@@ -222,20 +244,27 @@ public class Ficha_cliente extends AppCompatActivity {
                 String street = et_street.getText().toString();
                 int cp = Integer.parseInt(et_cp.getText().toString());
                 String city = et_city.getText().toString();
-                String tutor = null;
-                if(et_tutor.toString().trim().isEmpty()){
-                    tutor = et_tutor.getText().toString();
-                }
+                String tutor= et_tutor.getText().toString();
+
+
                 //Aquí quiero obtener la fecha selecionada
 
-                Cliente cli = new Cliente(cliente_selecionado, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, false, null, null, false, street, cp, city);
+                Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, false, null, null, false, street, cp, city);
 
-                if(modificarClienteEnLista(cliente_selecionado, cli)){
+                if (modificarClienteEnLista(cliente_selecionado_id, cli)) {
+
                     //Modificar base de datos
                     /*Codigo para modificar un cliente
                     Cliente clienteModificado = new Cliente("usuario123", "nuevaContrasena", "Juan", "Perez", "juan.perez@nuevocliente.com");
                     GestionBBDD.modificarCliente(context, clienteModificado);
                      */
+
+                    actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                    cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id));
+                    campos_ficha_editables(false);
+                    bt_modificar_salir.setVisibility(View.GONE);
+                    bt_modificar_aceptar.setVisibility(View.GONE);
+
 
                 }
 
@@ -247,12 +276,29 @@ public class Ficha_cliente extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 title_age.setText("Edad");
-                cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado));
+                cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id));
             }
         });
 
-        
+
     }
+
+    public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView buscador) {
+
+        String[] nombres = new String[lista.size()];
+        for (int i = 0; i < lista.size(); i++) {
+            Cliente cli = lista.get(i);
+            //nombres[i] = cli.getName();
+            nombres[i] = cli.getName() + " " + cli.getSurname();
+
+            //AutoCompletText
+            ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, nombres);
+            buscador.setAdapter(adaptador);
+            buscador.setThreshold(1);
+
+        }
+    }
+
 
     /**
      * Metodo que retorna un cliente del ArrayList a partir de su id
@@ -327,7 +373,6 @@ public class Ficha_cliente extends AppCompatActivity {
     public void inicializar_componentes(){
         //Inicializo los componentes parte izquierda
 
-
         bt_modificar_aceptar =findViewById(R.id.bt_aceptar);
         bt_modificar_salir = findViewById(R.id.bt_salir);
         bt_modificar_aceptar.setVisibility(View.GONE);
@@ -372,8 +417,6 @@ public class Ficha_cliente extends AppCompatActivity {
         tv_next_text= findViewById(R.id.tv_fecha_proxTVPS);
         iv_foto = findViewById(R.id.iv_foto);
         iv_foto.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.foto));
-
-
 
         /*et_graduacion= findViewById(R.id.et_graduado);
         et_fecha_gradu= findViewById(R.id.et_fecha_graduacion);
@@ -459,8 +502,9 @@ public class Ficha_cliente extends AppCompatActivity {
 
         try{
             lista.add(new Cliente(1, "Eduardo", "Lucas", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco",true ,"10/05/2019", "gafas", false,  "Illescas 27", 28047, "Madird" ));
-            lista.add(new Cliente(2, "Pacp", "Martin", "520546567L", dateFormat.parse("06/02/2019"), 123456789, "paco@gmail", "Antonio Lucas",false ,null, null, false,  "Valmo 27", 28047, "Barcelona" ));
-            lista.add(new Cliente(3, "Sara", "Lopez", "520546123G", dateFormat.parse("10/11/2022"), 123456789, "sara@gmail", null,true ,"10/11/2022", "lentillas", true,  "Oca 27", 28047, "Lugo" ));
+            lista.add(new Cliente(2, "Carlos", "Herrera", "520546567L", dateFormat.parse("06/02/2019"), 123456789, "paco@gmail", "Antonio Lucas",false ,null, null, false,  "Valmo 27", 28047, "Barcelona" ));
+            lista.add(new Cliente(3, "Bibiana", "Martinez", "520546123G", dateFormat.parse("10/11/2022"), 123456789, "sara@gmail", null,true ,"10/11/2022", "lentillas", true,  "Oca 27", 28047, "Lugo" ));
+            lista.add(new Cliente(1, "Eduardo", "Jose", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco",true ,"10/05/2019", "gafas", false,  "Illescas 27", 28047, "Madird" ));
 
             return lista;
         }catch (ParseException e){
