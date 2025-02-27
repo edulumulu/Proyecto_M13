@@ -118,7 +118,7 @@
 
     <EditText
         android:id="@+id/et_dni"
-        android:layout_width="wrap_content"
+        android:layout_width="130dp"
         android:layout_height="45dp"
         android:layout_marginStart="7dp"
 
@@ -142,7 +142,7 @@
     <EditText
         android:id="@+id/et_age"
         android:layout_width="wrap_content"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
         android:text="13"
         android:textSize="20sp"
@@ -164,7 +164,7 @@
 
     <EditText
         android:id="@+id/et_tel"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="45dp"
         android:layout_marginStart="7dp"
         android:layout_marginTop="5dp"
@@ -198,7 +198,7 @@
 
     <EditText
         android:id="@+id/et_tutor"
-        android:layout_width="wrap_content"
+        android:layout_width="220dp"
         android:layout_height="45dp"
         android:layout_marginStart="7dp"
         android:text="Javier Perez"
@@ -275,7 +275,7 @@
 
     <EditText
         android:id="@+id/et_street"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="45dp"
         android:layout_marginStart="7dp"
         android:text="Illescas"
@@ -307,7 +307,7 @@
 
     <EditText
         android:id="@+id/et_cp"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="45dp"
         android:layout_marginStart="7dp"
         android:text="28047"
@@ -339,7 +339,7 @@
 
     <EditText
         android:id="@+id/et_city"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="45dp"
         android:layout_marginStart="7dp"
         android:text="Madrid"
@@ -601,9 +601,10 @@
         android:layout_marginEnd="40dp"
         android:layout_width="200dp"
         android:layout_height="200dp"
+        android:layout_marginBottom="20dp"
         android:scaleType="fitCenter"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_02"
+        app:layout_constraintBottom_toTopOf="@id/et_city"
         tools:srcCompat="@tools:sample/avatars" />
 
 
@@ -729,6 +730,21 @@
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
 
     <Button
+        android:id="@+id/bt_aceptar_insert"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginEnd="40dp"
+        android:background="@android:color/darker_gray"
+        android:text="Aceptar"
+        android:textSize="12sp"
+        app:backgroundTint="#F7F244AA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
+
+
+    <Button
         android:id="@+id/bt_salir"
         android:layout_width="160dp"
         android:layout_height="50dp"
@@ -740,6 +756,20 @@
         app:backgroundTint="#F7F244AA"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/bt_aceptar"
+        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
+
+    <Button
+        android:id="@+id/bt_salir_insertar"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="15dp"
+        android:background="@android:color/darker_gray"
+        android:text="Salir"
+        android:textSize="12sp"
+        app:backgroundTint="#F7F244AA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/bt_aceptar_insert"
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
 
 
