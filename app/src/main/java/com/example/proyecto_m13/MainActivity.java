@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText etUsuario, etContrasena;
     Button btIniciar;
+    GestionBBDD gestionBBDD = new GestionBBDD();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +42,7 @@ public class MainActivity extends AppCompatActivity {
         if (usuario.isEmpty() || contrasena.isEmpty()){
             Toast.makeText(this, "No puedes dejar ningún campo vacío", Toast.LENGTH_LONG).show();
         }else {
-            /* si rellenan los datos lanzariamos un método que comprueba las credenciales con la BBDD
-            gestionBBDD.comprobarCredenciales();
-            En este caso abriremos la siguiente actividad para empezar a hacer pruebas
-            Y le paso el usuario por si quieres mostrar el nombre arriba a la izquierda*/
-            Intent intent = new Intent(MainActivity.this,Ficha_cliente.class);
-            intent.putExtra("usuario", usuario);
-            startActivity(intent);
+            gestionBBDD.comprobarCredenciales(this, usuario, contrasena);
         }
     }
 }
