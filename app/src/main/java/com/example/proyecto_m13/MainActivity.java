@@ -2,13 +2,14 @@ package com.example.proyecto_m13;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -16,7 +17,6 @@ public class MainActivity extends AppCompatActivity {
     EditText etUsuario, etContrasena;
     Button btIniciar;
     GestionBBDD gestionBBDD = new GestionBBDD();
-    RecyclerView recyclerClientes;
 
     @SuppressLint("MissingInflatedId")
     @Override

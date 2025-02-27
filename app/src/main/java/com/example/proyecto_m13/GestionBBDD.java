@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -109,6 +110,8 @@ public class GestionBBDD {
                     }
 
                     // Procesar los datos de la respuesta JSON
+                    Log.d("ServerResponse", "Respuesta del servidor: " + response.toString());
+
                     JSONObject jsonObject = new JSONObject(response.toString());
                     String estado = jsonObject.getString("estado");
 
@@ -182,8 +185,8 @@ public class GestionBBDD {
 
                     // Crear el objeto JSON con los datos del cliente
                     JSONObject jsonInsertar = new JSONObject();
-                    //jsonInsertar.put("nombre", cliente.getNombre());
-                    //jsonInsertar.put("apellido", cliente.getApellido());
+                    jsonInsertar.put("nombre", cliente.getName());
+                    jsonInsertar.put("apellido", cliente.getSurname());
                     jsonInsertar.put("email", cliente.getEmail());
 
                     // Enviar el objeto JSON como cuerpo de la solicitud
