@@ -22,16 +22,15 @@ import java.util.ArrayList;
 public class GestionBBDD {
 
     @SuppressLint("StaticFieldLeak")
-    public void comprobarCredenciales (Context context, String usuario, String contrasena){
-        new AsyncTask<Void, Void, String>(){
-
+    public void comprobarCredenciales(Context context, String usuario, String contrasena) {
+        new AsyncTask<Void, Void, String>() {
             @Override
-            protected String doInBackground(Void... voids){
-                try{
+            protected String doInBackground(Void... voids) {
+                try {
                     URL url = new URL("http://ipservidor/nombrearchivo.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type","application/json; utf-8");
+                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
                     conexion.setDoOutput(true);
 
                     JSONObject jsonValidar = new JSONObject();
@@ -45,7 +44,7 @@ public class GestionBBDD {
                     BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
                     StringBuilder response = new StringBuilder();
                     String responseLine;
-                    while ((responseLine = br.readLine()) != null){
+                    while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
                     br.close();
@@ -57,28 +56,41 @@ public class GestionBBDD {
                 }
             }
 
+<<<<<<< Updated upstream
             protected void onPostExecute (String response){
                 if (response != null){
                     try{
+=======
+            @Override
+            protected void onPostExecute(String response) {
+                if (response != null) {
+                    try {
+>>>>>>> Stashed changes
                         JSONObject jsonResponse = new JSONObject(response);
                         String estado = jsonResponse.getString("estado");
                         String mensaje = jsonResponse.getString("mensaje");
 
-                        if ("correcto".equals(estado)){
+                        if ("correcto".equals(estado)) {
                             Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_LONG).show();
+<<<<<<< Updated upstream
                             Intent intent = new Intent(context,Ficha_cliente.class);
                             intent.putExtra("usuario", usuario);
                             context.startActivity(intent);
+=======
+>>>>>>> Stashed changes
 
+                            Intent intent = new Intent(context, Ficha_cliente.class);
+                            intent.putExtra("usuario", usuario);
+                            context.startActivity(intent);
+
+                            // Cerrar actividad si es posible
                             if (context instanceof android.app.Activity) {
-                                android.app.Activity activity = (android.app.Activity) context;
-                                context.startActivity(intent);
-                                activity.finish();
-                            } else {
-                                Toast.makeText(context, "No se puede cerrar la actividad", Toast.LENGTH_LONG).show();
+                                ((android.app.Activity) context).finish();
                             }
+                        } else {
+                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
                         }
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
                     }
