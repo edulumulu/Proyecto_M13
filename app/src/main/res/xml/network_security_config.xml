@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Permitir tráfico en texto claro (HTTP) para todos los dominios -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">example.com</domain>
+        <domain includeSubdomains="true">api.example.com</domain>
+    </domain-config>
+
+    <!-- Permitir tráfico en texto claro para todas las direcciones (opcional, pero no recomendado en producción) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+
+    <!-- Configuración global para todas las conexiones -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
