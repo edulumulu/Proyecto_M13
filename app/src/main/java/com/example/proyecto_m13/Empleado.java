@@ -10,10 +10,13 @@ public class Empleado {
     private String email;
     private String cargo;
 
-    public Empleado(Integer idEmpleado) {
-        this.idEmpleado = idEmpleado;
+    //Constructor con usuario y contraseña
+    public Empleado(String usuario, String contrasena) {
+        this.usuario = usuario;
+        this.contrasena = contrasena;
     }
 
+    //Constructor con todo
     public Empleado(Integer idEmpleado, String nif, String nombre, String apellidos, String usuario, String contrasena, String email, String cargo) {
         this.idEmpleado = idEmpleado;
         this.nif = nif;
@@ -24,17 +27,6 @@ public class Empleado {
         this.email = email;
         this.cargo = cargo;
     }
-
-    public Empleado(String nif, String nombre, String apellidos, String usuario, String contrasena, String email, String cargo) {
-        this.nif = nif;
-        this.nombre = nombre;
-        this.apellidos = apellidos;
-        this.usuario = usuario;
-        this.contrasena = contrasena;
-        this.email = email;
-        this.cargo = cargo;
-    }
-
 
     public Integer getIdEmpleado() {
         return idEmpleado;
