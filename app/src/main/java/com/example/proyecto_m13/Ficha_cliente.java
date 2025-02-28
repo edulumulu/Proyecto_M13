@@ -9,6 +9,7 @@ import static Utilidades.Utilidades.obtener_cliente_por_id;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -89,17 +90,10 @@ public class Ficha_cliente extends AppCompatActivity {
         setContentView(R.layout.activity_ficha_cliente);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        buscar_clientes = findViewById(R.id.autoct_buscador);
-        //sp_clientes = findViewById(R.id.sp_clientes);
-        tv_user = findViewById(R.id.tv_user);
-        title_seleciona = findViewById(R.id.textview_10);
-        title_acciones = findViewById(R.id.textview_11);
-        bt_insert = findViewById(R.id.bt_insert);
-        bt_update = findViewById(R.id.bt_update);
-        bt_delete = findViewById(R.id.bt_delete);
-        bt_test = findViewById(R.id.bt_test);
-        ib_exit = findViewById(R.id.ib_exit);
+        relacionar_variables_front_back();
         inicializar_componentes();
+        poner_nombre_Empleado();
+
 
 
         // Metodo que carga la lista en el arrayList
@@ -548,11 +542,38 @@ public class Ficha_cliente extends AppCompatActivity {
             }
         });
 
+        ib_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intento = new Intent(Ficha_cliente.this, MainActivity.class);
+                startActivity(intento);
+            }
+        });
+
 
     }
 
 
 
+
+    public void poner_nombre_Empleado(){
+        String usuario = getIntent().getStringExtra("usuario");
+        tv_user.setText(usuario);
+    }
+
+    public void relacionar_variables_front_back(){
+
+        buscar_clientes = findViewById(R.id.autoct_buscador);
+        //sp_clientes = findViewById(R.id.sp_clientes);
+        tv_user = findViewById(R.id.tv_user);
+        title_seleciona = findViewById(R.id.textview_10);
+        title_acciones = findViewById(R.id.textview_11);
+        bt_insert = findViewById(R.id.bt_insert);
+        bt_update = findViewById(R.id.bt_update);
+        bt_delete = findViewById(R.id.bt_delete);
+        bt_test = findViewById(R.id.bt_test);
+        ib_exit = findViewById(R.id.ib_exit);
+    }
 
     /**
      * Metodo que muestra los datos de un cliente en la ficha
@@ -762,6 +783,7 @@ public class Ficha_cliente extends AppCompatActivity {
     public void inicializar_componentes() {
         //Inicializo los componentes parte izquierda
 
+        ib_exit = findViewById(R.id.ib_exit);
         bt_modificar_aceptar = findViewById(R.id.bt_aceptar);
         bt_modificar_salir = findViewById(R.id.bt_salir);
         bt_insertar_aceptar = findViewById(R.id.bt_aceptar_insert);
