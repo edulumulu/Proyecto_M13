@@ -1,10 +1,10 @@
 package com.example.proyecto_m13;
 
-import static androidx.core.widget.TextViewKt.addTextChangedListener;
-
 import static Utilidades.Utilidades.eliminar_Cliente_PorId;
 import static Utilidades.Utilidades.modificar_Cliente_EnLista;
 import static Utilidades.Utilidades.obtener_cliente_por_id;
+import static Utilidades.Utilidades.visibilidad_Textviews;
+import static Utilidades.Utilidades.visibilidad_botones;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -17,10 +17,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import android.text.InputType;
@@ -31,29 +29,17 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
-
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 
 import Utilidades.Utilidades;
@@ -68,7 +54,6 @@ public class Ficha_cliente extends AppCompatActivity {
 
     //Variables parte izquierda de la app
     private TextView tv_user, title_seleciona, title_acciones;
-    //private Spinner sp_clientes;
     private AutoCompleteTextView buscar_clientes;
     private Button bt_insert, bt_delete, bt_update, bt_test;
     private Button bt_modificar_aceptar, bt_modificar_salir, bt_insertar_aceptar, bt_insertar_salir;
@@ -76,10 +61,8 @@ public class Ficha_cliente extends AppCompatActivity {
     private ImageView iv_foto;
 
     //Variables parte derecha
-
     private TextView tv_id, title_id, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail, title_direc, title_street, title_cp, title_city, title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_date_test, title_next_date_test;
     private EditText et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city;
-    //private EditText et_graduacion, et_fecha_gradu, et_tipo_lente, et_test_tvps, et_fecha_test_TVPS, et_next_text;
     private TextView tv_graduacion, tv_fecha_gradu, tv_tipo_lente, tv_test_tvps, tv_fecha_test_TVPS, tv_next_text;
 
 
@@ -118,25 +101,29 @@ public class Ficha_cliente extends AppCompatActivity {
                 }
             }
         });*/
-        lista_clientes = Utilidades.cargar_lista_empleados();
 
+        lista_clientes = Utilidades.cargar_lista_empleados();
         actualizar_nombres_buscador(lista_clientes, buscar_clientes);
 
 
+        //si no hay ningun cliente selecionado visibilidad de los campos cerrada
         if (!buscar_clientes.isSelected()) {
             campos_ficha_visibilidad(false);
         }
 
-        //Cargar spinner
-        //ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombres);
-        //sp_clientes.setAdapter(adaptador);
-
+        /**
+         * Borrar testo del buscador cuando se hace click
+         */
         buscar_clientes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buscar_clientes.setText(""); // Borra el texto cuando se hace clic
+                buscar_clientes.setText("");
             }
         });
+
+        /*
+        Abre la ficha del cliente cuando se clicak sobre su nombre
+         */
         buscar_clientes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -145,14 +132,13 @@ public class Ficha_cliente extends AppCompatActivity {
                     if (eleccion.equalsIgnoreCase(cli.getName() + " " + cli.getSurname())) {
                         cliente_selecionado_id = cli.getId();
                         Log.d("Cliente seleccionado", "ID: " + cliente_selecionado_id);
+
                         //Hago visible los campos de la ficha y cargo los datos
                         cargar_cliente_en_ficha(cli);
-
+                        //Los campos de los datos del cliente no se pueden editar
                         campos_ficha_editables(false);
-                        bt_modificar_salir.setVisibility(View.GONE);
-                        bt_modificar_aceptar.setVisibility(View.GONE);
-                        bt_insertar_aceptar.setVisibility(View.GONE);
-                        bt_insertar_salir.setVisibility(View.GONE);
+                        //Invisibilizo los botones de manipular modificar y de insertar
+                        visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir });
                         break;
                     }
 
@@ -166,12 +152,12 @@ public class Ficha_cliente extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                //Vista del formulario editable
                 preparar_formulario_insert();
-                bt_insertar_aceptar.setVisibility(View.VISIBLE);
-                bt_insertar_salir.setVisibility(View.VISIBLE);
+                //Aparicon de botones de interacción
+                visibilidad_botones(true, new Button[]{bt_insertar_aceptar, bt_insertar_salir});
                 et_tutor.setEnabled(false);
 
-                //ESTOY CON ESTO
                 //Comprobar que cuando se selecciona fecha si es menor de edad aparece el campo tutor
                 et_age.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -226,20 +212,25 @@ public class Ficha_cliente extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                //Comprobacion general de los campos rellenos
                 if (!comprobación_de_relleno_formulario()) {
                     return;
                 }
 
+                //Si es menor de edad comprueba que se rellene el campo tutor
                 if(!Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada) &&
                         (et_tutor.getText().toString().trim().isEmpty()|| et_tutor.getText().toString().equalsIgnoreCase("Si es menor de edad"))){
                     Toast.makeText(Ficha_cliente.this, "Al ser menor debes incluir un tutor", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                //Si es mayor de edad comprueba que el tutor esté vacío
                 if(Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)){
                    et_tutor.setHint(null);
                    et_tutor.setText("");
                 }
+
+                //recopilación del contenido de los campos
                 String nombre = et_name.getText().toString();
                 String surname = et_surname.getText().toString();
                 String dni = et_dni.getText().toString();
@@ -248,7 +239,6 @@ public class Ficha_cliente extends AppCompatActivity {
                 String street = et_street.getText().toString();
                 int cp = Integer.parseInt(et_cp.getText().toString());
                 String city = et_city.getText().toString();
-
                 String tutor = et_tutor.getText().toString();
 
                 //Cliente que usaré para hacer el insert
@@ -273,20 +263,18 @@ public class Ficha_cliente extends AppCompatActivity {
                         false, street, cp, city));
 
 
+                //      ESTO HAY QUE REVISARLO CON EL NUEVO MÉTODO
                 if (lista_clientes.size() == 5) {
                     //Actualizo datos buscador y modifico el id selecionado al nuevo cliente para que aparezca su ficha
                     actualizar_nombres_buscador(lista_clientes, buscar_clientes);
                     cliente_selecionado_id = 5;
 
-                    bt_insertar_salir.setVisibility(View.GONE);
-                    bt_insertar_aceptar.setVisibility(View.GONE);
+                    visibilidad_botones(false, new Button[]{bt_insertar_aceptar, bt_insertar_salir});
                     cargar_cliente_en_ficha(obtener_cliente_por_id(5, lista_clientes));
                     campos_ficha_editables(false);
 
-                    TextView[] textvi = new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor};
-
-                    for(TextView tv : textvi){tv.setVisibility(View.VISIBLE);}
-
+                    //Visibilizo elementos
+                    visibilidad_Textviews(true, new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor} );
                     iv_foto.setVisibility(View.VISIBLE);
                     et_tutor.setVisibility(View.VISIBLE);
                     title_age.setText("Edad:");
@@ -301,9 +289,7 @@ public class Ficha_cliente extends AppCompatActivity {
             public void onClick(View view) {
                 title_age.setText("Edad");
                 campos_ficha_visibilidad(false);
-                bt_insertar_salir.setVisibility(View.GONE);
-                bt_insertar_aceptar.setVisibility(View.GONE);
-
+                visibilidad_botones(false, new Button[]{bt_insertar_salir, bt_insertar_aceptar});
             }
         });
 
@@ -317,8 +303,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     return;
 
                 }
-                bt_modificar_aceptar.setVisibility(View.VISIBLE);
-                bt_modificar_salir.setVisibility(View.VISIBLE);
+                visibilidad_botones(true, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
                 iv_foto.setVisibility(View.GONE);
                 campos_ficha_editables(true);
                 title_age.setText("Fecha de nacimiento:");
@@ -326,7 +311,6 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date fechaNacimiento = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_born();
-
                 et_age.setText(sdf.format(fechaNacimiento));
 
                 et_age.setOnClickListener(new View.OnClickListener() {
@@ -385,8 +369,6 @@ public class Ficha_cliente extends AppCompatActivity {
                         }
                     }
                 });
-
-
             }
         });
 
@@ -404,14 +386,17 @@ public class Ficha_cliente extends AppCompatActivity {
                     }
                 }
 
+                //Verificar comprobaciones genrales de ingreso de datos
                 if (!comprobación_de_relleno_formulario()) {
                     return;
                 }
+                //Si no es mayor de edad aparece campro tuor
                 if(!Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada) &&
                         (et_tutor.getText().toString().trim().isEmpty()|| et_tutor.getText().toString().equalsIgnoreCase(""))){
                     Toast.makeText(Ficha_cliente.this, "Es menor de edad, debes incluir un tutor", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                //Si no lo es se modifica el contenido del editTest
                 if(Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)){
                     et_tutor.setText("");
                 }
@@ -436,6 +421,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     // Si el campo está vacío, manejarlo
                     Toast.makeText(Ficha_cliente.this, "Por favor ingresa una fecha", Toast.LENGTH_SHORT).show();
                 }
+                //Recogemos contenido de los editTest
                 String nombre = et_name.getText().toString();
                 String surname = et_surname.getText().toString();
                 String dni = et_dni.getText().toString();
@@ -446,6 +432,8 @@ public class Ficha_cliente extends AppCompatActivity {
                 String city = et_city.getText().toString();
                 String tutor = et_tutor.getText().toString();
 
+                //A PARTIR DE AQUÍ REVISAR PORQUE NECESIOTO EL UPDATE
+                //Recojo
                 boolean graduado = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getGraduate();
                 Date fecha_gradu1 = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_graduacion();
                 String tipo = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTipo_lentes();
@@ -467,8 +455,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     actualizar_nombres_buscador(lista_clientes, buscar_clientes);
                     cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
                     campos_ficha_editables(false);
-                    bt_modificar_salir.setVisibility(View.GONE);
-                    bt_modificar_aceptar.setVisibility(View.GONE);
+                    visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
 
                     //TextView[] textvi = new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor};
 
@@ -492,8 +479,8 @@ public class Ficha_cliente extends AppCompatActivity {
                 cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
                 title_age.setText("Edad");
                 et_age.setText(String.valueOf(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).calcularEdad()));
-                bt_modificar_salir.setVisibility(View.GONE);
-                bt_modificar_aceptar.setVisibility(View.GONE);
+
+                visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
                 iv_foto.setVisibility(View.VISIBLE);
 
             }
@@ -508,6 +495,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 }
 
+                //Dialogo que pide ratificacion en los cambios
                 new AlertDialog.Builder(Ficha_cliente.this)
                         .setTitle("Confirmación")  // Título del diálogo
                         .setMessage("¿Estás seguro de que uqiere eliminar el cliente " + obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getName() + " " + obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getSurname() + "?")  // Mensaje que se mostrará
@@ -554,8 +542,9 @@ public class Ficha_cliente extends AppCompatActivity {
     }
 
 
-
-
+    /**
+     * Poner el nombre del empleado que está logeado
+     */
     public void poner_nombre_Empleado(){
         String usuario = getIntent().getStringExtra("usuario");
         tv_user.setText(usuario);

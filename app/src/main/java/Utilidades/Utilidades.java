@@ -1,6 +1,9 @@
 package Utilidades;
 
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.proyecto_m13.Cliente;
@@ -142,6 +145,22 @@ public class Utilidades {
             }
         }
         return ok;
+    }
+
+    public static void visibilidad_botones (boolean mostrar , Button[] botones){
+        int visibility = mostrar ? View.VISIBLE : View.GONE;
+
+        for(Button bt : botones){
+            bt.setVisibility(visibility);
+        }
+    }
+
+    public static void visibilidad_Textviews (boolean mostrar, TextView[] botones){
+        int visibility = mostrar ? View.VISIBLE : View.GONE;
+
+        for(TextView tv : botones){
+            tv.setVisibility(visibility);
+        }
     }
 
 
