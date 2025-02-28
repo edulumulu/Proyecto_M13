@@ -1,0 +1,148 @@
+package Utilidades;
+
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.example.proyecto_m13.Cliente;
+import com.example.proyecto_m13.Ficha_cliente;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+public class Utilidades {
+
+    /**
+     * Método que devuelve un ArrayList de empleados prefijado
+     *
+     * @return
+     */
+    public static ArrayList<Cliente> cargar_lista_empleados() {
+        ArrayList<Cliente> lista = new ArrayList<>();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        try {
+            lista.add(new Cliente(1, "Eduardo", "Lucas", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco", true, dateFormat.parse("10/05/2019"), "gafas", false, "Illescas 27", 28047, "Madird"));
+            lista.add(new Cliente(2, "Carlos", "Herrera", "520546567L", dateFormat.parse("06/02/2019"), 123456789, "paco@gmail", "Antonio Lucas", false, null, null, false, "Valmo 27", 28047, "Barcelona"));
+            lista.add(new Cliente(3, "Bibiana", "Martinez", "520546123G", dateFormat.parse("10/11/2022"), 123456789, "sara@gmail", null, true, dateFormat.parse("10/11/2022"), "lentillas", true, "Oca 27", 28047, "Lugo"));
+            lista.add(new Cliente(4, "Eduardo", "Jose", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco", true, dateFormat.parse("10/05/2019"), "gafas", false, "Illescas 27", 28047, "Madird"));
+
+            return lista;
+        } catch (ParseException e) {
+
+            return lista;
+        }
+
+    }
+
+    /**
+     * Método que comprba si los editText están vacios
+     *
+     * @param campos
+     * @return
+     */
+    public static boolean campos_estan_vacios(EditText... campos) {
+        for (EditText campo : campos) {
+            if (campo.getText().toString().trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Método para saber si han pasado 18 años de la fecha introducida
+     * @param fechaNacimiento
+     * @return
+     */
+    public static boolean esMayorDeEdad(Date fechaNacimiento) {
+        Calendar cal = Calendar.getInstance();
+        int edadActual = cal.get(Calendar.YEAR) - (fechaNacimiento.getYear() + 1900); // Sumamos 1900 ya que el año de Date es desde 1900
+
+        if (cal.get(Calendar.MONTH) < fechaNacimiento.getMonth()) {
+            edadActual--; // Si la fecha actual aún no ha llegado al cumpleaños
+        } else if (cal.get(Calendar.MONTH) == fechaNacimiento.getMonth()) {
+            if (cal.get(Calendar.DAY_OF_MONTH) < fechaNacimiento.getDate()) {
+                edadActual--; // Si el cumpleaños no ha pasado en el mes actual
+            }
+        }
+
+        return edadActual >= 18;  // Si tiene 18 años o más, es mayor de edad
+    }
+
+    /**
+     * Metodo que retorna un cliente del ArrayList a partir de su id
+     *
+     * @param id
+     * @return
+     */
+    public static Cliente obtener_cliente_por_id(int id , ArrayList<Cliente> listaclientes) {
+        for (Cliente cliente : listaclientes) {
+            if (cliente.getId() == id) {
+                return cliente; // Retorna el cliente si encuentra coincidencia
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Método que elimina un cliente del array list por id
+     *
+     * @param clienteId
+     * @return
+     */
+    public static boolean eliminar_Cliente_PorId(int clienteId, ArrayList<Cliente> listaclientes) {
+
+        boolean ok = false;
+        for (int i = 0; i < listaclientes.size(); i++) {
+            Cliente cliente = listaclientes.get(i);
+
+            // Si encontramos al cliente con el ID correspondiente
+            if (cliente.getId() == clienteId) {
+                // Actualizar el cliente con los nuevos datos
+                listaclientes.remove(i);
+                ok = true;
+                break;  // Salir del bucle cuando encontramos al cliente
+            }
+        }
+        return ok;
+
+        /*boolean ok = false;
+        for(Cliente cli : lista_clientes){
+            if(cli.getId() == clienteId){
+                lista_clientes.remove(cli);
+                ok = true;
+            }
+        }
+        return ok;*/
+    }
+
+    /**
+     * Modifica el cliente modificado en el Arraylista (lista de clientes en memoria)
+     *
+     * @param clienteId
+     * @param nuevoCliente
+     * @return
+     */
+    public static boolean modificar_Cliente_EnLista(int clienteId, Cliente nuevoCliente, ArrayList<Cliente> listaclientes) {
+
+        boolean ok = false;
+        for (int i = 0; i < listaclientes.size(); i++) {
+            Cliente cliente = listaclientes.get(i);
+
+            // Si encontramos al cliente con el ID correspondiente
+            if (cliente.getId() == clienteId) {
+                // Actualizar el cliente con los nuevos datos
+                listaclientes.set(i, nuevoCliente);  // Reemplazar el cliente en la lista
+                ok = true;
+                break;  // Salir del bucle cuando encontramos al cliente
+            }
+        }
+        return ok;
+    }
+
+
+}

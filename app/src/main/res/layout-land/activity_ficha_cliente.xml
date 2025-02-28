@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:text="589A"
+        android:text=""
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="30sp"
         android:textStyle="bold"
@@ -168,6 +168,7 @@
         android:layout_height="45dp"
         android:layout_marginStart="7dp"
         android:layout_marginTop="5dp"
+        android:inputType="number"
         android:text="666666666"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -235,6 +236,7 @@
         android:layout_marginStart="7dp"
         android:layout_marginTop="4dp"
         android:text="eduardolucasmunoz@gshdmail.com"
+        android:inputType="textEmailAddress"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_5"
@@ -311,6 +313,7 @@
         android:layout_height="45dp"
         android:layout_marginStart="7dp"
         android:text="28047"
+        android:inputType="number"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_8"
@@ -684,7 +687,7 @@
         android:layout_marginTop="7dp"
         android:background="@android:color/darker_gray"
         android:text="Modificar"
-        android:textSize="12sp"
+        android:textSize="18sp"
         app:backgroundTint="#F7F244AA"
         app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
         app:layout_constraintStart_toStartOf="parent"
@@ -697,7 +700,7 @@
         android:layout_marginTop="7dp"
         android:background="@android:color/darker_gray"
         android:text="Eliminar"
-        android:textSize="12sp"
+        android:textSize="18sp"
         app:backgroundTint="#F7F244AA"
         app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
         app:layout_constraintStart_toStartOf="parent"
@@ -710,7 +713,7 @@
         android:layout_marginTop="7dp"
         android:background="@android:color/darker_gray"
         android:text="Realizar TVPS"
-        android:textSize="11sp"
+        android:textSize="18sp"
         app:backgroundTint="#F7F244AA"
         app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
         app:layout_constraintStart_toStartOf="parent"
@@ -723,7 +726,7 @@
         android:layout_marginBottom="15dp"
         android:background="@android:color/darker_gray"
         android:text="Aceptar"
-        android:textSize="12sp"
+        android:textSize="18sp"
         app:backgroundTint="#F7F244AA"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/iv_foto"
@@ -737,11 +740,11 @@
         android:layout_marginEnd="40dp"
         android:background="@android:color/darker_gray"
         android:text="Aceptar"
-        android:textSize="12sp"
+        android:textSize="18sp"
         app:backgroundTint="#F7F244AA"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_horizontal_08"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
+        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_06" />
 
 
     <Button
@@ -752,7 +755,7 @@
         android:layout_marginBottom="15dp"
         android:background="@android:color/darker_gray"
         android:text="Salir"
-        android:textSize="12sp"
+        android:textSize="18sp"
         app:backgroundTint="#F7F244AA"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/bt_aceptar"
@@ -766,11 +769,11 @@
         android:layout_marginBottom="15dp"
         android:background="@android:color/darker_gray"
         android:text="Salir"
-        android:textSize="12sp"
+        android:textSize="18sp"
         app:backgroundTint="#F7F244AA"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_horizontal_08"
         app:layout_constraintEnd_toStartOf="@id/bt_aceptar_insert"
-        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
+        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_06" />
 
 
     <ImageButton
