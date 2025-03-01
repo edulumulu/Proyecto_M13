@@ -58,6 +58,7 @@ public class Utilidades {
 
     /**
      * Método para saber si han pasado 18 años de la fecha introducida
+     *
      * @param fechaNacimiento
      * @return
      */
@@ -77,12 +78,35 @@ public class Utilidades {
     }
 
     /**
+     * Método para saber si la fecha elegida corres ponde a una persona de entre 1 y 100 años
+     *
+     * @param fechaNacimiento
+     * @return
+     */
+    public static boolean fecha_valida(Date fechaNacimiento) {
+        Calendar cal = Calendar.getInstance();
+        int añoActual = cal.get(Calendar.YEAR);
+        int añoNacimiento = fechaNacimiento.getYear() + 1900; // Ajustar año de Date
+
+        int edad = añoActual - añoNacimiento;
+
+        // Verificar si aún no ha cumplido años en el año actual
+        if (cal.get(Calendar.MONTH) < fechaNacimiento.getMonth() ||
+                (cal.get(Calendar.MONTH) == fechaNacimiento.getMonth() && cal.get(Calendar.DAY_OF_MONTH) < fechaNacimiento.getDate())) {
+            edad--;
+        }
+
+        return edad >= 1 && edad <= 100;
+    }
+
+
+    /**
      * Metodo que retorna un cliente del ArrayList a partir de su id
      *
      * @param id
      * @return
      */
-    public static Cliente obtener_cliente_por_id(int id , ArrayList<Cliente> listaclientes) {
+    public static Cliente obtener_cliente_por_id(int id, ArrayList<Cliente> listaclientes) {
         for (Cliente cliente : listaclientes) {
             if (cliente.getId() == id) {
                 return cliente; // Retorna el cliente si encuentra coincidencia
@@ -90,6 +114,30 @@ public class Utilidades {
         }
         return null;
     }
+
+    /**
+     * Metodo para comprobar que el nombre y apellidos o el dni no coincida con otro cliente del arraylist
+     * @param id
+     * @param nombre
+     * @param apellido
+     * @param dni
+     * @param listaClientes
+     * @return
+     */
+    public static boolean nombreYDniNoRepetidos(int id, String nombre, String apellido, String dni, ArrayList<Cliente> listaClientes) {
+        for (Cliente cli : listaClientes) {
+            if (cli.getId() != id) { // Permitir solo si el ID es diferente
+                if (cli.getName().equalsIgnoreCase(nombre) && cli.getSurname().equalsIgnoreCase(apellido)) {
+                    return false; // Ya existe alguien con ese nombre y apellido
+                }
+                if (cli.getDni().equalsIgnoreCase(dni)) {
+                    return false; // Ya existe alguien con ese DNI
+                }
+            }
+        }
+        return true; // Si no encontró coincidencias, devuelve true
+    }
+
 
     /**
      * Método que elimina un cliente del array list por id
@@ -147,19 +195,25 @@ public class Utilidades {
         return ok;
     }
 
-    public static void visibilidad_botones (boolean mostrar , Button[] botones){
+    public static void visibilidad_botones(boolean mostrar, Button[] botones) {
         int visibility = mostrar ? View.VISIBLE : View.GONE;
 
-        for(Button bt : botones){
+        for (Button bt : botones) {
             bt.setVisibility(visibility);
         }
     }
 
-    public static void visibilidad_Textviews (boolean mostrar, TextView[] botones){
+    public static void visibilidad_Textviews(boolean mostrar, TextView[] botones) {
         int visibility = mostrar ? View.VISIBLE : View.GONE;
 
-        for(TextView tv : botones){
+        for (TextView tv : botones) {
             tv.setVisibility(visibility);
+        }
+    }
+
+    public static void desactivar_activar_Botones(boolean habilitados, Button[] botones) {
+        for (Button bt : botones) {
+            bt.setEnabled(habilitados); // Habilita o deshabilita cada botón
         }
     }
 

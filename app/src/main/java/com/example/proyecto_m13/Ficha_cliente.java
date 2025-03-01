@@ -1,7 +1,10 @@
 package com.example.proyecto_m13;
 
+import static Utilidades.Utilidades.desactivar_activar_Botones;
 import static Utilidades.Utilidades.eliminar_Cliente_PorId;
+import static Utilidades.Utilidades.fecha_valida;
 import static Utilidades.Utilidades.modificar_Cliente_EnLista;
+import static Utilidades.Utilidades.nombreYDniNoRepetidos;
 import static Utilidades.Utilidades.obtener_cliente_por_id;
 import static Utilidades.Utilidades.visibilidad_Textviews;
 import static Utilidades.Utilidades.visibilidad_botones;
@@ -50,6 +53,7 @@ public class Ficha_cliente extends AppCompatActivity {
     private static ArrayList<Cliente> lista_clientes = new ArrayList<>();
     private int cliente_selecionado_id;
     private Date fecha_nacimiento_Seleccionada;
+    private boolean cliente_selecionado = false;
 
 
     //Variables parte izquierda de la app
@@ -130,6 +134,7 @@ public class Ficha_cliente extends AppCompatActivity {
                 String eleccion = (String) adapterView.getItemAtPosition(i);
                 for (Cliente cli : lista_clientes) {
                     if (eleccion.equalsIgnoreCase(cli.getName() + " " + cli.getSurname())) {
+                        cliente_selecionado = true;
                         cliente_selecionado_id = cli.getId();
                         Log.d("Cliente seleccionado", "ID: " + cliente_selecionado_id);
 
@@ -137,6 +142,8 @@ public class Ficha_cliente extends AppCompatActivity {
                         cargar_cliente_en_ficha(cli);
                         //Los campos de los datos del cliente no se pueden editar
                         campos_ficha_editables(false);
+                        //activo botones restantes
+                        desactivar_activar_Botones(true, new Button[]{bt_update, bt_delete, bt_test});
                         //Invisibilizo los botones de manipular modificar y de insertar
                         visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir });
                         break;
@@ -151,6 +158,8 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_insert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                desactivar_activar_Botones(false, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
 
                 //Vista del formulario editable
                 preparar_formulario_insert();
@@ -178,10 +187,11 @@ public class Ficha_cliente extends AppCompatActivity {
                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                                 fecha_nacimiento_Seleccionada = sdf.parse(textoFecha);  // Convertir el texto en un objeto Date
 
-                                if (fecha_nacimiento_Seleccionada != null) {
+                                if (fecha_nacimiento_Seleccionada != null && fecha_valida(fecha_nacimiento_Seleccionada)) {
                                     if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
                                         title_tutor.setVisibility(View.GONE);
                                         et_tutor.setVisibility(View.GONE);
+                                        et_tutor.setText(null);
                                         et_tutor.setEnabled(false);  // Deshabilitar campo tutor si es mayor de edad
                                         Log.d("Fecha", "Es mayor de edad, se deshabilita el campo tutor");
                                     } else {
@@ -200,17 +210,23 @@ public class Ficha_cliente extends AppCompatActivity {
                 });
 
 
-                //recoger datos del cliente y hacer el insert
-
-                //3. boton aceptar
-
-
             }
         });
 
         bt_insertar_aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // Verificar si el nombre y apellido ya están registrados en la base de datos
+                for (Cliente cli : lista_clientes) {
+                    if (et_name.getText().toString().equalsIgnoreCase(cli.getName()) &&
+                            et_surname.getText().toString().equalsIgnoreCase(cli.getSurname())) {
+                        Toast.makeText(Ficha_cliente.this, "El usuario con ese nombre y apellido ya está registrado", Toast.LENGTH_SHORT).show();
+                    }
+                    if (et_dni.getText().toString().equalsIgnoreCase(cli.getDni())) {
+                        Toast.makeText(Ficha_cliente.this, "El usuario con ese DNI ya está registrado", Toast.LENGTH_SHORT).show();
+                    }
+                }
 
                 //Comprobacion general de los campos rellenos
                 if (!comprobación_de_relleno_formulario()) {
@@ -278,6 +294,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     iv_foto.setVisibility(View.VISIBLE);
                     et_tutor.setVisibility(View.VISIBLE);
                     title_age.setText("Edad:");
+                    desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
 
                 }
 
@@ -290,6 +307,14 @@ public class Ficha_cliente extends AppCompatActivity {
                 title_age.setText("Edad");
                 campos_ficha_visibilidad(false);
                 visibilidad_botones(false, new Button[]{bt_insertar_salir, bt_insertar_aceptar});
+
+                if(cliente_selecionado){
+                    desactivar_activar_Botones(true, new Button[]{bt_delete, bt_test, bt_update, bt_insert});
+                }else{
+                    desactivar_activar_Botones(false, new Button[]{bt_delete, bt_test, bt_update});
+                    bt_insert.setEnabled(true);
+                }
+
             }
         });
 
@@ -298,6 +323,10 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // Desactivo botones hasta quwe se resuelva accion
+                desactivar_activar_Botones(false, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+
                 if(tv_id.getText().toString().isEmpty()){
                     Toast.makeText(Ficha_cliente.this, "Debes selecionar un cliente previamente", Toast.LENGTH_SHORT).show();
                     return;
@@ -349,18 +378,21 @@ public class Ficha_cliente extends AppCompatActivity {
                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                                 fecha_nacimiento_Seleccionada = sdf.parse(textoFecha);  // Convertir el texto en un objeto Date
 
-                                if (fecha_nacimiento_Seleccionada != null) {
-                                    if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
-                                        title_tutor.setVisibility(View.GONE);
-                                        et_tutor.setVisibility(View.GONE);
-                                        et_tutor.setEnabled(false);  // Deshabilitar campo tutor si es mayor de edad
-                                        Log.d("Fecha", "Es mayor de edad, se deshabilita el campo tutor");
-                                    } else {
-                                        title_tutor.setVisibility(View.VISIBLE);
-                                        et_tutor.setVisibility(View.VISIBLE);
-                                        et_tutor.setEnabled(true);  // Habilitar campo tutor si es menor de edad
-                                        Log.d("Fecha", "Es menor de edad, se habilita el campo tutor");
-                                    }
+                                if (fecha_nacimiento_Seleccionada != null ) {
+
+                                        if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
+                                            title_tutor.setVisibility(View.GONE);
+                                            et_tutor.setVisibility(View.GONE);
+                                            et_tutor.setText(null);
+                                            et_tutor.setEnabled(false);  // Deshabilitar campo tutor si es mayor de edad
+                                            Log.d("Fecha", "Es mayor de edad, se deshabilita el campo tutor");
+                                        } else {
+                                            title_tutor.setVisibility(View.VISIBLE);
+                                            et_tutor.setVisibility(View.VISIBLE);
+                                            et_tutor.setEnabled(true);  // Habilitar campo tutor si es menor de edad
+                                            Log.d("Fecha", "Es menor de edad, se habilita el campo tutor");
+                                        }
+
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -375,19 +407,15 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_modificar_aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Verificar si el nombre y apellido ya están registrados en la base de datos
-                for (Cliente cli : lista_clientes) {
-                    if (et_name.getText().toString().equalsIgnoreCase(cli.getName()) &&
-                            et_surname.getText().toString().equalsIgnoreCase(cli.getSurname())) {
-                        Toast.makeText(Ficha_cliente.this, "El usuario con ese nombre y apellido ya está registrado", Toast.LENGTH_SHORT).show();
-                    }
-                    if (et_dni.getText().toString().equalsIgnoreCase(cli.getDni())) {
-                        Toast.makeText(Ficha_cliente.this, "El usuario con ese DNI ya está registrado", Toast.LENGTH_SHORT).show();
-                    }
-                }
 
                 //Verificar comprobaciones genrales de ingreso de datos
                 if (!comprobación_de_relleno_formulario()) {
+                    return;
+                }
+
+                //Comprobar que los nombres no existen ya en otros clientes
+                if(!nombreYDniNoRepetidos(cliente_selecionado_id, et_name.getText().toString(), et_surname.getText().toString(), et_dni.getText().toString(), lista_clientes )){
+                    Toast.makeText(Ficha_cliente.this, "Nombre o DNI ya exstentes en la base de datos", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 //Si no es mayor de edad aparece campro tuor
@@ -396,6 +424,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     Toast.makeText(Ficha_cliente.this, "Es menor de edad, debes incluir un tutor", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 //Si no lo es se modifica el contenido del editTest
                 if(Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)){
                     et_tutor.setText("");
@@ -466,6 +495,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     title_age.setText("Edad:");
 
                     et_age.setText(String.valueOf(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).calcularEdad()));
+                    desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
 
                 }
 
@@ -482,6 +512,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
                 iv_foto.setVisibility(View.VISIBLE);
+                desactivar_activar_Botones(true, new Button[]{bt_delete, bt_test, bt_update, bt_insert});
 
             }
         });
@@ -514,6 +545,7 @@ public class Ficha_cliente extends AppCompatActivity {
                                     actualizar_nombres_buscador(lista_clientes, buscar_clientes);
                                     campos_ficha_visibilidad(false);
                                     title_age.setText("Edad:");
+                                    desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
                                 }
 
 
@@ -562,6 +594,7 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_delete = findViewById(R.id.bt_delete);
         bt_test = findViewById(R.id.bt_test);
         ib_exit = findViewById(R.id.ib_exit);
+        desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
     }
 
     /**
@@ -692,6 +725,12 @@ public class Ficha_cliente extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
             Toast.makeText(Ficha_cliente.this, "El formato de la fecha es incorrecto", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(fecha_valida(fecha_nacimiento_Seleccionada)){
+        }else{
+            Toast.makeText(Ficha_cliente.this, "El Cliente debe tener entre 1 y 100 años", Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -928,147 +967,4 @@ public class Ficha_cliente extends AppCompatActivity {
 
 
 
-    //Metodos traspasados a el pacage utilidades
-    /**
-     * Modifica el cliente modificado en el Arraylista (lista de clientes en memoria)
-     *
-     * @param clienteId
-     * @param nuevoCliente
-     * @return
-     */
-    /*public boolean modificar_Cliente_EnLista(int clienteId, Cliente nuevoCliente) {
-
-        boolean ok = false;
-        for (int i = 0; i < lista_clientes.size(); i++) {
-            Cliente cliente = lista_clientes.get(i);
-
-            // Si encontramos al cliente con el ID correspondiente
-            if (cliente.getId() == clienteId) {
-                // Actualizar el cliente con los nuevos datos
-                lista_clientes.set(i, nuevoCliente);  // Reemplazar el cliente en la lista
-                ok = true;
-                break;  // Salir del bucle cuando encontramos al cliente
-            }
-        }
-        return ok;
-    }*/
-
-    /**
-     * Método que elimina un cliente del array list por id
-     *
-     * @param clienteId
-     * @return
-     */
-    /*public boolean eliminar_Cliente_PorId(int clienteId) {
-
-        boolean ok = false;
-        for (int i = 0; i < lista_clientes.size(); i++) {
-            Cliente cliente = lista_clientes.get(i);
-
-            // Si encontramos al cliente con el ID correspondiente
-            if (cliente.getId() == clienteId) {
-                // Actualizar el cliente con los nuevos datos
-                lista_clientes.remove(i);
-                ok = true;
-                break;  // Salir del bucle cuando encontramos al cliente
-            }
-        }
-        return ok;
-
-        */
-
-    /**
-     * Metodo que retorna un cliente del ArrayList a partir de su id
-     *
-     * @param id
-     * @return
-     */
-    /*public Cliente obtener_cliente_por_id(int id) {
-        for (Cliente cliente : lista_clientes) {
-            if (cliente.getId() == id) {
-                return cliente; // Retorna el cliente si encuentra coincidencia
-            }
-        }
-        return null;
-    }*/
-
-    /**
-     * Método para saber si han pasado 18 años de la fecha introducida
-     * @param fechaNacimiento
-     * @return
-     */
-    /*public static boolean esMayorDeEdad(Date fechaNacimiento) {
-        Calendar cal = Calendar.getInstance();
-        int edadActual = cal.get(Calendar.YEAR) - (fechaNacimiento.getYear() + 1900); // Sumamos 1900 ya que el año de Date es desde 1900
-
-        if (cal.get(Calendar.MONTH) < fechaNacimiento.getMonth()) {
-            edadActual--; // Si la fecha actual aún no ha llegado al cumpleaños
-        } else if (cal.get(Calendar.MONTH) == fechaNacimiento.getMonth()) {
-            if (cal.get(Calendar.DAY_OF_MONTH) < fechaNacimiento.getDate()) {
-                edadActual--; // Si el cumpleaños no ha pasado en el mes actual
-            }
-        }
-
-        return edadActual >= 18;  // Si tiene 18 años o más, es mayor de edad
-    }*/
-
-    /**
-     * Método que comprba si los editText están vacios
-     *
-     * @param campos
-     * @return
-     */
-    /*public boolean campos_estan_vacios(EditText... campos) {
-        for (EditText campo : campos) {
-            if (campo.getText().toString().trim().isEmpty()) {
-                return true;
-            }
-        }
-        return false;
-    }*/
-
-    /**
-     * Método que devuelve un ArrayList de empleados prefijado
-     *
-     * @return
-     */
-    /*public ArrayList<Cliente> cargar_lista_empleados() {
-        ArrayList<Cliente> lista = new ArrayList<>();
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-        try {
-            lista.add(new Cliente(1, "Eduardo", "Lucas", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco", true, dateFormat.parse("10/05/2019"), "gafas", false, "Illescas 27", 28047, "Madird"));
-            lista.add(new Cliente(2, "Carlos", "Herrera", "520546567L", dateFormat.parse("06/02/2019"), 123456789, "paco@gmail", "Antonio Lucas", false, null, null, false, "Valmo 27", 28047, "Barcelona"));
-            lista.add(new Cliente(3, "Bibiana", "Martinez", "520546123G", dateFormat.parse("10/11/2022"), 123456789, "sara@gmail", null, true, dateFormat.parse("10/11/2022"), "lentillas", true, "Oca 27", 28047, "Lugo"));
-            lista.add(new Cliente(4, "Eduardo", "Jose", "520546666K", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail", "Paco", true, dateFormat.parse("10/05/2019"), "gafas", false, "Illescas 27", 28047, "Madird"));
-
-            return lista;
-        } catch (ParseException e) {
-            Toast.makeText(Ficha_cliente.this, "Error al cargar los datos por defecto", Toast.LENGTH_SHORT).show();
-            return lista;
-        }
-
-    }*/
-
-    /*private void mostrarDatePicker() {
-        // Obtener la fecha actual
-        final Calendar calendario = Calendar.getInstance();
-        int anio = calendario.get(Calendar.YEAR);
-        int mes = calendario.get(Calendar.MONTH);
-        int dia = calendario.get(Calendar.DAY_OF_MONTH);
-
-        // Crear y mostrar el DatePickerDialog
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                this,
-                (DatePicker view, int year, int month, int dayOfMonth) -> {
-                    // Formatear la fecha y mostrarla en el EditText
-                    String fechaSeleccionada = dayOfMonth + "/" + (month + 1) + "/" + year;
-                    et_age.setText(fechaSeleccionada);
-                },
-                anio, mes, dia
-        );
-
-        datePickerDialog.show();
-    }*/
 }

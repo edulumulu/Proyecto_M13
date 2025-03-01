@@ -712,7 +712,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="7dp"
         android:background="@android:color/darker_gray"
-        android:text="Realizar TVPS"
+        android:text="Test TVPS"
         android:textSize="18sp"
         app:backgroundTint="#F7F244AA"
         app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
