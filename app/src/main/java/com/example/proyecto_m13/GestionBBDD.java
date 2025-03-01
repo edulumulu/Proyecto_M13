@@ -1,23 +1,22 @@
 package com.example.proyecto_m13;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
+import android.util.Log;
 import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class GestionBBDD {
 
@@ -28,7 +27,7 @@ public class GestionBBDD {
             @Override
             protected String doInBackground(Void... voids){
                 try{
-                    URL url = new URL("http://ipservidor/nombrearchivo.php");
+                    URL url = new URL("http://192.168.0.105/db_validation.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type","application/json; utf-8");
@@ -57,7 +56,8 @@ public class GestionBBDD {
                 }
             }
 
-            protected void onPostExecute (Context context, String response){
+            protected void onPostExecute (String response){
+
                 if (response != null){
                     try{
                         JSONObject jsonResponse = new JSONObject(response);
@@ -69,14 +69,10 @@ public class GestionBBDD {
                             Intent intent = new Intent(context,Ficha_cliente.class);
                             context.startActivity(intent);
                             intent.putExtra("usuario", usuario);
+                            context.startActivity(intent);
 
-                            if (context instanceof android.app.Activity) {
-                                android.app.Activity activity = (android.app.Activity) context;
-                                context.startActivity(intent);
-                                activity.finish();
-                            } else {
-                                Toast.makeText(context, "No se puede cerrar la actividad", Toast.LENGTH_LONG).show();
-                            }
+                        }else {
+                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
                         }
                     }catch (Exception e) {
                         e.printStackTrace();
@@ -100,7 +96,7 @@ public class GestionBBDD {
             protected ArrayList<Cliente> doInBackground(Void... voids) {
                 ArrayList<Cliente> listaClientes = new ArrayList<>();
                 try {
-                    URL url = new URL("http://ipservidor/nombrearchivo.php");
+                    URL url = new URL("http://192.168.0.105/db_select.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("GET");
                     conexion.setRequestProperty("Accept", "application/json");
@@ -114,6 +110,8 @@ public class GestionBBDD {
                     }
 
                     // Procesar los datos de la respuesta JSON
+                    Log.d("ServerResponse", "Respuesta del servidor: " + response.toString());
+
                     JSONObject jsonObject = new JSONObject(response.toString());
                     String estado = jsonObject.getString("estado");
 
@@ -121,14 +119,37 @@ public class GestionBBDD {
                         JSONArray jsonListado = jsonObject.getJSONArray("datos");
                         for (int i = 0; i < jsonListado.length(); i++) {
                             JSONObject jsonCliente = jsonListado.getJSONObject(i);
-                           /* Cliente cliente = new Cliente(
-                                    jsonCliente.getString("usuario"),
-                                    jsonCliente.getString("contrasena")
+
+                            // Convertir fecha de nacimiento a Date
+                            Date dateBorn = null;
+                            try {
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                dateBorn = sdf.parse(jsonCliente.getString("date_born"));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            Cliente cliente = new Cliente(
+                                    jsonCliente.getInt("id"),
+                                    jsonCliente.getString("name"),
+                                    jsonCliente.getString("surname"),
+                                    jsonCliente.getString("dni"),
+                                    dateBorn,
+                                    jsonCliente.getInt("tlf"),
+                                    jsonCliente.getString("email"),
+                                    jsonCliente.optString("tutor", ""),
+                                    jsonCliente.getBoolean("graduate"),
+                                    jsonCliente.optString("date_graduacion", ""),
+                                    jsonCliente.optString("tipo_lentes", ""),
+                                    jsonCliente.getBoolean("Test_TVPS"),
+                                    jsonCliente.getString("street"),
+                                    jsonCliente.getInt("cp"),
+                                    jsonCliente.getString("ciudad")
+                            );
 
                             listaClientes.add(cliente);
-                            );
-                            */
                         }
+
                     }
 
                 } catch (Exception e) {
@@ -164,8 +185,8 @@ public class GestionBBDD {
 
                     // Crear el objeto JSON con los datos del cliente
                     JSONObject jsonInsertar = new JSONObject();
-                    //jsonInsertar.put("nombre", cliente.getNombre());
-                    //jsonInsertar.put("apellido", cliente.getApellido());
+                    jsonInsertar.put("nombre", cliente.getName());
+                    jsonInsertar.put("apellido", cliente.getSurname());
                     jsonInsertar.put("email", cliente.getEmail());
 
                     // Enviar el objeto JSON como cuerpo de la solicitud
@@ -275,20 +296,20 @@ public class GestionBBDD {
 
 
     @SuppressLint("StaticFieldLeak")
-    public void eliminarCliente(Context context, String idUsuario) {
+    public void eliminarCliente(Context context, int id_cliente) {
         new AsyncTask<Void, Void, String>() {
 
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    URL url = new URL("http://ipservidor/nombrearchivo_eliminar.php");
+                    URL url = new URL("http://192.168.0.105/db_delete.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type", "application/json; utf-8");
                     conexion.setDoOutput(true);
 
                     JSONObject jsonEliminar = new JSONObject();
-                    jsonEliminar.put("idUsuario", idUsuario);
+                    jsonEliminar.put("id_cliente", id_cliente);
 
                     OutputStream os = conexion.getOutputStream();
                     os.write(jsonEliminar.toString().getBytes("UTF-8"));
