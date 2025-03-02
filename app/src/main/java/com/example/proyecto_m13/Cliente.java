@@ -43,7 +43,7 @@ public class Cliente {
     }
     //constructor sin id
 
-    public Cliente(String name, String surname, String dni, Date date_born, int tlf, String email, String tutor, boolean b, Date parse, String street, boolean b1, String s, int cp, String ciudad) {
+    public Cliente(String name, String surname, String dni, Date date_born, int tlf, String email, String tutor, String street, int cp, String ciudad){
         this.name = name;
         this.surname = surname;
         this.dni = dni;
