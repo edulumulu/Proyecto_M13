@@ -2,6 +2,7 @@ package com.example.proyecto_m13;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.time.LocalDate;
 
 public class Cliente {
     int id;
@@ -24,7 +25,7 @@ public class Cliente {
 
 
     //Constructor con todo
-    public Cliente(int id, String name, String surname, String dni, Date date_born, int tlf, String email, String tutor, boolean graduate, Date date_graduacion, String tipo_lentes, boolean test_TVPS, String street, int cp, String ciudad) {
+    public Cliente(int id, String name, String surname, String dni, Date date_born, int tlf, String email, String tutor, boolean graduate, Date date_graduacion, String tipo_lentes, boolean test_TVPS, String street, int cp, String ciudad){
         this.id = id;
         this.name = name;
         this.surname = surname;

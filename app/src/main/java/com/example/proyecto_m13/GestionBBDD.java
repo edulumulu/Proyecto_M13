@@ -199,15 +199,16 @@ public class GestionBBDD {
                     jsonInsertar.put("c_p", cliente.getCp());
                     jsonInsertar.put("ciudad", cliente.getCiudad());
                     jsonInsertar.put("tutor_legal", cliente.getTutor());
+                    /* Lo dejo comentado porque en ficha cliente veo que utiliza el constructor sin estos datos
                     jsonInsertar.put("graduado", cliente.getGraduate());
                     jsonInsertar.put("tipo_lente", cliente.getTipo_lentes());
                     jsonInsertar.put("test_completado", cliente.getTest_TVPS());
                     jsonInsertar.put("resultado_test", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
-
+*/
 
                     // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
                     jsonInsertar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
-                    jsonInsertar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
+ //                   jsonInsertar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
 
 
                     // objeto JSON que se envia

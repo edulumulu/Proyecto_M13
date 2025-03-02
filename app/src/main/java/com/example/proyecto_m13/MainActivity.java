@@ -58,10 +58,9 @@ public class MainActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
             //lo inserto con id 1 aunque internamente va a tener otro id en la base de datos
-          /* gestionBBDD.insertarCliente(this, new Cliente(1,"Carlos", "Herrera",
-                   "520546567L", dateFormat.parse("06/02/2019"),
-                   123456789, "paco@gmail", "Antonio Lucas", false, null,
-                   null, false, "Valmo 27", 28047, "Barcelona")); y
+          /*gestionBBDD.insertarCliente(this, new Cliente("Carlos", "Herrera",
+                   "22222222L", dateFormat.parse("06/02/2019"),
+                   123456789, "paco@gmail", "Antonio Lucas","Valmo 27", 28047, "Barcelona"));
 
            /*gestionBBDD.modificarCliente(this,new Cliente(2, "Bibiana", "Martin",
                     "520546668J", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail",

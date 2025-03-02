@@ -244,7 +244,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 //Cliente que usaré para hacer el insert
                 //SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                //Cliente cli = new Cliente(nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, true, dateFormat.parse("10/05/2019"), street, false, "Illescas 27", cp, city);
+                //Cliente cli = new Cliente(nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, street, cp, city);
 
                         /*//Para cuando mi compañero tenga el metodo hecho
                         //1 hago el insert en BBDD
