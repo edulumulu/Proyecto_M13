@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-
+    public static final String BASE_URL = "http://192.168.0.10/";
     @SuppressLint("StaticFieldLeak")
     public void comprobarCredenciales (Context context, String usuario, String contrasena){
         new AsyncTask<Void, Void, String>(){
@@ -27,7 +27,7 @@ public class GestionBBDD {
             @Override
             protected String doInBackground(Void... voids){
                 try{
-                    URL url = new URL("http://192.168.0.105/db_validation.php");
+                    URL url = new URL(BASE_URL + "db_validation.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type","application/json; utf-8");
@@ -85,7 +85,7 @@ public class GestionBBDD {
         }.execute();
     }
 
-    public interface ClienteCallback {
+    /*public interface ClienteCallback {
         void onClientesListados(ArrayList<Cliente> listaClientes);
     }
 
@@ -169,31 +169,54 @@ public class GestionBBDD {
             }
         }.execute();
     }
-
+*/
     @SuppressLint("StaticFieldLeak")
     public void insertarCliente(Context context, Cliente cliente) {
         new AsyncTask<Void, Void, String>() {
-
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    URL url = new URL("http://ipservidor/nombrearchivo_insertar.php");
+                    // Se establece la URL del servicio donde se enviarán los datos
+                    URL url = new URL(BASE_URL+"db_insert.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+
+                    // Se configura la conexión para enviar una solicitud POST con datos en formato JSON
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type", "application/json; utf-8");
                     conexion.setDoOutput(true);
 
-                    // Crear el objeto JSON con los datos del cliente
-                    JSONObject jsonInsertar = new JSONObject();
-                    jsonInsertar.put("nombre", cliente.getName());
-                    jsonInsertar.put("apellido", cliente.getSurname());
-                    jsonInsertar.put("email", cliente.getEmail());
+                    // Se define un formateador de fechas para convertir objetos Date a cadenas en formato "yyyy-MM-dd"
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-                    // Enviar el objeto JSON como cuerpo de la solicitud
+                    // Se crea un objeto JSON con los datos del cliente a insertar en la base de datos
+                    JSONObject jsonInsertar = new JSONObject();
+                    jsonInsertar.put("dni", cliente.getDni());
+                    jsonInsertar.put("nombre", cliente.getName());
+                    jsonInsertar.put("apellidos", cliente.getSurname());
+                    jsonInsertar.put("telefono", cliente.getTlf());
+                    jsonInsertar.put("email", cliente.getEmail());
+                    jsonInsertar.put("calle", cliente.getStreet());
+                    jsonInsertar.put("c_p", cliente.getCp());
+                    jsonInsertar.put("ciudad", cliente.getCiudad());
+                    jsonInsertar.put("tutor_legal", cliente.getTutor());
+                    /* Lo dejo comentado porque en ficha cliente veo que utiliza el constructor sin estos datos
+                    jsonInsertar.put("graduado", cliente.getGraduate());
+                    jsonInsertar.put("tipo_lente", cliente.getTipo_lentes());
+                    jsonInsertar.put("test_completado", cliente.getTest_TVPS());
+                    jsonInsertar.put("resultado_test", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
+*/
+
+                    // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
+                    jsonInsertar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
+ //                   jsonInsertar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
+
+
+                    // objeto JSON que se envia
                     OutputStream os = conexion.getOutputStream();
                     os.write(jsonInsertar.toString().getBytes("UTF-8"));
                     os.close();
 
+                    // Se recibe y procesa la respuesta del servidor
                     BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
                     StringBuilder response = new StringBuilder();
                     String responseLine;
@@ -201,6 +224,8 @@ public class GestionBBDD {
                         response.append(responseLine.trim());
                     }
                     br.close();
+
+                    // Se retorna la respuesta obtenida del servidor
                     return response.toString();
 
                 } catch (Exception e) {
@@ -209,53 +234,81 @@ public class GestionBBDD {
                 }
             }
 
+            @Override
             protected void onPostExecute(String response) {
                 if (response != null) {
                     try {
+                        // Se procesa la respuesta del servidor, interpretando los datos en formato JSON
                         JSONObject jsonResponse = new JSONObject(response);
                         String estado = jsonResponse.getString("estado");
                         String mensaje = jsonResponse.getString("mensaje");
 
+                        // Se verifica si la inserción fue exitosa y se muestra un mensaje acorde
                         if ("correcto".equals(estado)) {
                             Toast.makeText(context, "Cliente insertado correctamente", Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
                     }
                 } else {
+                    // Se muestra un mensaje si hubo un problema con la conexión al servidor
                     Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
                 }
             }
         }.execute();
     }
+
 
     @SuppressLint("StaticFieldLeak")
     public void modificarCliente(Context context, Cliente cliente) {
         new AsyncTask<Void, Void, String>() {
-
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    URL url = new URL("http://ipservidor/nombrearchivo_modificar.php");
+                    // Se establece la URL del servicio que procesará la modificación del cliente
+                    URL url = new URL(BASE_URL + "db_update.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+
+                    // Se configura la conexión para enviar una solicitud POST con datos en formato JSON
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type", "application/json; utf-8");
                     conexion.setDoOutput(true);
 
-                    // Crear el objeto JSON con los datos del cliente
-                    JSONObject jsonModificar = new JSONObject();
-                    //jsonModificar.put("nombre", cliente.getNombre());
-                    //jsonModificar.put("apellido", cliente.getApellido());
-                    jsonModificar.put("email", cliente.getEmail());
+                    // Se define un formateador de fechas para convertir objetos Date a cadenas en formato "yyyy-MM-dd"
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-                    // Enviar el objeto JSON como cuerpo de la solicitud
+                    // Se crea un objeto JSON con los datos del cliente a modificar
+                    JSONObject jsonModificar = new JSONObject();
+                    jsonModificar.put("id_cliente", cliente.getId());
+                    jsonModificar.put("dni", cliente.getDni());
+                    jsonModificar.put("nombre", cliente.getName());
+                    jsonModificar.put("apellidos", cliente.getSurname());
+                    jsonModificar.put("telefono", cliente.getTlf());
+                    jsonModificar.put("email", cliente.getEmail());
+                    jsonModificar.put("calle", cliente.getStreet());
+                    jsonModificar.put("c_p", cliente.getCp());
+                    jsonModificar.put("ciudad", cliente.getCiudad());
+
+                    // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
+                    jsonModificar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
+                    jsonModificar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
+
+                    // Se manejan los valores opcionales, enviando null en caso de que no tengan datos
+                    jsonModificar.put("tutor_legal", cliente.getTutor() != null ? cliente.getTutor() : JSONObject.NULL);
+                    jsonModificar.put("graduado", cliente.getGraduate() ? 1 : 0);
+                    jsonModificar.put("tipo_lente", cliente.getTipo_lentes() != null ? cliente.getTipo_lentes() : JSONObject.NULL);
+                    jsonModificar.put("test_completado", cliente.getTest_TVPS() ? 1 : 0);
+                    jsonModificar.put("resultado_test", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
+
+                    // Se envía el objeto JSON en el cuerpo de la solicitud
                     OutputStream os = conexion.getOutputStream();
                     os.write(jsonModificar.toString().getBytes("UTF-8"));
                     os.close();
 
+                    // Se recibe y procesa la respuesta del servidor
                     BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
                     StringBuilder response = new StringBuilder();
                     String responseLine;
@@ -263,6 +316,8 @@ public class GestionBBDD {
                         response.append(responseLine.trim());
                     }
                     br.close();
+
+                    // Se retorna la respuesta obtenida del servidor
                     return response.toString();
 
                 } catch (Exception e) {
@@ -271,29 +326,32 @@ public class GestionBBDD {
                 }
             }
 
+            @Override
             protected void onPostExecute(String response) {
                 if (response != null) {
                     try {
+                        // Se procesa la respuesta del servidor, interpretando los datos en formato JSON
                         JSONObject jsonResponse = new JSONObject(response);
                         String estado = jsonResponse.getString("estado");
                         String mensaje = jsonResponse.getString("mensaje");
 
+                        // Se verifica si la modificación fue exitosa y se muestra un mensaje acorde
                         if ("correcto".equals(estado)) {
                             Toast.makeText(context, "Cliente modificado correctamente", Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
                     }
                 } else {
+                    // Se muestra un mensaje si hubo un problema con la conexión al servidor
                     Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
                 }
             }
         }.execute();
     }
-
 
     @SuppressLint("StaticFieldLeak")
     public void eliminarCliente(Context context, int id_cliente) {
@@ -302,7 +360,7 @@ public class GestionBBDD {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    URL url = new URL("http://192.168.0.105/db_delete.php");
+                    URL url = new URL(BASE_URL+"db_delete.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type", "application/json; utf-8");
