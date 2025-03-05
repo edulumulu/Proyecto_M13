@@ -51,6 +51,7 @@ import Utilidades.Utilidades;
 public class Ficha_cliente extends AppCompatActivity {
 
     private static ArrayList<Cliente> lista_clientes = new ArrayList<>();
+    GestionBBDD gestionBBDD = new GestionBBDD();
     private int cliente_selecionado_id;
     private Date fecha_nacimiento_Seleccionada;
     private boolean cliente_selecionado = false;

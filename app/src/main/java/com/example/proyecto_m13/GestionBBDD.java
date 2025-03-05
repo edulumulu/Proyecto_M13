@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.0.105/";
+    public static final String BASE_URL = "http://192.168.1.149/";
     @SuppressLint("StaticFieldLeak")
     public void comprobarCredenciales (Context context, String usuario, String contrasena){
         new AsyncTask<Void, Void, String>(){
@@ -52,6 +52,8 @@ public class GestionBBDD {
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.d("ServerResponse", "Respuesta del servidor: MMMALA");
+
                     return null;
                 }
             }
