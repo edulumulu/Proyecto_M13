@@ -85,90 +85,89 @@ public class GestionBBDD {
         }.execute();
     }
 
-    public interface ClienteCallback {
-        void onClientesListados(ArrayList<Cliente> listaClientes);
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    public void listarClientes(Context context, final ClienteCallback callback) {
-        new AsyncTask<Void, Void, ArrayList<Cliente>>() {
-            @Override
-            protected ArrayList<Cliente> doInBackground(Void... voids) {
-                ArrayList<Cliente> listaClientes = new ArrayList<>();
-                try {
-                    URL url = new URL("http://192.168.0.105/db_select.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-                    conexion.setRequestMethod("GET");
-                    conexion.setRequestProperty("Accept", "application/json");
-
-                    // Leer la respuesta
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "utf-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-
-                    // Procesar los datos de la respuesta JSON
-                    Log.d("ServerResponse", "Respuesta del servidor: " + response.toString());
-
-                    JSONObject jsonObject = new JSONObject(response.toString());
-                    String estado = jsonObject.getString("estado");
-
-                    if (estado.equals("correcto")) {
-                        JSONArray jsonListado = jsonObject.getJSONArray("datos");
-                        for (int i = 0; i < jsonListado.length(); i++) {
-                            JSONObject jsonCliente = jsonListado.getJSONObject(i);
-
-                            // Convertir fecha de nacimiento a Date
-                            Date dateBorn = null;
-                            try {
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                                dateBorn = sdf.parse(jsonCliente.getString("date_born"));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                            Cliente cliente = new Cliente(
-                                    jsonCliente.getInt("id"),
-                                    jsonCliente.getString("name"),
-                                    jsonCliente.getString("surname"),
-                                    jsonCliente.getString("dni"),
-                                    dateBorn,
-                                    jsonCliente.getInt("tlf"),
-                                    jsonCliente.getString("email"),
-                                    jsonCliente.optString("tutor", ""),
-                                    jsonCliente.getBoolean("graduate"),
-                                    jsonCliente.optString("date_graduacion", ""),
-                                    jsonCliente.optString("tipo_lentes", ""),
-                                    jsonCliente.getBoolean("Test_TVPS"),
-                                    jsonCliente.getString("street"),
-                                    jsonCliente.getInt("cp"),
-                                    jsonCliente.getString("ciudad")
-                            );
-
-                            listaClientes.add(cliente);
-                        }
-
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return listaClientes;
-            }
-
-            @Override
-            protected void onPostExecute(ArrayList<Cliente> listaClientes) {
-                // Llamamos al callback para devolver la lista de clientes
-                if (callback != null) {
-                    callback.onClientesListados(listaClientes);
-                }else {
-
-                }
-            }
-        }.execute();
-    }
+//    public interface ClienteCallback {
+//        void onClientesListados(ArrayList<Cliente> listaClientes);
+//    }
+//
+//   @SuppressLint("StaticFieldLeak")
+//   public void listarClientes(Context context, final ClienteCallback callback) {
+//       @Override
+//            protected ArrayList<Cliente> doInBackground(Void... voids) {
+//               ArrayList<Cliente> listaClientes = new ArrayList<>();
+//               try {
+//                   URL url = new URL("http://192.168.0.105/db_select.php");
+//                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+//                    conexion.setRequestMethod("GET");
+//                    conexion.setRequestProperty("Accept", "application/json");
+//
+//                   // Leer la respuesta
+//                   BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "utf-8"));
+///                   StringBuilder response = new StringBuilder();
+//                    String responseLine;
+//                   while ((responseLine = br.readLine()) != null) {
+//////                        response.append(responseLine.trim());
+//////                    }
+//////
+////                    // Procesar los datos de la respuesta JSON
+////                    Log.d("ServerResponse", "Respuesta del servidor: " + response.toString());
+////
+////                    JSONObject jsonObject = new JSONObject(response.toString());
+////                    String estado = jsonObject.getString("estado");
+////
+////                    if (estado.equals("correcto")) {
+////                        JSONArray jsonListado = jsonObject.getJSONArray("datos");
+////                        for (int i = 0; i < jsonListado.length(); i++) {
+////                            JSONObject jsonCliente = jsonListado.getJSONObject(i);
+////
+////                            // Convertir fecha de nacimiento a Date
+////                            Date dateBorn = null;
+////                            try {
+////                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+////                                dateBorn = sdf.parse(jsonCliente.getString("date_born"));
+////                            } catch (Exception e) {
+////                                e.printStackTrace();
+////                            }
+////
+////                            Cliente cliente = new Cliente(
+////                                    jsonCliente.getInt("id"),
+////                                    jsonCliente.getString("name"),
+////                                    jsonCliente.getString("surname"),
+////                                    jsonCliente.getString("dni"),
+////                                    dateBorn,
+////                                    jsonCliente.getInt("tlf"),
+////                                    jsonCliente.getString("email"),
+////                                    jsonCliente.optString("tutor", ""),
+//                                        jsonCliente.get
+////                                    jsonCliente.getBoolean("graduate"),
+////                                    jsonCliente.optString("tipo_lentes", ""),
+////                                    jsonCliente.getBoolean("Test_TVPS"),
+////                                    jsonCliente.getString("street"),
+////                                    jsonCliente.getInt("cp"),
+////                                    jsonCliente.getString("ciudad")
+////                            );
+////
+////                            listaClientes.add(cliente);
+////                        }
+////
+////                    }
+////
+////                } catch (Exception e) {
+////                    e.printStackTrace();
+////                }
+////                return listaClientes;
+////            }
+////
+////            @Override
+////            protected void onPostExecute(ArrayList<Cliente> listaClientes) {
+////                // Llamamos al callback para devolver la lista de clientes
+////                if (callback != null) {
+////                    callback.onClientesListados(listaClientes);
+////                }else {
+////
+////                }
+////            }
+////        }.execute();
+////    }
 
     @SuppressLint("StaticFieldLeak")
     public void insertarCliente(Context context, Cliente cliente) {

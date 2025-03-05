@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         }else {
             //gestionBBDD.listarClientes(this,this);
             //gestionBBDD.eliminarCliente(this, 2);
-            //gestionBBDD.comprobarCredenciales(this, usuario, contrasena);
+            gestionBBDD.comprobarCredenciales(this, usuario, contrasena);
         }
     }
 }
