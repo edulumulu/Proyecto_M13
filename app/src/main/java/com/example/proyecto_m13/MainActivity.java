@@ -36,25 +36,25 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    try {
+                   // try {
                         iniciarSesion();
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
+                    //} catch (ParseException e) {
+                    //    throw new RuntimeException(e);
+                    //}
                 }
             });
     }
 
-    private void iniciarSesion() throws ParseException {
+    private void iniciarSesion() {
         final String usuario = etUsuario.getText().toString().trim();
         final String contrasena = etContrasena.getText().toString().trim();
 
-        if (usuario.isEmpty() || contrasena.isEmpty()){
+        if (usuario.isEmpty() || contrasena.isEmpty()) {
             Toast.makeText(this, "No puedes dejar ningún campo vacío", Toast.LENGTH_LONG).show();
-        }else {
-            //gestionBBDD.listarClientes(this,this);
+        } else {
             //gestionBBDD.eliminarCliente(this, 2);
-            //gestionBBDD.comprobarCredenciales(this, usuario, contrasena);
+            gestionBBDD.comprobarCredenciales(this, usuario, contrasena);
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
             //lo inserto con id 1 aunque internamente va a tener otro id en la base de datos
@@ -66,6 +66,24 @@ public class MainActivity extends AppCompatActivity {
                     "520546668J", dateFormat.parse("03/04/1987"), 123456789, "edu@gmail",
                     "Paco", true, dateFormat.parse("10/05/2019"),
                  "gafas", false, "Illescas 27", 28047, "Madird"));*/
+
+            // Llamar a listarClientes y manejar los datos con un callback
+            /*gestionBBDD.listarClientes(this, new GestionBBDD.ClienteCallback() {
+                @Override
+                public void onClientesListados(ArrayList<Cliente> listaClientes) {
+                    if (listaClientes != null && !listaClientes.isEmpty()) {
+                        // Imprimir clientes en Log
+                        for (Cliente cliente : listaClientes) {
+                            Log.d("Cliente", "ID: " + cliente.getId() + ", Nombre: " + cliente.getName());
+                        }
+
+                        // Mostrar mensaje con el número de clientes cargados
+                        Toast.makeText(MainActivity.this, "Clientes cargados: " + listaClientes.size(), Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });*/
         }
     }
-}
+    }

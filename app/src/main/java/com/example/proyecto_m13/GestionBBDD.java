@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.0.10/";
+    public static final String BASE_URL = "http://192.168.0.105/";
     @SuppressLint("StaticFieldLeak")
     public void comprobarCredenciales (Context context, String usuario, String contrasena){
         new AsyncTask<Void, Void, String>(){
@@ -85,7 +85,7 @@ public class GestionBBDD {
         }.execute();
     }
 
-    /*public interface ClienteCallback {
+    public interface ClienteCallback {
         void onClientesListados(ArrayList<Cliente> listaClientes);
     }
 
@@ -96,20 +96,17 @@ public class GestionBBDD {
             protected ArrayList<Cliente> doInBackground(Void... voids) {
                 ArrayList<Cliente> listaClientes = new ArrayList<>();
                 try {
-                    URL url = new URL("http://192.168.0.105/db_select.php");
+                    URL url = new URL(BASE_URL + "db_select.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("GET");
                     conexion.setRequestProperty("Accept", "application/json");
 
-                    // Leer la respuesta
                     BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "utf-8"));
                     StringBuilder response = new StringBuilder();
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
-
-                    // Procesar los datos de la respuesta JSON
                     Log.d("ServerResponse", "Respuesta del servidor: " + response.toString());
 
                     JSONObject jsonObject = new JSONObject(response.toString());
@@ -126,9 +123,26 @@ public class GestionBBDD {
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                                 dateBorn = sdf.parse(jsonCliente.getString("date_born"));
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                Log.e("Error", "Fecha de nacimiento inválida: " + jsonCliente.optString("date_born"));
                             }
 
+                            // Convertir fecha de graduación a Date, manejando valores nulos o vacíos
+                            Date dateGraduacion = null;
+                            try {
+                                String dateGraduacionStr = jsonCliente.optString("date_graduacion", "").trim();
+                                if (!dateGraduacionStr.isEmpty() && !dateGraduacionStr.equalsIgnoreCase("null")) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                    dateGraduacion = sdf.parse(dateGraduacionStr);
+                                }
+                            } catch (Exception e) {
+                                Log.e("Error", "Fecha de graduación inválida: " + jsonCliente.optString("date_graduacion"));
+                            }
+
+                            // Manejo de valores booleanos y conversiones seguras
+                            boolean graduate = jsonCliente.optBoolean("graduate", false);
+                            boolean testTVPS = jsonCliente.optString("Test_TVPS", "0").equals("1");
+
+                            // Crear objeto Cliente con los datos recibidos
                             Cliente cliente = new Cliente(
                                     jsonCliente.getInt("id"),
                                     jsonCliente.getString("name"),
@@ -138,10 +152,10 @@ public class GestionBBDD {
                                     jsonCliente.getInt("tlf"),
                                     jsonCliente.getString("email"),
                                     jsonCliente.optString("tutor", ""),
-                                    jsonCliente.getBoolean("graduate"),
-                                    jsonCliente.optString("date_graduacion", ""),
+                                    graduate,
+                                    dateGraduacion,
                                     jsonCliente.optString("tipo_lentes", ""),
-                                    jsonCliente.getBoolean("Test_TVPS"),
+                                    testTVPS,
                                     jsonCliente.getString("street"),
                                     jsonCliente.getInt("cp"),
                                     jsonCliente.getString("ciudad")
@@ -149,27 +163,25 @@ public class GestionBBDD {
 
                             listaClientes.add(cliente);
                         }
-
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e("Error", "Error al obtener los clientes", e);
                 }
                 return listaClientes;
             }
 
             @Override
             protected void onPostExecute(ArrayList<Cliente> listaClientes) {
-                // Llamamos al callback para devolver la lista de clientes
                 if (callback != null) {
                     callback.onClientesListados(listaClientes);
-                }else {
-
+                } else {
+                    Log.e("Error", "Callback es null en listarClientes");
                 }
             }
         }.execute();
     }
-*/
+
     @SuppressLint("StaticFieldLeak")
     public void insertarCliente(Context context, Cliente cliente) {
         new AsyncTask<Void, Void, String>() {
@@ -204,11 +216,11 @@ public class GestionBBDD {
                     jsonInsertar.put("tipo_lente", cliente.getTipo_lentes());
                     jsonInsertar.put("test_completado", cliente.getTest_TVPS());
                     jsonInsertar.put("resultado_test", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
-*/
+                    */
 
                     // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
                     jsonInsertar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
- //                   jsonInsertar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
+                    //jsonInsertar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
 
 
                     // objeto JSON que se envia
