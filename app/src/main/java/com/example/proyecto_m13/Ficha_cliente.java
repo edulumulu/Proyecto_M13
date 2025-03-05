@@ -257,8 +257,10 @@ public class Ficha_cliente extends AppCompatActivity {
                 String city = et_city.getText().toString();
                 String tutor = et_tutor.getText().toString();
 
+
                 //Cliente que usaré para hacer el insert
-                Cliente cli = new Cliente(nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, street, cp, city);
+                //SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                //Cliente cli = new Cliente(nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, street, cp, city);
 
                         /*//Para cuando mi compañero tenga el metodo hecho
                         //1 hago el insert en BBDD
