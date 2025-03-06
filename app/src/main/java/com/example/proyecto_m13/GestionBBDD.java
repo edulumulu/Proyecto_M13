@@ -151,7 +151,7 @@ public class GestionBBDD {
                             }
 
                             // Manejo de valores booleanos y conversiones seguras
-                            boolean graduate = jsonCliente.optBoolean("graduate", false);
+                            boolean graduate = jsonCliente.optString("Test_TVPS", "0").equals("1");
                             boolean testTVPS = jsonCliente.optString("Test_TVPS", "0").equals("1");
 
                             // Crear objeto Cliente con los datos recibidos
@@ -225,6 +225,8 @@ public class GestionBBDD {
                     jsonInsertar.put("c_p", cliente.getCp());
                     jsonInsertar.put("ciudad", cliente.getCiudad());
                     jsonInsertar.put("tutor_legal", cliente.getTutor());
+                    jsonInsertar.put("tipo_lente", cliente.getTipo_lentes());
+
                     /* Lo dejo comentado porque en ficha cliente veo que utiliza el constructor sin estos datos
                     jsonInsertar.put("graduado", cliente.getGraduate());
                     jsonInsertar.put("tipo_lente", cliente.getTipo_lentes());

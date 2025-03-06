@@ -171,29 +171,6 @@ public class Utilidades {
         return ok;*/
     }
 
-    /**
-     * Modifica el cliente modificado en el Arraylista (lista de clientes en memoria)
-     *
-     * @param clienteId
-     * @param nuevoCliente
-     * @return
-     */
-    public static boolean modificar_Cliente_EnLista(int clienteId, Cliente nuevoCliente, ArrayList<Cliente> listaclientes) {
-
-        boolean ok = false;
-        for (int i = 0; i < listaclientes.size(); i++) {
-            Cliente cliente = listaclientes.get(i);
-
-            // Si encontramos al cliente con el ID correspondiente
-            if (cliente.getId() == clienteId) {
-                // Actualizar el cliente con los nuevos datos
-                listaclientes.set(i, nuevoCliente);  // Reemplazar el cliente en la lista
-                ok = true;
-                break;  // Salir del bucle cuando encontramos al cliente
-            }
-        }
-        return ok;
-    }
 
     public static void visibilidad_botones(boolean mostrar, Button[] botones) {
         int visibility = mostrar ? View.VISIBLE : View.GONE;

@@ -3,7 +3,6 @@ package com.example.proyecto_m13;
 import static Utilidades.Utilidades.desactivar_activar_Botones;
 import static Utilidades.Utilidades.eliminar_Cliente_PorId;
 import static Utilidades.Utilidades.fecha_valida;
-import static Utilidades.Utilidades.modificar_Cliente_EnLista;
 import static Utilidades.Utilidades.nombreYDniNoRepetidos;
 import static Utilidades.Utilidades.obtener_cliente_por_id;
 import static Utilidades.Utilidades.visibilidad_Textviews;
@@ -93,7 +92,7 @@ public class Ficha_cliente extends AppCompatActivity {
         }
 
 
-        cargar_array_list();
+        cargar_array_list_BBDD();
 
 
         /**
@@ -237,44 +236,38 @@ public class Ficha_cliente extends AppCompatActivity {
                 int cp = Integer.parseInt(et_cp.getText().toString());
                 String city = et_city.getText().toString();
                 String tutor = et_tutor.getText().toString();
+                String tipo = "sin datos";
+                int id =0;
+                for(Cliente cli : lista_clientes){
+                    id = cli.getId()+1;
+                }
 
-                Cliente cliente = new Cliente(nombre,
+                Cliente cliente_Array = new Cliente(id ,nombre,
                         surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
-                        tutor, street, cp, city);
+                        tutor, street, cp, city, tipo);
+                Cliente cliente= new Cliente(id ,nombre,
+                        surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
+                        tutor, street, cp, city, tipo);
 
-                gestionBBDD.insertarCliente(Ficha_cliente.this, cliente, new GestionBBDD.insertCallback() {
-                    @Override
-                    public void onClienteInsertado(String respuesta) {
-                        if (respuesta != null) {
-                            insercion_correcta = respuesta;
-                            cargar_array_list();
-                            campos_ficha_visibilidad(false);
-                            title_age.setText("Edad:");
-                            desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
-                        }
+                if (lista_clientes.add(cliente_Array)){
+                    insertar_cliente_aqui_BBDD(cliente);
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
 
-                    }
-                });
+                        cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
+                        visibilidad_botones(false, new Button[]{bt_insertar_aceptar, bt_insertar_salir});
+                        campos_ficha_editables(false);
 
+                        //Visibilizo elementos
+                        visibilidad_Textviews(true, new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor} );
+                        iv_foto.setVisibility(View.VISIBLE);
+                        et_tutor.setVisibility(View.VISIBLE);
+                        title_age.setText("Edad:");
+                        desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+                    }, 2000); // 5000 milisegundos = 5 segundos
 
+                }
 
-               /*if (lista_clientes.size() == 5) {
-                    //Actualizo datos buscador y modifico el id selecionado al nuevo cliente para que aparezca su ficha
-                    actualizar_nombres_buscador(lista_clientes, buscar_clientes);
-                    cliente_selecionado_id = 5;
-
-                    visibilidad_botones(false, new Button[]{bt_insertar_aceptar, bt_insertar_salir});
-                    cargar_cliente_en_ficha(obtener_cliente_por_id(5, lista_clientes));
-                    campos_ficha_editables(false);
-
-                    //Visibilizo elementos
-                    visibilidad_Textviews(true, new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor} );
-                    iv_foto.setVisibility(View.VISIBLE);
-                    et_tutor.setVisibility(View.VISIBLE);
-                    title_age.setText("Edad:");
-                    desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
-
-                }*/
 
             }
         });
@@ -444,6 +437,15 @@ public class Ficha_cliente extends AppCompatActivity {
                 boolean graduado = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getGraduate();
                 Date fecha_gradu1 = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_graduacion();
                 String tipo = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTipo_lentes();
+
+                if (tipo == null) {
+                    Toast.makeText(Ficha_cliente.this, "ATENCION VARIABLE NULL", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    Toast.makeText(Ficha_cliente.this, "---------------------", Toast.LENGTH_SHORT).show();
+
+                }
+
                 boolean test_tvps = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTest_TVPS();
 
 
@@ -451,39 +453,30 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, graduado, fecha_gradu1, tipo, test_tvps, street, cp, city);
 
-                if (modificar_Cliente_EnLista(cliente_selecionado_id, cli, lista_clientes)) {
+                if (modificar_Cliente_EnLista(cliente_selecionado_id, cli)) {
 
-                    //Modificar base de datos
-                    /*Codigo para modificar un cliente
-                    Cliente clienteModificado = new Cliente("usuario123", "nuevaContrasena", "Juan", "Perez", "juan.perez@nuevocliente.com");
-                    GestionBBDD.modificarCliente(context, clienteModificado);
-                     */
-                    gestionBBDD.modificarCliente(Ficha_cliente.this, cli, new GestionBBDD.updateCallback() {
-                        @Override
-                        public void onClienteModificado(String respuesta) {
-                            if (respuesta != null) {
-                                insercion_correcta = respuesta;
-                                cargar_array_list();
-                            }
-                        }
+                    modificar_cliente_aqui_BBDD(cli);
 
-                    });
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                        cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
+                        campos_ficha_editables(false);
+                        visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
 
-                    //actualizar_nombres_buscador(lista_clientes, buscar_clientes);
-                    cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
-                    campos_ficha_editables(false);
-                    visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
+                        TextView[] textvi = new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor};
 
-                    //TextView[] textvi = new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor};
+                        for(TextView tv : textvi){tv.setVisibility(View.VISIBLE);}
 
-                    //for(TextView tv : textvi){tv.setVisibility(View.VISIBLE);}
+                        iv_foto.setVisibility(View.VISIBLE);
+                        et_tutor.setVisibility(View.VISIBLE);
+                        title_age.setText("Edad:");
 
-                    iv_foto.setVisibility(View.VISIBLE);
-                    et_tutor.setVisibility(View.VISIBLE);
-                    title_age.setText("Edad:");
+                        et_age.setText(String.valueOf(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).calcularEdad()));
+                        desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+                    }, 2000); // 5000 milisegundos = 5 segundos
 
-                    et_age.setText(String.valueOf(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).calcularEdad()));
-                    desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+
+
 
                 }
 
@@ -514,9 +507,6 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 }
 
-                // Obtener cliente a eliminar
-                //Cliente clienteAEliminar = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes);
-
                 //Dialogo que pide ratificacion en los cambios
                 new AlertDialog.Builder(Ficha_cliente.this)
                         .setTitle("Confirmación")  // Título del diálogo
@@ -529,7 +519,9 @@ public class Ficha_cliente extends AppCompatActivity {
 
                                 boolean eliminadoArray = eliminar_Cliente_PorId(cliente_selecionado_id, lista_clientes);
                                 if (eliminadoArray) {
-                                    elimnar_cliente_aqui();
+
+                                    elimnar_cliente_aqui_BBDD();
+
                                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
                                         actualizar_nombres_buscador(lista_clientes, buscar_clientes);
                                         campos_ficha_visibilidad(false);
@@ -572,7 +564,10 @@ public class Ficha_cliente extends AppCompatActivity {
     }
 
 
-    public void cargar_array_list() {
+    /**
+     * Carga el array con los datos de la consulta de la BBDD
+     */
+    public void cargar_array_list_BBDD() {
         // Metodo que carga la lista en el arrayList
         gestionBBDD.listarClientes(this, new GestionBBDD.ClienteCallback() {
             @Override
@@ -598,8 +593,10 @@ public class Ficha_cliente extends AppCompatActivity {
         });
     }
 
-
-    public void elimnar_cliente_aqui(){
+    /**
+     * Elimina el clinete de la base de datos
+     */
+    public void elimnar_cliente_aqui_BBDD(){
         gestionBBDD.eliminarCliente(Ficha_cliente.this, cliente_selecionado_id, new GestionBBDD.deleteCallback() {
             @Override
             public void onClienteEliminado(String respuesta) {
@@ -631,6 +628,96 @@ public class Ficha_cliente extends AppCompatActivity {
         });
     }
 
+    /**
+     * Inserta el nuevo cliente en la base de datos
+     * @param cli
+     */
+    public void insertar_cliente_aqui_BBDD(Cliente cli){
+        gestionBBDD.insertarCliente(Ficha_cliente.this, cli, new GestionBBDD.insertCallback() {
+                    @Override
+                    public void onClienteInsertado(String respuesta) {
+                        if (respuesta != null) {
+
+                        gestionBBDD.listarClientes(Ficha_cliente.this, new GestionBBDD.ClienteCallback() {
+                            @Override
+                            public void onClientesListados(ArrayList<Cliente> clientes) {
+                                if (clientes != null) {
+                                    lista_clientes.clear();
+                                    lista_clientes.addAll(clientes);
+
+                                }
+                            }
+                        });
+                    }
+
+            }
+        });
+    }
+
+    /**
+     * Modifica el cliente de la BBDD
+     * @param cli
+     */
+    public void modificar_cliente_aqui_BBDD(Cliente cli){
+        gestionBBDD.modificarCliente(Ficha_cliente.this, cli, new GestionBBDD.updateCallback(){
+
+            @Override
+            public void onClienteModificado(String respuesta) {
+
+                try {
+                    JSONObject jsonResponse = new JSONObject(respuesta);
+                    String estado = jsonResponse.getString("estado"); // Extraer el estado
+
+                    if (estado.equalsIgnoreCase("correcto")) {
+
+                        gestionBBDD.listarClientes(Ficha_cliente.this, new GestionBBDD.ClienteCallback() {
+                            @Override
+                            public void onClientesListados(ArrayList<Cliente> clientes) {
+                                if (clientes != null) {
+                                    lista_clientes.clear();
+                                    lista_clientes.addAll(clientes);
+
+                                }
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    Log.e("ModificarcCliente", "Error al parsear JSON: " + e.getMessage());
+                    runOnUiThread(() ->
+                            Toast.makeText(getApplicationContext(), "Error en la respuesta del servidor", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }
+        });
+
+    }
+
+
+
+
+    /**
+     * Modifica el cliente modificado en el Arraylist (lista de clientes en memoria)
+     *
+     * @param clienteId
+     * @param nuevoCliente
+     * @return
+     */
+    public static boolean modificar_Cliente_EnLista(int clienteId, Cliente nuevoCliente) {
+
+        boolean ok = false;
+        for (int i = 0; i < lista_clientes.size(); i++) {
+            Cliente cliente = lista_clientes.get(i);
+
+            // Si encontramos al cliente con el ID correspondiente
+            if (cliente.getId() == clienteId) {
+                // Actualizar el cliente con los nuevos datos
+                lista_clientes.set(i, nuevoCliente);  // Reemplazar el cliente en la lista
+                ok = true;
+                break;  // Salir del bucle cuando encontramos al cliente
+            }
+        }
+        return ok;
+    }
     /**
      * Poner el nombre del empleado que está logeado
      */
