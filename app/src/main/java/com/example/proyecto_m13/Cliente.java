@@ -23,6 +23,9 @@ public class Cliente {
     int cp;
     String ciudad;
 
+    public Cliente(int id) {
+        this.id = id;
+    }
 
     //Constructor con todo
     public Cliente(int id, String name, String surname, String dni, Date date_born, int tlf, String email, String tutor, boolean graduate, Date date_graduacion, String tipo_lentes, boolean test_TVPS, String street, int cp, String ciudad){

@@ -17,6 +17,8 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -38,6 +40,9 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +60,7 @@ public class Ficha_cliente extends AppCompatActivity {
     private int cliente_selecionado_id;
     private Date fecha_nacimiento_Seleccionada;
     private boolean cliente_selecionado = false;
+    private String insercion_correcta;
 
 
     //Variables parte izquierda de la app
@@ -82,39 +88,13 @@ public class Ficha_cliente extends AppCompatActivity {
         inicializar_componentes();
         poner_nombre_Empleado();
 
-
-
-        // Metodo que carga la lista en el arrayList
-         /*Código que obtiene un arraylist de clientes, y obtiene los datos de cada cliente
-        y los mete en un arrayList de strings para mostrarlo en el adaptador
-        GestionBBDD gestionBBDD = new GestionBBDD();
-        gestionBBDD.listarClientes(this, new GestionBBDD.ClienteCallback() {
-            @Override
-            public void onClientesListados(ArrayList<Cliente> listaClientes) {
-                if (listaClientes != null && !listaClientes.isEmpty()) {
-                    // Aquí puedes actualizar la UI con los clientes
-                    ArrayList<String> listaClientesAdaptador = new ArrayList<>();
-                    for (Cliente cliente : listaClientes) {
-                        listaClientesAdaptador.add("Usuario: " + cliente.getUsuario() + "\nContraseña: " + cliente.getContrasena());
-                    }
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(Ficha_cliente.this, android.R.layout.simple_list_item_1, listaClientesAdaptador);
-                    ListView viewCliente = findViewById(R.id.viewCliente);
-                    viewCliente.setAdapter(adapter);
-                } else {
-                    Toast.makeText(Ficha_cliente.this, "No se encontraron clientes", Toast.LENGTH_LONG).show();
-                }
-            }
-        });*/
-
-        lista_clientes = Utilidades.cargar_lista_empleados();
-        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
-
-
-        //si no hay ningun cliente selecionado visibilidad de los campos cerrada
         if (!buscar_clientes.isSelected()) {
             campos_ficha_visibilidad(false);
         }
+
+
+        cargar_array_list();
+
 
         /**
          * Borrar testo del buscador cuando se hace click
@@ -146,7 +126,7 @@ public class Ficha_cliente extends AppCompatActivity {
                         //activo botones restantes
                         desactivar_activar_Botones(true, new Button[]{bt_update, bt_delete, bt_test});
                         //Invisibilizo los botones de manipular modificar y de insertar
-                        visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir });
+                        visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir});
                         break;
                     }
 
@@ -235,16 +215,16 @@ public class Ficha_cliente extends AppCompatActivity {
                 }
 
                 //Si es menor de edad comprueba que se rellene el campo tutor
-                if(!Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada) &&
-                        (et_tutor.getText().toString().trim().isEmpty()|| et_tutor.getText().toString().equalsIgnoreCase("Si es menor de edad"))){
+                if (!Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada) &&
+                        (et_tutor.getText().toString().trim().isEmpty() || et_tutor.getText().toString().equalsIgnoreCase("Si es menor de edad"))) {
                     Toast.makeText(Ficha_cliente.this, "Al ser menor debes incluir un tutor", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 //Si es mayor de edad comprueba que el tutor esté vacío
-                if(Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)){
-                   et_tutor.setHint(null);
-                   et_tutor.setText("");
+                if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
+                    et_tutor.setHint(null);
+                    et_tutor.setText("");
                 }
 
                 //recopilación del contenido de los campos
@@ -258,32 +238,27 @@ public class Ficha_cliente extends AppCompatActivity {
                 String city = et_city.getText().toString();
                 String tutor = et_tutor.getText().toString();
 
-
-                //Cliente que usaré para hacer el insert
-                //SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                //Cliente cli = new Cliente(nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, street, cp, city);
-
-                        /*//Para cuando mi compañero tenga el metodo hecho
-                        //1 hago el insert en BBDD
-                        //Vuelvo a cargar el arrayList tras el insert
-                        //Dejo abierta la ficha del cliente insertado
-
-                 *//*Codigo para insertar un cliente
-        Cliente nuevoCliente = new Cliente("usuario123", "contrasena123", "Juan", "Perez", "juan.perez@example.com");
-        GestionBBDD.insertarCliente(context, nuevoCliente);
-         *//*
-                        //Si es correcto cargo nuevamente con el select los clientes en el array*/
-
-                //por ahora para testear...
-                //lista_clientes = cargar_lista_empleados();
-                lista_clientes.add(new Cliente(5, nombre,
+                Cliente cliente = new Cliente(nombre,
                         surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
-                        tutor, false, null, null,
-                        false, street, cp, city));
+                        tutor, street, cp, city);
+
+                gestionBBDD.insertarCliente(Ficha_cliente.this, cliente, new GestionBBDD.insertCallback() {
+                    @Override
+                    public void onClienteInsertado(String respuesta) {
+                        if (respuesta != null) {
+                            insercion_correcta = respuesta;
+                            cargar_array_list();
+                            campos_ficha_visibilidad(false);
+                            title_age.setText("Edad:");
+                            desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
+                        }
+
+                    }
+                });
 
 
-                //      ESTO HAY QUE REVISARLO CON EL NUEVO MÉTODO
-                if (lista_clientes.size() == 5) {
+
+               /*if (lista_clientes.size() == 5) {
                     //Actualizo datos buscador y modifico el id selecionado al nuevo cliente para que aparezca su ficha
                     actualizar_nombres_buscador(lista_clientes, buscar_clientes);
                     cliente_selecionado_id = 5;
@@ -299,7 +274,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     title_age.setText("Edad:");
                     desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
 
-                }
+                }*/
 
             }
         });
@@ -311,16 +286,15 @@ public class Ficha_cliente extends AppCompatActivity {
                 campos_ficha_visibilidad(false);
                 visibilidad_botones(false, new Button[]{bt_insertar_salir, bt_insertar_aceptar});
 
-                if(cliente_selecionado){
+                if (cliente_selecionado) {
                     desactivar_activar_Botones(true, new Button[]{bt_delete, bt_test, bt_update, bt_insert});
-                }else{
+                } else {
                     desactivar_activar_Botones(false, new Button[]{bt_delete, bt_test, bt_update});
                     bt_insert.setEnabled(true);
                 }
 
             }
         });
-
 
 
         bt_update.setOnClickListener(new View.OnClickListener() {
@@ -330,7 +304,7 @@ public class Ficha_cliente extends AppCompatActivity {
                 // Desactivo botones hasta quwe se resuelva accion
                 desactivar_activar_Botones(false, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
 
-                if(tv_id.getText().toString().isEmpty()){
+                if (tv_id.getText().toString().isEmpty()) {
                     Toast.makeText(Ficha_cliente.this, "Debes selecionar un cliente previamente", Toast.LENGTH_SHORT).show();
                     return;
 
@@ -381,20 +355,20 @@ public class Ficha_cliente extends AppCompatActivity {
                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                                 fecha_nacimiento_Seleccionada = sdf.parse(textoFecha);  // Convertir el texto en un objeto Date
 
-                                if (fecha_nacimiento_Seleccionada != null ) {
+                                if (fecha_nacimiento_Seleccionada != null) {
 
-                                        if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
-                                            title_tutor.setVisibility(View.GONE);
-                                            et_tutor.setVisibility(View.GONE);
-                                            et_tutor.setText(null);
-                                            et_tutor.setEnabled(false);  // Deshabilitar campo tutor si es mayor de edad
-                                            Log.d("Fecha", "Es mayor de edad, se deshabilita el campo tutor");
-                                        } else {
-                                            title_tutor.setVisibility(View.VISIBLE);
-                                            et_tutor.setVisibility(View.VISIBLE);
-                                            et_tutor.setEnabled(true);  // Habilitar campo tutor si es menor de edad
-                                            Log.d("Fecha", "Es menor de edad, se habilita el campo tutor");
-                                        }
+                                    if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
+                                        title_tutor.setVisibility(View.GONE);
+                                        et_tutor.setVisibility(View.GONE);
+                                        et_tutor.setText(null);
+                                        et_tutor.setEnabled(false);  // Deshabilitar campo tutor si es mayor de edad
+                                        Log.d("Fecha", "Es mayor de edad, se deshabilita el campo tutor");
+                                    } else {
+                                        title_tutor.setVisibility(View.VISIBLE);
+                                        et_tutor.setVisibility(View.VISIBLE);
+                                        et_tutor.setEnabled(true);  // Habilitar campo tutor si es menor de edad
+                                        Log.d("Fecha", "Es menor de edad, se habilita el campo tutor");
+                                    }
 
                                 }
                             } catch (ParseException e) {
@@ -417,19 +391,19 @@ public class Ficha_cliente extends AppCompatActivity {
                 }
 
                 //Comprobar que los nombres no existen ya en otros clientes
-                if(!nombreYDniNoRepetidos(cliente_selecionado_id, et_name.getText().toString(), et_surname.getText().toString(), et_dni.getText().toString(), lista_clientes )){
+                if (!nombreYDniNoRepetidos(cliente_selecionado_id, et_name.getText().toString(), et_surname.getText().toString(), et_dni.getText().toString(), lista_clientes)) {
                     Toast.makeText(Ficha_cliente.this, "Nombre o DNI ya exstentes en la base de datos", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 //Si no es mayor de edad aparece campro tuor
-                if(!Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada) &&
-                        (et_tutor.getText().toString().trim().isEmpty()|| et_tutor.getText().toString().equalsIgnoreCase(""))){
+                if (!Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada) &&
+                        (et_tutor.getText().toString().trim().isEmpty() || et_tutor.getText().toString().equalsIgnoreCase(""))) {
                     Toast.makeText(Ficha_cliente.this, "Es menor de edad, debes incluir un tutor", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 //Si no lo es se modifica el contenido del editTest
-                if(Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)){
+                if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
                     et_tutor.setText("");
                 }
 
@@ -464,12 +438,13 @@ public class Ficha_cliente extends AppCompatActivity {
                 String city = et_city.getText().toString();
                 String tutor = et_tutor.getText().toString();
 
+
                 //A PARTIR DE AQUÍ REVISAR PORQUE NECESIOTO EL UPDATE
                 //Recojo
                 boolean graduado = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getGraduate();
                 Date fecha_gradu1 = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_graduacion();
                 String tipo = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTipo_lentes();
-                boolean test_tvps= obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTest_TVPS();
+                boolean test_tvps = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTest_TVPS();
 
 
                 // Esto hay que cambiarlo
@@ -483,8 +458,18 @@ public class Ficha_cliente extends AppCompatActivity {
                     Cliente clienteModificado = new Cliente("usuario123", "nuevaContrasena", "Juan", "Perez", "juan.perez@nuevocliente.com");
                     GestionBBDD.modificarCliente(context, clienteModificado);
                      */
+                    gestionBBDD.modificarCliente(Ficha_cliente.this, cli, new GestionBBDD.updateCallback() {
+                        @Override
+                        public void onClienteModificado(String respuesta) {
+                            if (respuesta != null) {
+                                insercion_correcta = respuesta;
+                                cargar_array_list();
+                            }
+                        }
 
-                    actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                    });
+
+                    //actualizar_nombres_buscador(lista_clientes, buscar_clientes);
                     cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
                     campos_ficha_editables(false);
                     visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
@@ -523,11 +508,14 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(tv_id.getText().toString().isEmpty()){
+                if (tv_id.getText().toString().isEmpty()) {
                     Toast.makeText(Ficha_cliente.this, "Debes selecionar un cliente previamente", Toast.LENGTH_SHORT).show();
                     return;
 
                 }
+
+                // Obtener cliente a eliminar
+                //Cliente clienteAEliminar = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes);
 
                 //Dialogo que pide ratificacion en los cambios
                 new AlertDialog.Builder(Ficha_cliente.this)
@@ -537,31 +525,38 @@ public class Ficha_cliente extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // Acción a realizar si el usuario presiona "Sí"
-                                if (eliminar_Cliente_PorId(cliente_selecionado_id, lista_clientes)) {
 
-                                    //Método de eliminacion BBDD
-                                     /*Codigo para eliminar un cliente
-                                        GestionBBDD.eliminarCliente(context, idUsuario);
-                                    */
 
-                                    Toast.makeText(getApplicationContext(), "Cliente borrado", Toast.LENGTH_SHORT).show();
-                                    actualizar_nombres_buscador(lista_clientes, buscar_clientes);
-                                    campos_ficha_visibilidad(false);
-                                    title_age.setText("Edad:");
-                                    desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
+                                boolean eliminadoArray = eliminar_Cliente_PorId(cliente_selecionado_id, lista_clientes);
+                                if (eliminadoArray) {
+                                    elimnar_cliente_aqui();
+                                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                                        campos_ficha_visibilidad(false);
+                                        title_age.setText("Edad:");
+                                        desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
+                                    }, 2000); // 5000 milisegundos = 5 segundos
+
+
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Error al eliminar el cliente del listado", Toast.LENGTH_SHORT).show();
                                 }
 
 
                             }
                         })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                .
+
+                        setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // Acción a realizar si el usuario presiona "No"
                                 dialog.dismiss();  // Cierra el diálogo
                             }
                         })
-                        .show();
+                                .
+
+                        show();
             }
         });
 
@@ -577,15 +572,74 @@ public class Ficha_cliente extends AppCompatActivity {
     }
 
 
+    public void cargar_array_list() {
+        // Metodo que carga la lista en el arrayList
+        gestionBBDD.listarClientes(this, new GestionBBDD.ClienteCallback() {
+            @Override
+            public void onClientesListados(ArrayList<Cliente> clientes) {
+                if (clientes != null && !clientes.isEmpty()) {
+                    lista_clientes.clear();
+                    lista_clientes.addAll(clientes);
+                    // Imprimir clientes en Log
+                    for (Cliente cliente : lista_clientes) {
+                        Log.d("Cliente", "ID: " + cliente.getId() + ", Nombre: " + cliente.getName());
+                    }
+
+                    // Mostrar mensaje con el número de clientes cargados
+                    Toast.makeText(Ficha_cliente.this, "Clientes cargados: " + lista_clientes.size(), Toast.LENGTH_LONG).show();
+
+                    actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+
+
+                } else {
+                    Toast.makeText(Ficha_cliente.this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+    public void elimnar_cliente_aqui(){
+        gestionBBDD.eliminarCliente(Ficha_cliente.this, cliente_selecionado_id, new GestionBBDD.deleteCallback() {
+            @Override
+            public void onClienteEliminado(String respuesta) {
+
+                try {
+                    JSONObject jsonResponse = new JSONObject(respuesta);
+                    String estado = jsonResponse.getString("estado"); // Extraer el estado
+
+                    if (estado.equalsIgnoreCase("correcto")) {
+
+                        gestionBBDD.listarClientes(Ficha_cliente.this, new GestionBBDD.ClienteCallback() {
+                            @Override
+                            public void onClientesListados(ArrayList<Cliente> clientes) {
+                                if (clientes != null) {
+                                    lista_clientes.clear();
+                                    lista_clientes.addAll(clientes);
+
+                                }
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    Log.e("EliminarCliente", "Error al parsear JSON: " + e.getMessage());
+                    runOnUiThread(() ->
+                            Toast.makeText(getApplicationContext(), "Error en la respuesta del servidor", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }
+        });
+    }
+
     /**
      * Poner el nombre del empleado que está logeado
      */
-    public void poner_nombre_Empleado(){
+    public void poner_nombre_Empleado() {
         String usuario = getIntent().getStringExtra("usuario");
         tv_user.setText(usuario);
     }
 
-    public void relacionar_variables_front_back(){
+    public void relacionar_variables_front_back() {
 
         buscar_clientes = findViewById(R.id.autoct_buscador);
         //sp_clientes = findViewById(R.id.sp_clientes);
@@ -666,7 +720,8 @@ public class Ficha_cliente extends AppCompatActivity {
      * @param lista
      * @param buscador
      */
-    public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView buscador) {
+    public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView
+            buscador) {
 
         String[] nombres = new String[lista.size()];
         for (int i = 0; i < lista.size(); i++) {
@@ -684,6 +739,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
     /**
      * Metodo quehace comprobaciones de la insercion de datos por parte del usuario en el formulario
+     *
      * @return
      */
     public boolean comprobación_de_relleno_formulario() {
@@ -731,8 +787,8 @@ public class Ficha_cliente extends AppCompatActivity {
             return false;
         }
 
-        if(fecha_valida(fecha_nacimiento_Seleccionada)){
-        }else{
+        if (fecha_valida(fecha_nacimiento_Seleccionada)) {
+        } else {
             Toast.makeText(Ficha_cliente.this, "El Cliente debe tener entre 1 y 100 años", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -794,13 +850,13 @@ public class Ficha_cliente extends AppCompatActivity {
         //Permito que los campos oportunos sean editables
         campos_ficha_editables(true);
 
-        TextView[]  textvi = new TextView[]{
-                title_purebas, title_graduacion,title_fecha_gradu, title_tipo_lente, title_test_TVPS,
+        TextView[] textvi = new TextView[]{
+                title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS,
                 title_date_test, title_next_date_test, title_id, tv_id, tv_graduacion, tv_fecha_gradu,
-                tv_tipo_lente, tv_test_tvps, tv_fecha_test_TVPS, tv_next_text,tv_id
+                tv_tipo_lente, tv_test_tvps, tv_fecha_test_TVPS, tv_next_text, tv_id
         };
         //Hago invisible los campos que no van a poder ser ingresados
-        for(TextView tv : textvi){
+        for (TextView tv : textvi) {
             tv.setVisibility(View.GONE);
         }
 
@@ -967,7 +1023,6 @@ public class Ficha_cliente extends AppCompatActivity {
 
         datePickerDialog.show();
     }
-
 
 
 }

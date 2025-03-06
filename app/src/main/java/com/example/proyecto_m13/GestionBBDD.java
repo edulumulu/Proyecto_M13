@@ -27,7 +27,7 @@ public class GestionBBDD {
             @Override
             protected String doInBackground(Void... voids){
                 try{
-                    URL url = new URL(BASE_URL + "db_validation.php");
+                    URL url = new URL(BASE_URL +"db_validation.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type","application/json; utf-8");
@@ -89,6 +89,16 @@ public class GestionBBDD {
 
     public interface ClienteCallback {
         void onClientesListados(ArrayList<Cliente> listaClientes);
+    }
+    public interface insertCallback {
+        void onClienteInsertado(String respuesta);
+    }
+    public interface updateCallback {
+        void onClienteModificado(String respuesta);
+    }
+
+    public interface deleteCallback {
+        void onClienteEliminado(String respuesta);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -185,8 +195,10 @@ public class GestionBBDD {
     }
 
     @SuppressLint("StaticFieldLeak")
-    public void insertarCliente(Context context, Cliente cliente) {
+    public void insertarCliente(Context context, Cliente cliente, final insertCallback callback) {
+
         new AsyncTask<Void, Void, String>() {
+            //String respuesta = null;
             @Override
             protected String doInBackground(Void... voids) {
                 try {
@@ -239,8 +251,10 @@ public class GestionBBDD {
                     }
                     br.close();
 
+
                     // Se retorna la respuesta obtenida del servidor
                     return response.toString();
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -250,6 +264,7 @@ public class GestionBBDD {
 
             @Override
             protected void onPostExecute(String response) {
+                //boolean ok = false;
                 if (response != null) {
                     try {
                         // Se procesa la respuesta del servidor, interpretando los datos en formato JSON
@@ -260,24 +275,29 @@ public class GestionBBDD {
                         // Se verifica si la inserción fue exitosa y se muestra un mensaje acorde
                         if ("correcto".equals(estado)) {
                             Toast.makeText(context, "Cliente insertado correctamente", Toast.LENGTH_LONG).show();
+                            //ok = true;
                         } else {
                             Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
+
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
+
                     }
                 } else {
                     // Se muestra un mensaje si hubo un problema con la conexión al servidor
                     Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
+                   // ok = true;
                 }
+                //return ok;
             }
         }.execute();
     }
 
 
     @SuppressLint("StaticFieldLeak")
-    public void modificarCliente(Context context, Cliente cliente) {
+    public void modificarCliente(Context context, Cliente cliente, final updateCallback callback) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... voids) {
@@ -368,7 +388,7 @@ public class GestionBBDD {
     }
 
     @SuppressLint("StaticFieldLeak")
-    public void eliminarCliente(Context context, int id_cliente) {
+    public void eliminarCliente(Context context, int id_cliente, final deleteCallback callback) {
         new AsyncTask<Void, Void, String>() {
 
             @Override
