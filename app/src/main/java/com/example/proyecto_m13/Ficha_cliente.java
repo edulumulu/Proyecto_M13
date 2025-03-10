@@ -242,7 +242,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     id = cli.getId()+1;
                 }
 
-                Cliente cliente_Array = new Cliente(id ,nombre,
+                Cliente cliente_Array = new Cliente(nombre,
                         surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
                         tutor, street, cp, city, tipo);
                 Cliente cliente= new Cliente(id ,nombre,
@@ -259,9 +259,10 @@ public class Ficha_cliente extends AppCompatActivity {
                         campos_ficha_editables(false);
 
                         //Visibilizo elementos
-                        visibilidad_Textviews(true, new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor} );
+                        visibilidad_Textviews(true, new TextView[]{title_purebas, title_test_TVPS, title_graduacion, title_tutor} );
                         iv_foto.setVisibility(View.VISIBLE);
                         et_tutor.setVisibility(View.VISIBLE);
+                        tv_id.setVisibility(View.GONE);
                         title_age.setText("Edad:");
                         desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
                     }, 2000); // 5000 milisegundos = 5 segundos
