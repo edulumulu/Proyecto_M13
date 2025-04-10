@@ -31,7 +31,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
     private int id_empleado;
     private int id_cliente;
-    private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8,bt_9, bt_cambio_test;
+    private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_cambio_test;
     ImageView iv_imagen;
     private ArrayList<Diapositiva> diapositivas = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas_parte_test = new ArrayList<>();
@@ -52,46 +52,13 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         setContentView(R.layout.activity_test_tvps);
 
 
-
-        inicializar_componentes();
-
         id_cliente = getIntent().getIntExtra ("cliente", -1);
 
-        Diapositiva diapositiva1 = new Diapositiva(1, 1, 1, false, 0,5, 2, "http://192.168.1.143/imagenes/1_01.png" );
-        Diapositiva diapositiva2 = new Diapositiva(2, 1, 2, false, 0,5, 4, "http://192.168.1.143/imagenes/1_02.png" );
-        Diapositiva diapositiva3 = new Diapositiva(3, 1, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/1_03.png" );
-        Diapositiva diapositiva4 = new Diapositiva(4, 2, 1, false, 0,5, 2, "http://192.168.1.143/imagenes/1_07.png" );
-        Diapositiva diapositiva5 = new Diapositiva(5, 2, 2, false, 0,5, 4, "http://192.168.1.143/imagenes/1_08.png" );
-        Diapositiva diapositiva6 = new Diapositiva(6, 2, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/1_09.png" );
-
-        Diapositiva diapositiva7 = new Diapositiva(7, 3, 1, false, 0,5, 2, "http://192.168.1.143/imagenes/3_01.png" );
-        Diapositiva diapositiva8 = new Diapositiva(8, 3, 2, false, 0,5, 4, "http://192.168.1.143/imagenes/3_02.png" );
-        Diapositiva diapositiva9 = new Diapositiva(9, 3, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/3_03.png" );
-        Diapositiva diapositiva10 = new Diapositiva(10, 4, 1, false, 0,4, 2, "http://192.168.1.143/imagenes/4_11.png" );
-        Diapositiva diapositiva11 = new Diapositiva(11, 4, 2, false, 0,4, 4, "http://192.168.1.143/imagenes/4_12.png" );
-        Diapositiva diapositiva12= new Diapositiva(12, 4, 3, false, 0,4, 1, "http://192.168.1.143/imagenes/4_13.png" );
-
-        diapositivas.add(diapositiva1);
-        diapositivas.add(diapositiva2);
-        diapositivas.add(diapositiva3);
-        diapositivas.add(diapositiva4);
-        diapositivas.add(diapositiva5);
-        diapositivas.add(diapositiva6);
-        diapositivas.add(diapositiva7);
-        diapositivas.add(diapositiva8);
-        diapositivas.add(diapositiva9);
-        diapositivas.add(diapositiva10);
-        diapositivas.add(diapositiva11);
-        diapositivas.add(diapositiva12);
+        inicializar_componentes();
+        diapositivas_De_prueba();
 
 
-
-       // int[] cantidad_test = new int[]{1,2,3,4,5,6,7};
-//
-//
-//        for(int num_test : cantidad_test){
-
-        int[] cantidad_test = new int[]{1,2,3,4,5,6,7};
+        //int[] cantidad_test = new int[]{1,2,3,4,5,6,7};
 
 
         pasar_test(1);
@@ -105,34 +72,13 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
 
     private void pasar_test(int parte_test){
+
+        iv_imagen.setVisibility(View.VISIBLE);
         currentIndex = 0;
         diapositivas_parte_test = diapositivas_test_parte(parte_test);
         url_fotos = obtener_url_fotos_parte_test(parte_test);
 
-        if(!diapositivas_parte_test.get(currentIndex).isTimer()){
-            cargar_imagen(url_fotos[currentIndex]);
-            if(diapositivas_parte_test.get(currentIndex).getId_estudio() == 1 || diapositivas_parte_test.get(currentIndex).getId_estudio() == 2  || diapositivas_parte_test.get(currentIndex).getId_estudio() == 3  ){
-                visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
-            }
-
-            if(diapositivas_parte_test.get(currentIndex).getId_estudio() == 4){
-                if(diapositivas_parte_test.get(currentIndex).getN_respuestas() == 5){
-                    visibilidad_botones(false, new Button[]{bt_6, bt_7, bt_8,bt_9});
-                    visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
-                }else if(diapositivas_parte_test.get(currentIndex).getN_respuestas() == 4){
-                    visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
-                    visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8,bt_9});
-                }
-
-            }
-
-            if(diapositivas_parte_test.get(currentIndex).getId_estudio() == 6 || diapositivas_parte_test.get(currentIndex).getId_estudio() == 7 ){
-                //visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8,bt_9});
-            }
-
-
-        }
-
+        eleccion_de_botones(diapositivas_parte_test, currentIndex);
 
         View.OnClickListener answerListener = view -> {
 
@@ -152,10 +98,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             currentIndex++;
 
 
-
-
-
-            if (currentIndex < url_fotos.length && cont_fallos_1<4) {
+            if (currentIndex < url_fotos.length && cont_fallos_general<4) {
+                eleccion_de_botones(diapositivas_parte_test, currentIndex);
                 cargar_imagen(url_fotos[currentIndex]);
             } else {
                 Toast.makeText(this, "ACIERTOS --> " +cont_aciertos_general + " /  FALLOS --> "+ cont_fallos_general, Toast.LENGTH_SHORT).show();
@@ -169,24 +113,27 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                 //tv_Cambio.setText("Has terminado el test " + parte_test + "\n Toca la pantalla para continuar");
                 bt_cambio_test.setVisibility(View.VISIBLE);
 
-                bt_cambio_test.setOnClickListener(v -> {
-                    // Si no hemos llegado al final de todos los tests
-                    contador_test_Terminados++;
-                    Toast.makeText(this, "Test terminados --> "+contador_test_Terminados, Toast.LENGTH_SHORT).show();
-                    bt_cambio_test.setVisibility(View.GONE); //hasta aquí funciona
-                    if(contador_test_Terminados < 7){
-                        bt_cambio_test.setVisibility(View.GONE);
-                        pasar_test(contador_test_Terminados+1);
+                bt_cambio_test.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Si no hemos llegado al final de todos los tests
+                        contador_test_Terminados++;
+                        Toast.makeText(Actividad_Test_TVPS.this, "Test terminados --> "+contador_test_Terminados, Toast.LENGTH_SHORT).show();
+                        bt_cambio_test.setVisibility(View.GONE); //hasta aquí funciona
+                        if(contador_test_Terminados < 4){
+                            bt_cambio_test.setVisibility(View.GONE);
+                            pasar_test(contador_test_Terminados+1);
 
+                        }
+                        else{
+                            tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
+                           mostrar_Acrietro_yfallos_finales();
+                            tv_Cambio.setVisibility(View.VISIBLE);
+
+                        }
                     }
-                    else{
-                        tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
-                        tv_Cambio.setVisibility(View.VISIBLE);
-
-                    }
-
-
                 });
+
 
             }
         };
@@ -201,6 +148,32 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         bt_8.setOnClickListener(answerListener);
         bt_9.setOnClickListener(answerListener);
 
+    }
+
+    private void eleccion_de_botones(ArrayList<Diapositiva> diapositivas, int indice){
+        if(!diapositivas.get(indice).isTimer()){
+            cargar_imagen(url_fotos[indice]);
+            if(diapositivas.get(indice).getId_estudio() == 1 || diapositivas.get(indice).getId_estudio() == 2  || diapositivas.get(indice).getId_estudio() == 3  ){
+                visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
+            }
+
+            if(diapositivas.get(indice).getId_estudio() == 4){
+                if(diapositivas.get(indice).getN_respuestas() == 5){
+                    visibilidad_botones(false, new Button[]{bt_6, bt_7, bt_8,bt_9});
+                    visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
+                }else if(diapositivas.get(indice).getN_respuestas() == 4){
+                    visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
+                    visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8,bt_9});
+                }
+
+            }
+
+            if(diapositivas.get(indice).getId_estudio() == 6 || diapositivas.get(indice).getId_estudio() == 7 ){
+                //visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8,bt_9});
+            }
+
+
+        }
     }
 
     public void contador_fallos(int parte_test){
@@ -248,9 +221,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     }
 
     public void contador_aciertos(int parte_test){
-        int cont_aciertos = -1; // Inicializamos la variable
 
-        // Usamos switch para manejar las diferentes partes del test
         switch(parte_test) {
             case 1:
                 cont_aciertos_1 = cont_aciertos_general; // Asignamos los aciertos a la parte 1
@@ -350,11 +321,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         new DownloadImageTask(iv_imagen).execute(url);
     }
 
-    private void mostrar_botones(int num_respeuestas){
-        if(num_respeuestas == 4){ visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7, bt_8,bt_9});}
-
-    }
-
     private void inicializar_componentes(){
 
         iv_imagen = findViewById(R.id.iv_imagen);
@@ -375,5 +341,54 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
         visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7,bt_8, bt_9, bt_cambio_test });
         tv_Cambio.setVisibility(View.GONE);
+    }
+
+    public void diapositivas_De_prueba(){
+        Diapositiva diapositiva1 = new Diapositiva(1, 1, 1, false, 0,5, 1, "http://192.168.1.143/imagenes/1_01.png" );
+        Diapositiva diapositiva2 = new Diapositiva(2, 1, 2, false, 0,5, 1, "http://192.168.1.143/imagenes/1_02.png" );
+        Diapositiva diapositiva3 = new Diapositiva(3, 1, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/1_03.png" );
+        Diapositiva diapositiva4 = new Diapositiva(4, 2, 1, false, 0,5, 1, "http://192.168.1.143/imagenes/1_07.png" );
+        Diapositiva diapositiva5 = new Diapositiva(5, 2, 2, false, 0,5, 1, "http://192.168.1.143/imagenes/1_08.png" );
+        Diapositiva diapositiva6 = new Diapositiva(6, 2, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/1_09.png" );
+
+        Diapositiva diapositiva7 = new Diapositiva(7, 3, 1, false, 0,5, 1, "http://192.168.1.143/imagenes/3_01.png" );
+        Diapositiva diapositiva8 = new Diapositiva(8, 3, 2, false, 0,5, 1, "http://192.168.1.143/imagenes/3_02.png" );
+        Diapositiva diapositiva9 = new Diapositiva(9, 3, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/3_03.png" );
+        Diapositiva diapositiva10 = new Diapositiva(10, 4, 1, false, 0,4, 1, "http://192.168.1.143/imagenes/4_11.png" );
+        Diapositiva diapositiva11 = new Diapositiva(11, 4, 2, false, 0,4, 1, "http://192.168.1.143/imagenes/4_12.png" );
+        Diapositiva diapositiva12= new Diapositiva(12, 4, 3, false, 0,4, 1, "http://192.168.1.143/imagenes/4_13.png" );
+
+        diapositivas.add(diapositiva1);
+        diapositivas.add(diapositiva2);
+        diapositivas.add(diapositiva3);
+        diapositivas.add(diapositiva4);
+        diapositivas.add(diapositiva5);
+        diapositivas.add(diapositiva6);
+        diapositivas.add(diapositiva7);
+        diapositivas.add(diapositiva8);
+        diapositivas.add(diapositiva9);
+        diapositivas.add(diapositiva10);
+        diapositivas.add(diapositiva11);
+        diapositivas.add(diapositiva12);
+
+    }
+
+    private void mostrar_Acrietro_yfallos_finales(){
+        Toast.makeText(Actividad_Test_TVPS.this, "test 1:\nACIERTOS --> " +cont_aciertos_1 + " /  FALLOS --> "+ cont_fallos_1, Toast.LENGTH_SHORT).show();
+        Toast.makeText(Actividad_Test_TVPS.this, "test 2:\nACIERTOS --> " +cont_aciertos_2 + " /  FALLOS --> "+ cont_fallos_2, Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(Actividad_Test_TVPS.this, "test 3:\nACIERTOS --> " +cont_aciertos_3 + " /  FALLOS --> "+ cont_fallos_3, Toast.LENGTH_SHORT).show();
+        Toast.makeText(Actividad_Test_TVPS.this, "test 4:\nACIERTOS --> " +cont_aciertos_4 + " /  FALLOS --> "+ cont_fallos_4, Toast.LENGTH_SHORT).show();
+
+    }
+
+
+
+
+
+
+    private void mostrar_botones(int num_respeuestas){
+        if(num_respeuestas == 4){ visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7, bt_8,bt_9});}
+
     }
 }
