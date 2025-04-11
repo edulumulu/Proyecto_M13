@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,7 +34,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private int id_empleado;
     private int id_cliente;
     private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_cambio_test;
-    ImageView iv_imagen;
+    ImageView iv_imagen, iv_imagen_timer;
     private ArrayList<Diapositiva> diapositivas = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas_parte_test = new ArrayList<>();
     //private ImageView imageView;
@@ -72,108 +74,149 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
 
     private void pasar_test(int parte_test){
-
         iv_imagen.setVisibility(View.VISIBLE);
-        currentIndex = 0;
+
         diapositivas_parte_test = diapositivas_test_parte(parte_test);
         url_fotos = obtener_url_fotos_parte_test(parte_test);
 
-        eleccion_de_botones(diapositivas_parte_test, currentIndex);
+        // Solo mostramos la primera diapositiva
+        eleccion_de_botones(diapositivas_parte_test, currentIndex, parte_test);
 
+        // Listener para botones cuando NO hay timer
         View.OnClickListener answerListener = view -> {
-
             int boton_presionado = Integer.parseInt(((Button) view).getText().toString());
             Log.d("Respuesta", "Usuario eligió: " + boton_presionado);
 
-
             if (boton_presionado == diapositivas_parte_test.get(currentIndex).getRespuesta_correcta()) {
                 cont_aciertos_general++;
-                //Toast.makeText(this, "ACIERTO", Toast.LENGTH_SHORT).show();
-                Log.d("Respuesta Correcta", "El usuario eligió la respuesta correcta.");
             } else {
                 cont_fallos_general++;
-                //Toast.makeText(this, "FALLO", Toast.LENGTH_SHORT).show();
-                Log.d("Respuesta Incorrecta", "El usuario eligió una respuesta incorrecta.");
             }
+
             currentIndex++;
 
-
-            if (currentIndex < url_fotos.length && cont_fallos_general<4) {
-                eleccion_de_botones(diapositivas_parte_test, currentIndex);
-                cargar_imagen(url_fotos[currentIndex]);
+            if (currentIndex < url_fotos.length && cont_fallos_general < 4) {
+                eleccion_de_botones(diapositivas_parte_test, currentIndex, parte_test);
             } else {
-                Toast.makeText(this, "ACIERTOS --> " +cont_aciertos_general + " /  FALLOS --> "+ cont_fallos_general, Toast.LENGTH_SHORT).show();
-                contador_fallos(parte_test);
-                contador_aciertos(parte_test);
-                Toast.makeText(this, "Fin del test", Toast.LENGTH_SHORT).show();
-
-                visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4,bt_5, bt_6, bt_7, bt_8, bt_9});
-                iv_imagen.setVisibility(View.GONE);
-                bt_cambio_test.setText("Has terminado el test " + parte_test + "\n Toca la pantalla para continuar");
-                //tv_Cambio.setText("Has terminado el test " + parte_test + "\n Toca la pantalla para continuar");
-                bt_cambio_test.setVisibility(View.VISIBLE);
-
-                bt_cambio_test.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // Si no hemos llegado al final de todos los tests
-                        contador_test_Terminados++;
-                        Toast.makeText(Actividad_Test_TVPS.this, "Test terminados --> "+contador_test_Terminados, Toast.LENGTH_SHORT).show();
-                        bt_cambio_test.setVisibility(View.GONE); //hasta aquí funciona
-                        if(contador_test_Terminados < 4){
-                            bt_cambio_test.setVisibility(View.GONE);
-                            pasar_test(contador_test_Terminados+1);
-
-                        }
-                        else{
-                            tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
-                           mostrar_Acrietro_yfallos_finales();
-                            tv_Cambio.setVisibility(View.VISIBLE);
-
-                        }
-                    }
-                });
-
-
+                finalizar_test(parte_test);
             }
         };
 
-        bt_1.setOnClickListener(answerListener);
-        bt_2.setOnClickListener(answerListener);
-        bt_3.setOnClickListener(answerListener);
-        bt_4.setOnClickListener(answerListener);
-        bt_5.setOnClickListener(answerListener);
-        bt_6.setOnClickListener(answerListener);
-        bt_7.setOnClickListener(answerListener);
-        bt_8.setOnClickListener(answerListener);
-        bt_9.setOnClickListener(answerListener);
-
+        // Asignar listeners a todos los botones
+        Button[] botones = new Button[]{bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9};
+        for (Button b : botones) b.setOnClickListener(answerListener);
     }
 
-    private void eleccion_de_botones(ArrayList<Diapositiva> diapositivas, int indice){
-        if(!diapositivas.get(indice).isTimer()){
-            cargar_imagen(url_fotos[indice]);
-            if(diapositivas.get(indice).getId_estudio() == 1 || diapositivas.get(indice).getId_estudio() == 2  || diapositivas.get(indice).getId_estudio() == 3  ){
-                visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
-            }
-
-            if(diapositivas.get(indice).getId_estudio() == 4){
-                if(diapositivas.get(indice).getN_respuestas() == 5){
-                    visibilidad_botones(false, new Button[]{bt_6, bt_7, bt_8,bt_9});
-                    visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
-                }else if(diapositivas.get(indice).getN_respuestas() == 4){
-                    visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5});
-                    visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8,bt_9});
-                }
-
-            }
-
-            if(diapositivas.get(indice).getId_estudio() == 6 || diapositivas.get(indice).getId_estudio() == 7 ){
-                //visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8,bt_9});
-            }
-
-
+    private void eleccion_de_botones(ArrayList<Diapositiva> diapositivas, int indice, int parte_test) {
+        if (indice >= diapositivas.size()) {
+            finalizar_test(parte_test);
+            return;
         }
+
+        iv_imagen.setVisibility(View.VISIBLE);
+        iv_imagen_timer.setVisibility(View.GONE);
+        visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9});
+
+        Diapositiva actual = diapositivas.get(indice);
+        int estudio = actual.getId_estudio();
+        int n_respuestas = actual.getN_respuestas();
+
+        if (estudio == 1 || estudio == 3) {
+            cargar_imagen(iv_imagen, url_fotos[indice]);
+            visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3, bt_4, bt_5});
+        } else if (estudio == 2 && n_respuestas == 4) {
+            cargar_imagen(iv_imagen, url_fotos[indice]);
+            visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8, bt_9});
+        } else if (estudio == 2 && n_respuestas == 0) {
+            // Mostrar imagen con timer y pasar automáticamente después
+            cargar_imagen(iv_imagen_timer, url_fotos[indice]);
+            iv_imagen_timer.setVisibility(View.VISIBLE);
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                iv_imagen_timer.setVisibility(View.GONE);
+                currentIndex++;
+
+                if (currentIndex < url_fotos.length && cont_fallos_general < 4) {
+                    eleccion_de_botones(diapositivas, currentIndex, parte_test);
+                } else {
+                    finalizar_test(parte_test);
+                }
+            }, 3000);
+
+        } else if (estudio == 4) {
+            cargar_imagen(iv_imagen, url_fotos[indice]);
+            if (n_respuestas == 5) {
+                visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3, bt_4, bt_5});
+            } else if (n_respuestas == 4) {
+                visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8, bt_9});
+            }
+        } else if (estudio == 6 || estudio == 7) {
+            cargar_imagen(iv_imagen, url_fotos[indice]);
+            visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8, bt_9});
+        }
+    }
+
+
+    private void configurar_botones_visibles(Diapositiva actual) {
+        int estudio = actual.getId_estudio();
+        int n_respuestas = actual.getN_respuestas();
+
+        if (estudio == 1 || estudio == 3) {
+            visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3, bt_4, bt_5});
+        } else if (estudio == 2) {
+            if (n_respuestas == 4) {
+                visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8, bt_9});
+            } else if (n_respuestas == 0) {
+                Toast.makeText(Actividad_Test_TVPS.this, "numero respuestas --> " +n_respuestas, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        else if (estudio == 4) {
+            if (n_respuestas == 5) {
+                visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3, bt_4, bt_5});
+            } else if (n_respuestas == 4) {
+                visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8, bt_9});
+            }
+
+        } else if ( estudio == 6 || estudio == 7) {
+            visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8, bt_9});
+        }
+    }
+
+    private void finalizar_test(int parte_test){
+
+        currentIndex = 0;
+        Toast.makeText(this, "ACIERTOS --> " +cont_aciertos_general + " /  FALLOS --> "+ cont_fallos_general, Toast.LENGTH_SHORT).show();
+        contador_fallos(parte_test);
+        contador_aciertos(parte_test);
+        Toast.makeText(this, "Fin del test", Toast.LENGTH_SHORT).show();
+
+        visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4,bt_5, bt_6, bt_7, bt_8, bt_9});
+        iv_imagen.setVisibility(View.GONE);
+        bt_cambio_test.setText("Has terminado el test " + parte_test + "\n Toca la pantalla para continuar");
+        //tv_Cambio.setText("Has terminado el test " + parte_test + "\n Toca la pantalla para continuar");
+        bt_cambio_test.setVisibility(View.VISIBLE);
+
+        bt_cambio_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Si no hemos llegado al final de todos los tests
+                contador_test_Terminados++;
+                Toast.makeText(Actividad_Test_TVPS.this, "Test terminados --> "+contador_test_Terminados, Toast.LENGTH_SHORT).show();
+                bt_cambio_test.setVisibility(View.GONE);
+                if(contador_test_Terminados < 4){
+                    bt_cambio_test.setVisibility(View.GONE);
+                    pasar_test(contador_test_Terminados+1);
+
+                }
+                else{
+                    tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
+                    mostrar_Acrietro_yfallos_finales();
+                    tv_Cambio.setVisibility(View.VISIBLE);
+
+                }
+            }
+        });
     }
 
     public void contador_fallos(int parte_test){
@@ -317,13 +360,15 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         return diapositivas_parte_test;
     }
 
-    private void cargar_imagen (String url){
-        new DownloadImageTask(iv_imagen).execute(url);
+    private void cargar_imagen( ImageView imageView, String url) {
+        new DownloadImageTask(imageView).execute(url);
     }
 
     private void inicializar_componentes(){
 
         iv_imagen = findViewById(R.id.iv_imagen);
+        iv_imagen_timer = findViewById(R.id.iv_imagen_timer);
+
         tv_Cambio = findViewById(R.id.tv_cambio);
 
         bt_1 = findViewById(R.id.bt_1);
@@ -340,36 +385,50 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
 
         visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7,bt_8, bt_9, bt_cambio_test });
+        iv_imagen_timer.setVisibility(View.GONE);
         tv_Cambio.setVisibility(View.GONE);
     }
 
     public void diapositivas_De_prueba(){
-        Diapositiva diapositiva1 = new Diapositiva(1, 1, 1, false, 0,5, 1, "http://192.168.1.143/imagenes/1_01.png" );
-        Diapositiva diapositiva2 = new Diapositiva(2, 1, 2, false, 0,5, 1, "http://192.168.1.143/imagenes/1_02.png" );
-        Diapositiva diapositiva3 = new Diapositiva(3, 1, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/1_03.png" );
-        Diapositiva diapositiva4 = new Diapositiva(4, 2, 1, false, 0,5, 1, "http://192.168.1.143/imagenes/1_07.png" );
-        Diapositiva diapositiva5 = new Diapositiva(5, 2, 2, false, 0,5, 1, "http://192.168.1.143/imagenes/1_08.png" );
-        Diapositiva diapositiva6 = new Diapositiva(6, 2, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/1_09.png" );
 
-        Diapositiva diapositiva7 = new Diapositiva(7, 3, 1, false, 0,5, 1, "http://192.168.1.143/imagenes/3_01.png" );
-        Diapositiva diapositiva8 = new Diapositiva(8, 3, 2, false, 0,5, 1, "http://192.168.1.143/imagenes/3_02.png" );
-        Diapositiva diapositiva9 = new Diapositiva(9, 3, 3, false, 0,5, 1, "http://192.168.1.143/imagenes/3_03.png" );
-        Diapositiva diapositiva10 = new Diapositiva(10, 4, 1, false, 0,4, 1, "http://192.168.1.143/imagenes/4_11.png" );
-        Diapositiva diapositiva11 = new Diapositiva(11, 4, 2, false, 0,4, 1, "http://192.168.1.143/imagenes/4_12.png" );
-        Diapositiva diapositiva12= new Diapositiva(12, 4, 3, false, 0,4, 1, "http://192.168.1.143/imagenes/4_13.png" );
+        //"http://192.168.1.143/"    casa
+        String ip= "http://192.168.1.106/";
+        Diapositiva diapositiva1 = new Diapositiva(1, 1, 1, false, 0,5, 1, ip + "imagenes/1_01.png");
+        Diapositiva diapositiva2 = new Diapositiva(2, 1, 2, false, 0,5, 1, ip + "imagenes/1_02.png");
+        Diapositiva diapositiva3 = new Diapositiva(3, 1, 3, false, 0,5, 1, ip + "imagenes/1_03.png");
+        //Diapositiva diapositiva4 = new Diapositiva(4, 2, 1, false, 0,0, 0, ip + "imagenes/2_01.png");
+        Diapositiva diapositiva5 = new Diapositiva(5, 2, 2, false, 0,4, 1, ip + "imagenes/2_02.png");
+        Diapositiva diapositiva6 = new Diapositiva(6, 2, 3, true, 0,0, 0, ip + "imagenes/2_39.png");
+        Diapositiva diapositiva7 = new Diapositiva(7, 2, 4, false, 0,4, 1, ip + "imagenes/2_40.png");
+
+//        Diapositiva diapositiva8 = new Diapositiva(8, 1, 1, false, 0,5, 1, ip + "imagenes/1_07.png");
+//        Diapositiva diapositiva9 = new Diapositiva(9, 1, 2, false, 0,5, 1, ip + "imagenes/1_08.png");
+//        Diapositiva diapositiva10 = new Diapositiva(10, 1, 3, false, 0,5, 1, ip + "imagenes/1_09.png");
+
+        Diapositiva diapositiva11 = new Diapositiva(11, 3, 1, false, 0,5, 1, ip + "imagenes/3_01.png");
+        Diapositiva diapositiva12 = new Diapositiva(12, 3, 2, false, 0,5, 1, ip + "imagenes/3_02.png");
+        Diapositiva diapositiva13 = new Diapositiva(13, 3, 3, false, 0,5, 1, ip + "imagenes/3_03.png");
+        Diapositiva diapositiva14 = new Diapositiva(14, 4, 1, false, 0,4, 1, ip + "imagenes/4_11.png");
+        Diapositiva diapositiva15 = new Diapositiva(15, 4, 2, false, 0,4, 1, ip + "imagenes/4_12.png");
+        Diapositiva diapositiva16 = new Diapositiva(16, 4, 3, false, 0,4, 1, ip + "imagenes/4_13.png");
 
         diapositivas.add(diapositiva1);
         diapositivas.add(diapositiva2);
         diapositivas.add(diapositiva3);
-        diapositivas.add(diapositiva4);
+        //diapositivas.add(diapositiva4);
         diapositivas.add(diapositiva5);
         diapositivas.add(diapositiva6);
         diapositivas.add(diapositiva7);
-        diapositivas.add(diapositiva8);
-        diapositivas.add(diapositiva9);
-        diapositivas.add(diapositiva10);
+//        diapositivas.add(diapositiva8);
+//        diapositivas.add(diapositiva9);
+//        diapositivas.add(diapositiva10);
         diapositivas.add(diapositiva11);
         diapositivas.add(diapositiva12);
+        diapositivas.add(diapositiva13);
+        diapositivas.add(diapositiva14);
+        diapositivas.add(diapositiva15);
+        diapositivas.add(diapositiva16);
+
 
     }
 
