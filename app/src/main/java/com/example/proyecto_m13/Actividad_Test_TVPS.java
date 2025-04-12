@@ -4,7 +4,6 @@ import static Utilidades.Utilidades.visibilidad_Textviews;
 import static Utilidades.Utilidades.visibilidad_botones;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -20,33 +19,32 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-import Utilidades.Utilidades;
-
 public class Actividad_Test_TVPS extends AppCompatActivity {
 
     private int id_empleado;
     private int id_cliente;
+
     private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_10, bt_11, bt_12, bt_13, bt_cambio_test;
-    ImageView iv_imagen, iv_imagen_timer;
+    private ImageView iv_imagen, iv_imagen_timer;
     private ArrayList<Diapositiva> diapositivas = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas_parte_test = new ArrayList<>();
-    //private ImageView imageView;
-    int currentIndex = 0;
-    String[] url_fotos;
-    int cont_fallos_general, cont_fallos_1, cont_fallos_2,cont_fallos_3,cont_fallos_4,cont_fallos_5,cont_fallos_6,cont_fallos_7;
-    int cont_aciertos_general, cont_aciertos_1, cont_aciertos_2, cont_aciertos_3, cont_aciertos_4, cont_aciertos_5, cont_aciertos_6, cont_aciertos_7;
-    int contador_test_Terminados = 0;
 
     private TextView tv_Cambio, tv_instrucciones;
+    private String[] url_fotos;
+    private int cont_fallos_general, cont_fallos_1, cont_fallos_2,cont_fallos_3,cont_fallos_4,cont_fallos_5,cont_fallos_6,cont_fallos_7;
+    private int cont_aciertos_general, cont_aciertos_1, cont_aciertos_2, cont_aciertos_3, cont_aciertos_4, cont_aciertos_5, cont_aciertos_6, cont_aciertos_7;
+
+    private int fallos_permitidos = 2;
+    private int indice_actual = 0;
+    private int contador_test_Terminados = 0;
+
+
 
 
     @Override
@@ -59,8 +57,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         id_cliente = getIntent().getIntExtra ("cliente", -1);
 
         inicializar_componentes();
+        //Array de diapositivas test
         diapositivas_De_prueba();
-
 
         mostrar_instrucciones(1);
         bt_cambio_test.setVisibility(View.VISIBLE);
@@ -73,88 +71,82 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             }
         });
 
-
-
-
-
-
-
-
     }
 
 
+    /**
+     * Método que inicia la parte del test que se solicita como parámetro, siendo este un entero
+     * @param parte_test
+     */
     private void pasar_test(int parte_test){
         iv_imagen.setVisibility(View.VISIBLE);
-
         diapositivas_parte_test = diapositivas_test_parte(parte_test);
         url_fotos = obtener_url_fotos_parte_test(parte_test);
 
         // Solo mostramos la primera diapositiva
-        eleccion_de_botones(diapositivas_parte_test, currentIndex, parte_test);
+        mostrar_diapositiva_y_botones(diapositivas_parte_test, indice_actual, parte_test);
 
         // Listener para botones cuando NO hay timer
         View.OnClickListener answerListener = view -> {
             int boton_presionado = Integer.parseInt(((Button) view).getText().toString());
             Log.d("Respuesta", "Usuario eligió: " + boton_presionado);
 
-            if (boton_presionado == diapositivas_parte_test.get(currentIndex).getRespuesta_correcta()) {
+            //Conteo fallos y  aciertos
+            if (boton_presionado == diapositivas_parte_test.get(indice_actual).getRespuesta_correcta()) {
                 cont_aciertos_general++;
             } else {
                 cont_fallos_general++;
             }
 
-            currentIndex++;
+            indice_actual++;     //Aumento el indice
 
-            if (currentIndex < url_fotos.length && cont_fallos_general < 2) {
-                iv_imagen.setImageBitmap(null);
-                eleccion_de_botones(diapositivas_parte_test, currentIndex, parte_test);
+            //Compruebo que si hay mas imagenes en el test y que no se han superado la cantidad de errores permitida para pasar la proxima parte o filaizar el test
+            if (indice_actual < url_fotos.length && cont_fallos_general < fallos_permitidos) {
+                iv_imagen.setImageBitmap(null);     // seteo el contenedor de imagenes a null
+                mostrar_diapositiva_y_botones(diapositivas_parte_test, indice_actual, parte_test);
             } else {
                 finalizar_test(parte_test);
             }
         };
 
-        // Asignar listeners a todos los botones
+        // Asigno los listeners a todos los botones
         Button[] botones = new Button[]{bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_10, bt_11, bt_12, bt_13};
         for (Button b : botones) b.setOnClickListener(answerListener);
     }
 
-    private void eleccion_de_botones(ArrayList<Diapositiva> diapositivas, int indice, int parte_test) {
-        if (indice >= diapositivas.size()) {
-            finalizar_test(parte_test);
-            return;
-        }
+    /**
+     * Metodo encargado de selecionar la cantidad de botones y su situación en pantalla según la diapositiva que tiene que mostrar
+     * @param diapositivas
+     * @param indice
+     * @param parte_test
+     */
+    private void mostrar_diapositiva_y_botones(ArrayList<Diapositiva> diapositivas, int indice, int parte_test) {
+        //Comprueo que el indice pasado no supera la cantidad de diapositivas de la parte del test sobre la que trabaja
+        if (indice >= diapositivas.size()) { finalizar_test(parte_test); return; }
 
+        //Hago visible el el contenedor de imagen con respuesta e invisible el de las que tienen timer y hago invisibles todos los botones
         iv_imagen.setVisibility(View.VISIBLE);
         iv_imagen_timer.setVisibility(View.GONE);
         visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7,bt_8, bt_9, bt_10, bt_11,bt_12, bt_13});
 
+        //Creo una variable diapositiva con la información de la diapositiva actual y estraigo su id-estudio y su número de respuestas
         Diapositiva actual = diapositivas.get(indice);
         int estudio = actual.getId_estudio();
         int n_respuestas = actual.getN_respuestas();
 
+        //Selecciono los botones dependiendo de la parte del test que se esté pasando
         if (estudio == 1 || estudio == 3) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
             visibilidad_botones(true, new Button[]{bt_1, bt_2, bt_3, bt_4, bt_5});
+
         } else if (estudio == 2 && n_respuestas == 4) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
             visibilidad_botones(true, new Button[]{bt_6, bt_7, bt_8, bt_9});
         } else if (estudio == 2 && n_respuestas == 0) {
-            // Mostrar imagen con timer y pasar automáticamente después
+            // Mostrar imagen con timer y pasados los segundos correspondientes desaparece
             cargar_imagen(iv_imagen_timer, url_fotos[indice]);
             iv_imagen_timer.setVisibility(View.VISIBLE);
-
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                iv_imagen_timer.setVisibility(View.GONE);
-                iv_imagen_timer.setImageBitmap(null);
-                currentIndex++;
-
-                if (currentIndex < url_fotos.length && cont_fallos_general < 4) {
-                    eleccion_de_botones(diapositivas, currentIndex, parte_test);
-                } else {
-                    finalizar_test(parte_test);
-                }
-            }, 3000);
-
+            iniciar_temporizador(3000, parte_test);
 
         } else if (estudio == 4) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
@@ -168,20 +160,10 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             cargar_imagen(iv_imagen, url_fotos[indice]);
             visibilidad_botones(true, new Button[]{bt_10, bt_11, bt_12, bt_13});
         } else if (estudio == 5 && n_respuestas == 0) {
-            // Mostrar imagen con timer y pasar automáticamente después
+            // igual que la parte 2
             cargar_imagen(iv_imagen_timer, url_fotos[indice]);
             iv_imagen_timer.setVisibility(View.VISIBLE);
-
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                iv_imagen_timer.setVisibility(View.GONE);
-                currentIndex++;
-
-                if (currentIndex < url_fotos.length && cont_fallos_general < 4) {
-                    eleccion_de_botones(diapositivas, currentIndex, parte_test);
-                } else {
-                    finalizar_test(parte_test);
-                }
-            }, 3000);
+            iniciar_temporizador(3000, parte_test);
 
         } else if (estudio == 6 || estudio == 7) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
@@ -189,10 +171,33 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         }
     }
 
+    /**
+     * Método que hace desaparecer la imagen actual pasados los segundos correspondientes
+     * @param tiempo
+     * @param parte_test
+     */
+    private void iniciar_temporizador(int tiempo, int parte_test){
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            iv_imagen_timer.setVisibility(View.GONE);
+            iv_imagen_timer.setImageBitmap(null);
+            indice_actual++;
 
+            if (indice_actual < url_fotos.length && cont_fallos_general < 4) {
+                mostrar_diapositiva_y_botones(diapositivas, indice_actual, parte_test);
+            } else {
+                finalizar_test(parte_test);
+            }
+        }, tiempo);
+    }
+
+    /**
+     * Método que se encarga de guardar los aciertos y fallos de la parte del test correspondiente
+     * y que habilita que se pueda pasar la siguiente parte del test tocando la pantalla
+     * @param parte_test
+     */
     private void finalizar_test(int parte_test){
 
-        currentIndex = 0;
+        indice_actual = 0;
         Toast.makeText(this, "ACIERTOS --> " +cont_aciertos_general + " /  FALLOS --> "+ cont_fallos_general, Toast.LENGTH_SHORT).show();
         contador_fallos(parte_test);
         contador_aciertos(parte_test);
@@ -201,11 +206,13 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7,bt_8, bt_9, bt_10, bt_11,bt_12, bt_13});
         iv_imagen.setVisibility(View.GONE);
 
-        //bt_cambio_test.setText("Has terminado el test " + parte_test );
         mostrar_instrucciones (parte_test +1);
         //tv_Cambio.setText("Has terminado el test " + parte_test + "\n Toca la pantalla para continuar");
         bt_cambio_test.setVisibility(View.VISIBLE);
 
+        /**
+         * Boton que habilita  mostrar el sigiente test o finalizar la actividad guardando los resultados
+         */
         bt_cambio_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -222,6 +229,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                 }
                 else{
                     tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
+                    //Guardar los datos en la BBDD
                     mostrar_Acrietro_yfallos_finales();
                     tv_Cambio.setVisibility(View.VISIBLE);
 
@@ -230,6 +238,10 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         });
     }
 
+    /**
+     * Guarda los fallos realizados en el test en la variable correspondiente a cada parte
+     * @param parte_test
+     */
     public void contador_fallos(int parte_test){
         // Usamos switch para manejar las diferentes partes del test
         switch(parte_test) {
@@ -274,6 +286,10 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         }
     }
 
+    /**
+     * Guarda los aciertos conseguidos en el test en la variable correspondiente a cada parte
+     * @param parte_test
+     */
     public void contador_aciertos(int parte_test){
 
         switch(parte_test) {
@@ -318,6 +334,10 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         }
     }
 
+    /**
+     * Muestra las instrucciones según el test que se va a realizar
+     * @param parte_Test
+     */
     public void mostrar_instrucciones(int parte_Test){
         tv_instrucciones.setVisibility(View.VISIBLE);
         switch (parte_Test){
@@ -345,7 +365,11 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         }
 
     }
-    // AsyncTask para descargar la imagen en segundo plano
+
+
+    /**
+     * AsyncTask para descargar la imagen en segundo plano
+     */
     private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
 
@@ -361,7 +385,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                 connection.setDoInput(true);
                 connection.connect();
                 InputStream input = connection.getInputStream();
-                bitmap = BitmapFactory.decodeStream(input);  // Convierte el flujo de entrada en un Bitmap
+                bitmap = BitmapFactory.decodeStream(input);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -371,11 +395,16 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         @Override
         protected void onPostExecute(Bitmap result) {
             if (result != null) {
-                imageView.setImageBitmap(result);  // Establece el Bitmap en el ImageView
+                imageView.setImageBitmap(result);
             }
         }
     }
 
+    /**
+     * Obtinee un Array de String con las url de las diapositivas de dicha parte del test
+     * @param parte_test
+     * @return
+     */
     public String[] obtener_url_fotos_parte_test(int parte_test){
         ArrayList<String> urls = new ArrayList<>();
         for (Diapositiva diapo : diapositivas){
@@ -386,6 +415,11 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         return urls.toArray(new String[0]);
     }
 
+    /**
+     * Retorna un ArrayList con las diapositivas que pertenencen a una parte del test
+     * @param parte_test
+     * @return
+     */
     private ArrayList<Diapositiva> diapositivas_test_parte (int parte_test){
         ArrayList<Diapositiva> diapositivas_parte_test=new ArrayList<>();
         for (Diapositiva diapo : diapositivas){
@@ -397,10 +431,18 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         return diapositivas_parte_test;
     }
 
+    /**
+     * Carga la imagen en el ImageView facilitado con la Url pasada por parámetro
+     * @param imageView
+     * @param url
+     */
     private void cargar_imagen( ImageView imageView, String url) {
         new DownloadImageTask(imageView).execute(url);
     }
 
+    /**
+     * Inicia los componentes de la actividad y los deja invisibles hasta nueva orden
+     */
     private void inicializar_componentes(){
 
         iv_imagen = findViewById(R.id.iv_imagen);
@@ -432,6 +474,10 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         visibilidad_Textviews(false, new TextView[]{tv_instrucciones, tv_Cambio});
     }
 
+
+
+
+    //Metodos que he usado para ir probando
     public void diapositivas_De_prueba(){
 
         //"http://192.168.1.143/"    casa
