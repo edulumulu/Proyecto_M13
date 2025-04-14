@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.net.ParseException;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -19,10 +22,8 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.1.143/";
+    public static final String BASE_URL = "http://192.168.0.105/";
 
-            //"http://192.168.1.143/"
-    // madre -->  http://192.168.1.106
     @SuppressLint("StaticFieldLeak")
     public void comprobarCredenciales (Context context, String usuario, String contrasena){
         new AsyncTask<Void, Void, String>(){
@@ -61,25 +62,28 @@ public class GestionBBDD {
                 }
             }
 
-            protected void onPostExecute (String response){
-
-                if (response != null){
-                    try{
+            protected void onPostExecute(String response) {
+                if (response != null) {
+                    try {
                         JSONObject jsonResponse = new JSONObject(response);
                         String estado = jsonResponse.getString("estado");
                         String mensaje = jsonResponse.getString("mensaje");
 
-                        if ("correcto".equals(estado)){
-                            Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(context,Ficha_cliente.class);
-                            context.startActivity(intent);
+                        if ("correcto".equals(estado)) {
+                            // Extraer el ID devuelto, que en el PHP se envía en el campo "id"
+                            int idEmpleado = jsonResponse.getInt("id");
+                            Toast.makeText(context, "Inicio de sesión exitoso. ID: " + idEmpleado, Toast.LENGTH_LONG).show();
+
+                            // Crear el Intent para pasar al siguiente Activit
+                            Intent intent = new Intent(context, Ficha_cliente.class);
                             intent.putExtra("usuario", usuario);
+                            intent.putExtra("idEmpleado", idEmpleado);
                             context.startActivity(intent);
 
-                        }else {
+                        } else {
                             Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
                         }
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
                     }
@@ -102,6 +106,14 @@ public class GestionBBDD {
 
     public interface deleteCallback {
         void onClienteEliminado(String respuesta);
+    }
+
+    public interface DiapositivasCallback {
+        void onDiapositivasListadas(ArrayList<Diapositiva> listaDiapositivas);
+    }
+
+    public interface TestsRealizadosCallback {
+        void onTestsRealizadosListados(ArrayList<Test_realizado> listaTests);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -445,6 +457,169 @@ public class GestionBBDD {
                     }
                 } else {
                     Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
+                }
+            }
+        }.execute();
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    public void listarDiapositivasPorTest(Context context, final int idTest, final DiapositivasCallback callback) {
+        new AsyncTask<Void, Void, ArrayList<Diapositiva>>() {
+            @Override
+            protected ArrayList<Diapositiva> doInBackground(Void... voids) {
+                ArrayList<Diapositiva> listaDiapositivas = new ArrayList<>();
+                try {
+                    // Construimos la URL, pasando idTest como parámetro GET
+                    URL url = new URL(BASE_URL + "db_diapositivas_by_test.php?id_test=" + idTest);
+                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+                    conexion.setRequestMethod("GET");
+                    conexion.setRequestProperty("Accept", "application/json");
+
+                    // Leemos la respuesta del servidor
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
+                    StringBuilder response = new StringBuilder();
+                    String linea;
+                    while ((linea = br.readLine()) != null) {
+                        response.append(linea);
+                    }
+                    br.close();
+
+                    // Procesar el JSON
+                    JSONObject jsonResponse = new JSONObject(response.toString());
+                    String estado = jsonResponse.getString("estado");
+
+                    if (estado.equals("correcto")) {
+                        JSONArray datos = jsonResponse.getJSONArray("datos");
+                        for (int i = 0; i < datos.length(); i++) {
+                            JSONObject obj = datos.getJSONObject(i);
+
+                            // Extrae todos los campos que tengas en la tabla diapositivas
+                            int id_diapositiva = obj.getInt("id_diapositiva");
+                            int id_estudio = obj.getInt("id_estudio");
+                            int n_diapositivas = obj.getInt("n_diapositivas");
+                            boolean timer = obj.getBoolean("timer");
+                            int tiempo = obj.getInt("tiempo");
+                            int n_respuestas = obj.getInt("n_respuestas");
+                            int respuesta_correcta = obj.getInt("respuesta_correcta");
+                            String foto = obj.getString("foto");
+
+                            // Crea el objeto Diapositiva
+                            Diapositiva diapositiva = new Diapositiva(
+                                    id_diapositiva,
+                                    id_estudio,
+                                    n_diapositivas,
+                                    timer,
+                                    tiempo,
+                                    n_respuestas,
+                                    respuesta_correcta,
+                                    foto
+                            );
+                            listaDiapositivas.add(diapositiva);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return listaDiapositivas;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<Diapositiva> listaDiapositivas) {
+                if (callback != null) {
+                    callback.onDiapositivasListadas(listaDiapositivas);
+                } else {
+                    Log.e("Error", "Callback es null en listarDiapositivas");
+                }
+            }
+        }.execute();
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    public void listarTestsPorCliente(final Context context, final int idCliente, final TestsRealizadosCallback callback) {
+        new AsyncTask<Void, Void, ArrayList<Test_realizado>>() {
+            @Override
+            protected ArrayList<Test_realizado> doInBackground(Void... voids) {
+                ArrayList<Test_realizado> listaTests = new ArrayList<>();
+                try {
+                    // Construir la URL, pasando id_cliente como parámetro GET
+                    URL url = new URL(BASE_URL + "db_test_realizados_by_cliente.php?id_cliente=" + idCliente);
+                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+                    conexion.setRequestMethod("GET");
+                    conexion.setRequestProperty("Accept", "application/json");
+
+                    // Leer la respuesta del servidor
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
+                    StringBuilder response = new StringBuilder();
+                    String linea;
+                    while ((linea = br.readLine()) != null) {
+                        response.append(linea);
+                    }
+                    br.close();
+
+                    // Procesar el JSON recibido
+                    JSONObject jsonResponse = new JSONObject(response.toString());
+                    String estado = jsonResponse.getString("estado");
+                    if (estado.equals("correcto")) {
+                        JSONArray datos = jsonResponse.getJSONArray("datos");
+
+                        // Crear un formateador para parsear las fechas (ajusta el patrón según tu formato)
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+                        for (int i = 0; i < datos.length(); i++) {
+                            JSONObject obj = datos.getJSONObject(i);
+
+                            int idTestRealizado = obj.getInt("id_test_realizado");
+                            int idTest = obj.getInt("id_test");
+
+                            // Parsear el campo fecha
+                            Date fecha = null;
+                            String fechaStr = obj.optString("fecha", null);
+                            if (fechaStr != null && !fechaStr.equals("null") && !fechaStr.isEmpty()) {
+                                try {
+                                    fecha = sdf.parse(fechaStr);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            // Parsear el campo fecha_proxima_revision
+                            Date fechaProximaRevision = null;
+                            String fechaProxStr = obj.optString("fecha_proxima_revision", null);
+                            if (fechaProxStr != null && !fechaProxStr.equals("null") && !fechaProxStr.isEmpty()) {
+                                try {
+                                    fechaProximaRevision = sdf.parse(fechaProxStr);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            int idCliente = obj.getInt("id_cliente");
+                            int idEmpleado = obj.getInt("id_empleado");
+                            String resultado = obj.getString("resultado");
+
+                            // Crear el objeto Test_realizado con los datos extraídos
+                            Test_realizado testRealizado = new Test_realizado(
+                                    idTestRealizado,
+                                    idTest,
+                                    fecha,
+                                    fechaProximaRevision,
+                                    idCliente,
+                                    idEmpleado,
+                                    resultado
+                            );
+                            listaTests.add(testRealizado);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return listaTests;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<Test_realizado> listaTests) {
+                if (callback != null) {
+                    callback.onTestsRealizadosListados(listaTests);
                 }
             }
         }.execute();

@@ -55,6 +55,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
 
         id_cliente = getIntent().getIntExtra ("cliente", -1);
+        id_empleado = getIntent().getIntExtra("idEmpleado", -1);
 
         inicializar_componentes();
         //Array de diapositivas test
