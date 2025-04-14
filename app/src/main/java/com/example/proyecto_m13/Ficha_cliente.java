@@ -556,10 +556,12 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Ficha_cliente.this, Actividad_Test_TVPS.class);
+                //Obtenemos el idEmpleado pasado por la otra actividad
+                int idEmpleado = getIntent().getIntExtra("idEmpleado", -1);
 
+                Intent intent = new Intent(Ficha_cliente.this, Actividad_Test_TVPS.class);
                 intent.putExtra("cliente", cliente_selecionado_id);
-                intent.putExtra("empleado", 1);
+                intent.putExtra("idEmpleado", idEmpleado);
                 startActivity(intent);
             }
         });
@@ -735,8 +737,6 @@ public class Ficha_cliente extends AppCompatActivity {
     public void poner_nombre_Empleado() {
         String usuario = getIntent().getStringExtra("usuario");
         tv_user.setText(usuario);
-
-
     }
 
     public void relacionar_variables_front_back() {

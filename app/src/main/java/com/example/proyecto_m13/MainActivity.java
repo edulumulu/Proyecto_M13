@@ -72,10 +72,7 @@ public class MainActivity extends AppCompatActivity {
         if (usuario.isEmpty() || contrasena.isEmpty()) {
             Toast.makeText(this, "No puedes dejar ningún campo vacío", Toast.LENGTH_LONG).show();
         } else {
-            //gestionBBDD.eliminarCliente(this, 2);
             gestionBBDD.comprobarCredenciales(this, usuario, contrasena);
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         }
     }
 }
