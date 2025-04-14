@@ -14,6 +14,9 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,9 +61,44 @@ public class MainActivity extends AppCompatActivity {
             });
 
             btIniciar.setOnClickListener(new View.OnClickListener() {
-                @Override
+               /* @Override
                 public void onClick(View v) {
                         iniciarSesion();
+                }*/
+
+                @Override
+                public void onClick(View v) {
+
+                    Test_realizado test = new Test_realizado(
+                            1,        // id_test
+                            2,      // id_cliente
+                            1,      // id_empleado
+                            "Positivo" // resultado
+                    );
+                    Toast.makeText(MainActivity.this, "Botón pulsado", Toast.LENGTH_SHORT).show();
+
+
+                    gestionBBDD.insertarTestRealizado(MainActivity.this, test, new GestionBBDD.InsertTestCallback() {
+                        @Override
+                        public void onTestInsertado(String respuesta) {
+                            try {
+                                JSONObject jsonResponse = new JSONObject(respuesta);
+                                if (jsonResponse.getString("estado").equals("correcto")) {
+                                    int idInsertado = jsonResponse.getInt("id_insertado");
+                                    Toast.makeText(MainActivity.this, "Insertado con ID: " + idInsertado, Toast.LENGTH_LONG).show();
+                                } else {
+                                    String errorMessage = jsonResponse.getString("mensaje");
+                                    Toast.makeText(MainActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
+                                }
+                            } catch (JSONException e) {
+                                Toast.makeText(MainActivity.this, "Error al procesar la respuesta: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                Toast.makeText(MainActivity.this, "Error inesperado: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 }
             });
     }

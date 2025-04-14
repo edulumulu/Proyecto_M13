@@ -18,11 +18,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.0.105/";
+    public static final String BASE_URL = "http://192.168.1.65/";
 
     @SuppressLint("StaticFieldLeak")
     public void comprobarCredenciales (Context context, String usuario, String contrasena){
@@ -624,4 +625,87 @@ public class GestionBBDD {
             }
         }.execute();
     }
+
+    @SuppressLint("StaticFieldLeak")
+    public void insertarTestRealizado(Context context, Test_realizado test, final InsertTestCallback callback) {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                /*
+                 * Realiza la conexión HTTP en segundo plano para insertar un nuevo registro
+                 * de test realizado en la base de datos remota
+                 */
+                try {
+                    Calendar calendar = Calendar.getInstance();
+                    // Usamos la fecha actual en lugar de la fecha del objeto test
+                    Date fechaActual = new Date();
+                    calendar.setTime(fechaActual);
+                    calendar.add(Calendar.MONTH, 5);
+                    Date fechaProximaRevision = calendar.getTime();
+
+                    // Configuración de la conexión HTTP
+                    URL url = new URL(BASE_URL+"db_test_realizados_insert.php");
+                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+                    conexion.setRequestMethod("POST");
+                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
+                    conexion.setDoOutput(true);
+
+                    // Formateo de fechas al estándar ISO para la base de datos
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    String fechaStr = dateFormat.format(fechaActual);
+                    String fechaProximaStr = dateFormat.format(fechaProximaRevision);
+
+
+                    // Construcción del objeto JSON con los datos del test
+                    JSONObject jsonTest = new JSONObject();
+                    jsonTest.put("id_test", test.getId_test());
+                    jsonTest.put("fecha", fechaStr != null ? fechaStr : "");
+                    jsonTest.put("fecha_proxima_revision", fechaProximaStr != null ? fechaProximaStr : "");
+                    jsonTest.put("id_cliente", test.getId_cliente());
+                    jsonTest.put("id_empleado", test.getId_empleado());
+                    jsonTest.put("resultado", test.getResultado() != null ? test.getResultado() : "");
+                    Log.d("INSERT_TEST", "Enviando datos: " + jsonTest.toString());
+
+                    // Envío de los datos a través del stream de salida
+                    OutputStream os = conexion.getOutputStream();
+                    os.write(jsonTest.toString().getBytes("UTF-8"));
+                    os.close();
+
+                    // Lectura de la respuesta del servidor
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    br.close();
+                    return response.toString();
+
+                } catch (Exception e) {
+                    Log.e("INSERT_TEST", "Error al crear JSON: " + e.getMessage());
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String response) {
+                /*
+                 * Procesamiento de la respuesta recibida del servidor
+                 * después de completar la operación en segundo plano
+                 */
+                if (response != null) {
+                    callback.onTestInsertado(response);
+                } else {
+                    callback.onTestInsertado("Error de conexión");
+                }
+            }
+        }.execute();
+    }
+
+    // Interfaz de callback específica para Test_realizado
+    public interface InsertTestCallback {
+        void onTestInsertado(String respuesta);
+    }
+
 }
