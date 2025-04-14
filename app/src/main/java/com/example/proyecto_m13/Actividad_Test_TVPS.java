@@ -29,11 +29,15 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
     private int id_empleado;
     private int id_cliente;
+    private int edad_cliente;
 
     private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_10, bt_11, bt_12, bt_13, bt_cambio_test;
     private ImageView iv_imagen, iv_imagen_timer;
     private ArrayList<Diapositiva> diapositivas = new ArrayList<>();
+    private ArrayList<Diapositiva> diapositivas2 = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas_parte_test = new ArrayList<>();
+    private Test_realizado resultado_test_resalizado;
+    private String conclusion_final;
 
     private TextView tv_Cambio, tv_instrucciones;
     private String[] url_fotos;
@@ -52,10 +56,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_test_tvps);
-
-
-        id_cliente = getIntent().getIntExtra ("cliente", -1);
-        id_empleado = getIntent().getIntExtra("idEmpleado", -1);
 
         inicializar_componentes();
         //Array de diapositivas test
@@ -83,6 +83,9 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         iv_imagen.setVisibility(View.VISIBLE);
         diapositivas_parte_test = diapositivas_test_parte(parte_test);
         url_fotos = obtener_url_fotos_parte_test(parte_test);
+
+        // CORRECCIÓN: Guardamos las diapositivas actuales para el temporizador
+       // diapositivas2 = diapositivas_parte_test;
 
         // Solo mostramos la primera diapositiva
         mostrar_diapositiva_y_botones(diapositivas_parte_test, indice_actual, parte_test);
@@ -160,6 +163,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         } else if (estudio == 5 && n_respuestas == 4) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
             visibilidad_botones(true, new Button[]{bt_10, bt_11, bt_12, bt_13});
+
         } else if (estudio == 5 && n_respuestas == 0) {
             // igual que la parte 2
             cargar_imagen(iv_imagen_timer, url_fotos[indice]);
@@ -184,7 +188,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             indice_actual++;
 
             if (indice_actual < url_fotos.length && cont_fallos_general < 4) {
-                mostrar_diapositiva_y_botones(diapositivas, indice_actual, parte_test);
+                mostrar_diapositiva_y_botones(diapositivas_parte_test, indice_actual, parte_test);
             } else {
                 finalizar_test(parte_test);
             }
@@ -231,12 +235,171 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                 else{
                     tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
                     //Guardar los datos en la BBDD
-                    mostrar_Acrietro_yfallos_finales();
+
+
+                    conclusion_final = contrastar_resultados();
+                    //resultado_test_resalizado = new Test_realizado();
+
+                    datoscliente_y_empleado();
+                    //mostrar_Acrietro_yfallos_finales();
+                    mostrar_Acrietro_yfallos_finales2(conclusion_final);
+
+                    //Toast.makeText(Actividad_Test_TVPS.this, "Empleado --> "+ id_empleado+" / Cliente --> "+id_cliente + " ,tiene "+edad_cliente+" años", Toast.LENGTH_LONG).show();
                     tv_Cambio.setVisibility(View.VISIBLE);
 
                 }
             }
         });
+    }
+
+    private String contrastar_resultados() {
+        String conclusion;
+
+        String parte1 = "No hay resultados";
+        String parte2 = "No hay resultados";
+        String parte3 = "No hay resultados";
+        String parte4 = "No hay resultados";
+        String parte5 = "No hay resultados";
+        String parte6 = "No hay resultados";
+        String parte7 = "No hay resultados";
+        String valoracion = null;
+        int contador = 0;
+
+        if (edad_cliente < 6) {
+            parte1 = resultado_ponderado(cont_aciertos_1, 2, 4);
+            parte2 = resultado_ponderado(cont_aciertos_2, 2, 4);
+            parte3 = resultado_ponderado(cont_aciertos_3, 2, 4);
+            parte4 = resultado_ponderado(cont_aciertos_4, 2, 4);
+            parte5 = resultado_ponderado(cont_aciertos_5, 2, 4);
+            parte6 = resultado_ponderado(cont_aciertos_6, 2, 4);
+            parte7 = resultado_ponderado(cont_aciertos_7, 2, 4);
+
+           contador = partes_no_superadas(2);
+
+
+        } else if (edad_cliente >= 6 && edad_cliente < 10) {
+
+            parte1 = resultado_ponderado(cont_aciertos_1, 3, 5);
+            parte2 = resultado_ponderado(cont_aciertos_2, 3, 5);
+            parte3 = resultado_ponderado(cont_aciertos_3, 3, 5);
+            parte4 = resultado_ponderado(cont_aciertos_3, 3, 5);
+            parte5 = resultado_ponderado(cont_aciertos_3, 3, 5);
+            parte6 = resultado_ponderado(cont_aciertos_3, 3, 5);
+            parte7 = resultado_ponderado(cont_aciertos_3, 3, 5);
+
+            contador = partes_no_superadas(3);
+
+        } else if (edad_cliente >= 10 && edad_cliente < 13) {
+
+            parte1 = resultado_ponderado(cont_aciertos_1, 4, 7);
+            parte2 = resultado_ponderado(cont_aciertos_2, 4, 7);
+            parte3 = resultado_ponderado(cont_aciertos_3, 4, 7);
+            parte4 = resultado_ponderado(cont_aciertos_3, 4, 7);
+            parte5 = resultado_ponderado(cont_aciertos_3, 4, 7);
+            parte6 = resultado_ponderado(cont_aciertos_3, 4, 7);
+            parte7 = resultado_ponderado(cont_aciertos_3, 4, 7);
+
+            contador = partes_no_superadas(3);
+
+        } else if (edad_cliente >= 13 ) {
+
+            parte1 = resultado_ponderado(cont_aciertos_1, 5, 9);
+            parte2 = resultado_ponderado(cont_aciertos_2, 5, 9);
+            parte3 = resultado_ponderado(cont_aciertos_3, 5, 9);
+            parte4 = resultado_ponderado(cont_aciertos_3, 5, 9);
+            parte5 = resultado_ponderado(cont_aciertos_3, 5, 9);
+            parte6 = resultado_ponderado(cont_aciertos_3, 5, 9);
+            parte7 = resultado_ponderado(cont_aciertos_3, 5, 9);
+
+            contador = partes_no_superadas(3);
+
+        }
+
+        valoracion = valoracion(contador);
+
+        conclusion = "Gráfica general:\n\n"
+                + "Discriminación visual --> " + parte1 +"\n"
+                + "Memoria visual --> "+ parte2 +"\n"
+                + "Relacción espacial --> " + parte3 +"\n"
+                + "Constancia de la forma --> "+ parte4 +"\n"
+                + "memoria secuencial --> " + parte5 +"\n"
+                + "Figura de fondo --> "+ parte6 +"\n"
+                + "Completado visual --> " + parte7 +"\n\n"
+                +"VALORACIÓN: "+ valoracion;
+
+        return conclusion;
+    }
+
+    private int partes_no_superadas(int aciertos){
+        int contador = 0;
+
+        if(cont_aciertos_1<aciertos){ contador++;}
+        if(cont_aciertos_2<aciertos){ contador++;}
+        if(cont_aciertos_3<aciertos){ contador++;}
+        if(cont_aciertos_4<aciertos){ contador++;}
+        if(cont_aciertos_5<aciertos){ contador++;}
+        if(cont_aciertos_6<aciertos){ contador++;}
+        if(cont_aciertos_7<aciertos){ contador++;}
+
+        return contador;
+    }
+
+    private String valoracion (int contador){
+
+        String valoracion = "";
+
+        switch (contador){
+            case 1:
+                valoracion = "Tiene un área poco desarrollada, se puede prestar atención en mejorarla pero no es relevante";
+                break;
+            case 2:
+                valoracion = "Tiene dos áreas poco desarrolladas, se recomienda prestar atención en mejorarlas";
+                break;
+            case 3:
+                valoracion = "Tiene tres áreas poco desarrolladas, se recomienda prestar trabajo en casa específico para mejorarlas";
+                break;
+            case 4:
+                valoracion = "Tiene cuatro áreas poco desarrolladas, se recomienda trabajar con un docente en horario estraescolar";
+                break;
+            case 5:
+                valoracion = "Tiene cinco áreas poco desarrolladas, se recomienda trabajar con un docente en horario estraescolar";
+                break;
+            case 6:
+                valoracion = "Tiene seis áreas poco desarrolladas, Es necesario trabajar con un especialista";
+                break;
+            case 7:
+                valoracion = "Tiene siete áreas poco desarrolladas. el retraso madurativo es elevado, se necesita trabajo con un especialista";
+                break;
+
+        }
+        return valoracion;
+    }
+
+    private String resultado_ponderado (int contador, int minimo, int maximo){
+        if(contador <minimo){
+            return "Está por debajo de la media";
+        }else if(cont_fallos_1 <=minimo &&cont_fallos_1 <=maximo){
+            return "Dentro de los valores normales";
+        }else {
+            return "Sobresale de la media";
+        }
+    }
+
+    private void datoscliente_y_empleado(){
+        id_cliente = getIntent().getIntExtra ("idCliente", -1);
+        id_empleado = getIntent().getIntExtra("idEmpleado", -1);
+        edad_cliente = getIntent().getIntExtra("edadCliente", -1);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Resultados Finales del Test")
+                .setMessage("Empleado --> "+ id_empleado+" / Cliente --> "+id_cliente + " ,tiene "+edad_cliente+" años")
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    // Puedes cerrar o hacer algo al aceptar
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
+
     }
 
     /**
@@ -483,8 +646,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
         //"http://192.168.1.143/"    casa
         // madre "http://192.168.1.106/"
-        String ip= "http://192.168.1.143/"; //casa
-        //String ip= "http://192.168.1.106/"; // Mama
+        //String ip= "http://192.168.1.143/"; //casa
+        String ip= "http://192.168.1.106/"; // Mama
         Diapositiva diapositiva1 = new Diapositiva(1, 1, 1, false, 0,5, 1, ip + "imagenes/1_01.png");
         Diapositiva diapositiva2 = new Diapositiva(2, 1, 2, false, 0,5, 1, ip + "imagenes/1_02.png");
         Diapositiva diapositiva3 = new Diapositiva(3, 1, 3, false, 0,5, 1, ip + "imagenes/1_03.png");
@@ -530,6 +693,18 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
     }
 
+    private void mostrar_Acrietro_yfallos_finales2(String conclusion){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Resultados Finales del Test")
+                .setMessage(conclusion)
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    // Puedes cerrar o hacer algo al aceptar
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
+    }
     private void mostrar_Acrietro_yfallos_finales(){
 //        Toast.makeText(Actividad_Test_TVPS.this, "test 1:\nACIERTOS --> " +cont_aciertos_1 + " /  FALLOS --> "+ cont_fallos_1, Toast.LENGTH_SHORT).show();
 //        Toast.makeText(Actividad_Test_TVPS.this, "test 2:\nACIERTOS --> " +cont_aciertos_2 + " /  FALLOS --> "+ cont_fallos_2, Toast.LENGTH_SHORT).show();
@@ -546,6 +721,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                             "Test 5:\nACIERTOS --> " + cont_aciertos_5 + " / FALLOS --> " + cont_fallos_5 + "\n\n" +
                             "Test 6:\nACIERTOS --> " + cont_aciertos_6 + " / FALLOS --> " + cont_fallos_6 + "\n\n" +
                             "Test 7:\nACIERTOS --> " + cont_aciertos_7 + " / FALLOS --> " + cont_fallos_7;
+
+
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Resultados Finales del Test")
