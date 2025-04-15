@@ -117,6 +117,11 @@ public class GestionBBDD {
         void onTestsRealizadosListados(ArrayList<Test_realizado> listaTests);
     }
 
+    public interface InsertTestCallback {
+        void onTestInsertado(String respuesta);
+    }
+
+
     @SuppressLint("StaticFieldLeak")
     public void listarClientes(Context context, final ClienteCallback callback) {
         new AsyncTask<Void, Void, ArrayList<Cliente>>() {
@@ -690,10 +695,7 @@ public class GestionBBDD {
 
             @Override
             protected void onPostExecute(String response) {
-                /*
-                 * Procesamiento de la respuesta recibida del servidor
-                 * después de completar la operación en segundo plano
-                 */
+
                 if (response != null) {
                     callback.onTestInsertado(response);
                 } else {
@@ -701,11 +703,6 @@ public class GestionBBDD {
                 }
             }
         }.execute();
-    }
-
-    // Interfaz de callback específica para Test_realizado
-    public interface InsertTestCallback {
-        void onTestInsertado(String respuesta);
     }
 
 }
