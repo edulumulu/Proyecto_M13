@@ -559,9 +559,10 @@ public class Ficha_cliente extends AppCompatActivity {
                 //Obtenemos el idEmpleado pasado por la otra actividad
                 int idEmpleado = getIntent().getIntExtra("idEmpleado", -1);
 
+                int edad =Integer.parseInt(et_age.getText().toString());
                 Intent intent = new Intent(Ficha_cliente.this, Actividad_Test_TVPS.class);
                 intent.putExtra("idCliente", cliente_selecionado_id);
-                intent.putExtra("edadCliente", et_age.getText());
+                intent.putExtra("edadCliente", edad);
                 intent.putExtra("idEmpleado", idEmpleado);
                 startActivity(intent);
             }

@@ -22,6 +22,15 @@ public class Test_realizado {
         this.resultado = resultado;
     }
 
+    public Test_realizado(int id_test, Date fecha, Date fecha_proxima_revision, int id_cliente, int id_empleado, String resultado) {
+        this.id_test = id_test;
+        this.fecha = fecha;
+        this.fecha_proxima_revision = fecha_proxima_revision;
+        this.id_cliente = id_cliente;
+        this.id_empleado = id_empleado;
+        this.resultado = resultado;
+    }
+
     public int getId_test_realizado() {
         return id_test_realizado;
     }
@@ -76,5 +85,18 @@ public class Test_realizado {
 
     public void setResultado(String resultado) {
         this.resultado = resultado;
+    }
+
+    @Override
+    public String toString() {
+        return "Test_realizado{" +
+                "id_test_realizado=" + id_test_realizado +
+                "\nid_test=" + id_test +
+                "\nfecha=" + fecha +
+                "\nfecha_proxima_revision=" + fecha_proxima_revision +
+                "\nid_cliente=" + id_cliente +
+                "\nid_empleado=" + id_empleado +
+                "\nresultado='" + resultado + '\'' +
+                '}';
     }
 }
