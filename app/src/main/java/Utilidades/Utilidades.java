@@ -1,5 +1,6 @@
 package Utilidades;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,6 +9,11 @@ import android.widget.Toast;
 
 import com.example.proyecto_m13.Cliente;
 import com.example.proyecto_m13.Ficha_cliente;
+import com.example.proyecto_m13.GestionBBDD;
+import com.example.proyecto_m13.Test_realizado;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -194,5 +200,47 @@ public class Utilidades {
         }
     }
 
+    /**
+     * Inserta un test realizado en la base de datos remota usando GestionBBDD
+     *
+     * @param context El contexto desde el que se llama (por ejemplo, una actividad)
+     * @param idTest ID del test
+     * @param idCliente ID del cliente
+     * @param idEmpleado ID del empleado que realizó el test
+     * @param resultado Resultado del test ("Positivo", "Negativo", etc.)
+     */
 
+   //Utilidades.llamarInsertarTestRealizado(this, 1, 2, 2, "Positivo");
+    public static void llamarInsertarTestRealizado(final Context context, int idTest, int idCliente, int idEmpleado, String resultado) {
+        // Crea el  objeto Test_realizado con los datos proporcionados
+        Test_realizado test = new Test_realizado(idTest, idCliente, idEmpleado, resultado);
+
+
+
+        Toast.makeText(context, "Enviando datos del test...", Toast.LENGTH_SHORT).show();
+        GestionBBDD gestionBBDD = new GestionBBDD();
+
+        // Llamar al método asíncrono para insertar el test
+        gestionBBDD.insertarTestRealizado(context, test, new GestionBBDD.InsertTestCallback() {
+            @Override
+            public void onTestInsertado(String respuesta) {
+                try {
+                    JSONObject jsonResponse = new JSONObject(respuesta);
+                    if (jsonResponse.getString("estado").equalsIgnoreCase("correcto")) {
+                        int idInsertado = jsonResponse.getInt("id_insertado");
+                        Toast.makeText(context, "Test insertado con ID: " + idInsertado, Toast.LENGTH_LONG).show();
+                    } else {
+                        String mensajeError = jsonResponse.optString("mensaje", "Error desconocido");
+                        Toast.makeText(context, "Error al insertar test: " + mensajeError, Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(context, "Error al procesar la respuesta: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    Toast.makeText(context, "Error inesperado: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }
