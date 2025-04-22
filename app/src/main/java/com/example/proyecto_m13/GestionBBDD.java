@@ -7,11 +7,10 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.core.net.ParseException;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -23,7 +22,8 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.0.105/";
+    public static final String BASE_URL = "http://192.168.0.13/";
+
 
     @SuppressLint("StaticFieldLeak")
     public void comprobarCredenciales (Context context, String usuario, String contrasena){
@@ -119,13 +119,18 @@ public class GestionBBDD {
         void onTestRealizadoObtenido(Test_realizado testRealizado);
     }
 
-    public interface InsertTestCallback {
-        void onTestInsertado(String respuesta);
+    public interface insertarTestCallback {
+        void onInsertarTestCallback(String respuesta);
     }
 
     public interface UpdateCompletadoCallback {
         void updateCompletadoCallback(String respuesta);
     }
+
+    public interface ListarEstudiosCallback {
+        void onListarEstudiosCallback(ArrayList<Estudio> estudios);
+    }
+
 
     @SuppressLint("StaticFieldLeak")
     public void listarClientes(Context context, final ClienteCallback callback) {
@@ -626,7 +631,7 @@ public class GestionBBDD {
     }
 
     @SuppressLint("StaticFieldLeak")
-    public void insertarTestRealizado(Context context, Test_realizado test, final InsertTestCallback callback) {
+    public void insertarTestRealizado(Context context, Test_realizado test, final insertarTestCallback callback) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... voids) {
@@ -636,7 +641,6 @@ public class GestionBBDD {
                  */
                 try {
                     Calendar calendar = Calendar.getInstance();
-                    // Usamos la fecha actual en lugar de la fecha del objeto test
                     Date fechaActual = new Date();
                     calendar.setTime(fechaActual);
                     calendar.add(Calendar.MONTH, 5);
@@ -689,11 +693,27 @@ public class GestionBBDD {
 
             @Override
             protected void onPostExecute(String response) {
-
                 if (response != null) {
-                    callback.onTestInsertado(response);
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        String mensaje = jsonResponse.getString("mensaje");
+
+                        if ("correcto".equals(estado)) {
+                            Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show();
+                            if (callback != null) callback.onInsertarTestCallback(mensaje);
+                        } else {
+                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
+                            if (callback != null) callback.onInsertarTestCallback("Error: " + mensaje);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
+                        if (callback != null) callback.onInsertarTestCallback("Error al procesar la respuesta");
+                    }
                 } else {
-                    callback.onTestInsertado("Error de conexión");
+                    Toast.makeText(context, "Error de conexión", Toast.LENGTH_LONG).show();
+                    if (callback != null) callback.onInsertarTestCallback("Error de conexión");
                 }
             }
         }.execute();
@@ -760,6 +780,80 @@ public class GestionBBDD {
                     }
                 } else {
                     Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Obtiene un ArrayList de estudios desde el servidor.
+     *
+     * @param context Contexto de la aplicación
+     * @param callback Callback para manejar la respuesta con la lista de estudios
+     */
+    @SuppressLint("StaticFieldLeak")
+    public void listarEstudios(Context context, final ListarEstudiosCallback callback) {
+        new AsyncTask<Void, Void, ArrayList<Estudio>>() {
+            @Override
+            protected ArrayList<Estudio> doInBackground(Void... voids) {
+                ArrayList<Estudio> listaEstudios = new ArrayList<>();
+                HttpURLConnection conexion = null;
+                BufferedReader br = null;
+
+                try {
+                    URL url = new URL(BASE_URL + "db_select_estudios.php");
+                    conexion = (HttpURLConnection) url.openConnection();
+                    conexion.setRequestMethod("GET");
+                    conexion.setRequestProperty("Accept", "application/json");
+
+                    br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "utf-8"));
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+
+                    JSONObject jsonObject = new JSONObject(response.toString());
+                    String estado = jsonObject.getString("estado");
+
+                    if (estado.equals("correcto")) {
+                        JSONArray jsonListado = jsonObject.getJSONArray("datos");
+                        for (int i = 0; i < jsonListado.length(); i++) {
+                            JSONObject jsonEstudio = jsonListado.getJSONObject(i);
+
+                            Estudio estudio = new Estudio(
+                                    jsonEstudio.getInt("id_estudio"),
+                                    jsonEstudio.getString("nombre_estudio"),
+                                    jsonEstudio.getString("descripcion_instrucciones")
+                            );
+                            listaEstudios.add(estudio);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.e("Error", "Error al obtener los estudios", e);
+                } finally {
+                    if (conexion != null) {
+                        conexion.disconnect();
+                    }
+                    if (br != null) {
+                        try {
+                            br.close();
+                        } catch (IOException e) {
+                            Log.e("Error", "Error al cerrar BufferedReader", e);
+                        }
+                    }
+                }
+                return listaEstudios;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<Estudio> listaEstudios) {
+                if (callback != null) {
+                    callback.onListarEstudiosCallback(listaEstudios);
+                } else {
+                    Log.e("Error", "Callback es null en listarEstudios");
+                    Toast.makeText(context, "Error interno: callback no definido", Toast.LENGTH_SHORT).show();
                 }
             }
         }.execute();

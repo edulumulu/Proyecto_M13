@@ -22,7 +22,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import Utilidades.Utilidades;
+import javax.security.auth.callback.Callback;
+
+import Utilidades.*;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         btIniciar = findViewById(R.id.btIniciar);
         ivState = findViewById(R.id.ivState);
 
+        Pruebas.pruebas(this);
 
         ivState.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
         });
     }
-
     private void iniciarSesion() {
         final String usuario = etUsuario.getText().toString().trim();
         final String contrasena = etContrasena.getText().toString().trim();
@@ -85,6 +87,4 @@ public class MainActivity extends AppCompatActivity {
             gestionBBDD.comprobarCredenciales(this, usuario, contrasena);
         }
     }
-
-
 }
