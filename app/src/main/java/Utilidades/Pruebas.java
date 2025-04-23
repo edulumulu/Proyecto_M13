@@ -25,8 +25,13 @@ public class Pruebas {
 
         gestionBBDD.insertarTestRealizado(context, test, new GestionBBDD.insertarTestCallback() {
             @Override
-            public void onInsertarTestCallback(String resultado) {
-                Log.d("InsertarTest", "Resultado de la inserción: " + resultado);
+            public void onSuccess(int idInsertado) {
+                Log.d("InsertarTest", "Resultado de la inserción: " + idInsertado);
+            }
+
+            @Override
+            public void onError(String mensajeError) {
+                Log.e("InsertarTest", "Error en la inserción: " + mensajeError);
             }
         });
     }

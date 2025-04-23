@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.1.143/";
+    public static final String BASE_URL = "http://192.168.56.1/";
 
 
     @SuppressLint("StaticFieldLeak")
@@ -120,8 +120,11 @@ public class GestionBBDD {
     }
 
     public interface insertarTestCallback {
-        void onInsertarTestCallback(String respuesta);
+        void onSuccess(int idInsertado);
+        void onError(String mensajeError);
     }
+
+
 
     public interface UpdateCompletadoCallback {
         void updateCompletadoCallback(String respuesta);
@@ -697,25 +700,23 @@ public class GestionBBDD {
                     try {
                         JSONObject jsonResponse = new JSONObject(response);
                         String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
 
                         if ("correcto".equals(estado)) {
-                            Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show();
-                            if (callback != null) callback.onInsertarTestCallback(mensaje);
+                            int idInsertado = jsonResponse.optInt("id_insertado", -1);
+                            if (callback != null) callback.onSuccess(idInsertado);
                         } else {
-                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
-                            if (callback != null) callback.onInsertarTestCallback("Error: " + mensaje);
+                            String mensaje = jsonResponse.optString("mensaje", "Error desconocido");
+                            if (callback != null) callback.onError(mensaje);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
-                        if (callback != null) callback.onInsertarTestCallback("Error al procesar la respuesta");
+                        if (callback != null) callback.onError("Error al procesar la respuesta del servidor");
                     }
                 } else {
-                    Toast.makeText(context, "Error de conexión", Toast.LENGTH_LONG).show();
-                    if (callback != null) callback.onInsertarTestCallback("Error de conexión");
+                    if (callback != null) callback.onError("Error de conexión");
                 }
             }
+
         }.execute();
     }
 
