@@ -110,8 +110,14 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private void guardar_test_realizado_BBDD(Test_realizado test){
         gestionBBDD.insertarTestRealizado(Actividad_Test_TVPS.this, test, new GestionBBDD.insertarTestCallback() {
             @Override
-            public void onInsertarTestCallback(String respuesta) {
+            public void onSuccess(int idInsertado) {
+                Toast.makeText(Actividad_Test_TVPS.this, "Insertado con ID: " + idInsertado, Toast.LENGTH_SHORT).show();
+                actualizar_cliente_BBDD(test.getId_cliente(), idInsertado);
+            }
 
+            @Override
+            public void onError(String mensajeError) {
+                Toast.makeText(Actividad_Test_TVPS.this, mensajeError, Toast.LENGTH_LONG).show();
             }
         });
     }
