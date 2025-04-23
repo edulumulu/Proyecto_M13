@@ -122,14 +122,14 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         });
     }
 
-    private int actualizar_cliente_BBDD(int id_cliente, int id_test){
+    private void actualizar_cliente_BBDD(int id_cliente, int id_test){
         gestionBBDD.actualizarEstadoTestCliente(Actividad_Test_TVPS.this, id_cliente, true, id_test, new GestionBBDD.UpdateCompletadoCallback() {
             @Override
             public void updateCompletadoCallback(String respuesta) {
 
             }
         });
-        return 1;
+
     }
 
     /**
@@ -307,21 +307,21 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
                     //OBTENER FECHAS
                         // Fecha actual
-                    Date fecha_realizacion = new Date();
+                    //Date fecha_realizacion = new Date();
                         // Crear un calendario con la fecha actual
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(fecha_realizacion);
+                    //Calendar calendar = Calendar.getInstance();
+                    //calendar.setTime(fecha_realizacion);
                         // Sumar 6 meses
-                    calendar.add(Calendar.MONTH, 6);
+                    //calendar.add(Calendar.MONTH, 6);
                         // Obtener la fecha de próxima revisión
-                    Date proxima_revision = calendar.getTime();
+                    //Date proxima_revision = calendar.getTime();
                     //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
 
 
-                    resultado_test_resalizado = new Test_realizado(1,1,fecha_realizacion,proxima_revision,id_cliente,id_empleado,conclusion_final);
+                    resultado_test_resalizado = new Test_realizado(2,id_cliente,id_empleado,conclusion_final);
 
-                    //int id_test_Realizado = guardar_test_realizado_BBDD(resultado_test_resalizado);
+                   guardar_test_realizado_BBDD(resultado_test_resalizado);
                     //actualizar_cliente_BBDD(id_cliente, id_test_Realizado);
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(Actividad_Test_TVPS.this);
