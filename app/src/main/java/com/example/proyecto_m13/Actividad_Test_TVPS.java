@@ -243,6 +243,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
                 }
                 else{
+                    bt_cambio_test.setVisibility(View.GONE);
+                    bt_cambio_test.setText("");
                     tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
                     datos_cliente_y_empleado();
 
@@ -575,24 +577,26 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                 tv_instrucciones.setText("Has terminado el test 1"+"\n\nTest "+parte_Test+"Discriminacion VisualTest Memoria visual\nMemoriza la figurara\nPasados 10 segundos podras selecionar la figura memorizada\n\nPara comenzar el test toca la pantalla");
                 break;
             case 3:
-                tv_instrucciones.setText("Debes comprar un burro y ponerle una cola");
+                tv_instrucciones.setText("Has terminado el test 2"+"\n\nTest "+parte_Test+"Relacciones espaciales\nElije la figura qeu es diferente\n\nPara comenzar el test toca la pantalla");
                 break;
             case 4:
-                tv_instrucciones.setText("Debes comprar un burro y ponerle una cola");
+                tv_instrucciones.setText("Has terminado el test 3"+"\n\nTest "+parte_Test+"Forma constante\nseleciona la figura en la que aprece la misma forma que se muestra arriba\n\nPara comenzar el test toca la pantalla");
+
                 break;
             case 5:
-                tv_instrucciones.setText("Debes comprar un burro y ponerle una cola");
+                tv_instrucciones.setText("Has terminado el test 4"+"\n\nTest "+parte_Test+"Memoria secuencial\nMemoriza la secuencia\nPasados 10 segundos podras selecionar la secuencia memorizada\n\nPara comenzar el test toca la pantalla");
                 break;
             case 6:
-                tv_instrucciones.setText("Debes comprar un burro y ponerle una cola");
+                tv_instrucciones.setText("Has terminado el test 5"+"\n\nTest "+parte_Test+"Discriminacion VisualTest Memoria visual\nMemoriza la figurara\nPasados 10 segundos podras selecionar la figura memorizada\n\nPara comenzar el test toca la pantalla");
                 break;
             case 7:
+                tv_instrucciones.setText("Has terminado el test 6"+"\n\nTest "+parte_Test+"Enclaustramiento visual\nseleciona la figura que muestra en su itneror la figura que está arriba\n\nPara comenzar el test toca la pantalla");
+
                 break;
 
         }
 
     }
-
 
     /**
      * AsyncTask para descargar la imagen en segundo plano
@@ -709,8 +713,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
         //"http://192.168.1.143/"    casa
         // madre "http://192.168.1.106/"
-        //String ip= "http://192.168.1.143/"; //casa
-        String ip= "http://192.168.1.106/"; // Mama
+        String ip= "http://192.168.1.143/"; //casa
+        //String ip= "http://192.168.1.106/"; // Mama
         Diapositiva diapositiva1 = new Diapositiva(1, 1, 1, false, 0,5, 1, ip + "imagenes/1_01.png");
         Diapositiva diapositiva2 = new Diapositiva(2, 1, 2, false, 0,5, 1, ip + "imagenes/1_02.png");
         Diapositiva diapositiva3 = new Diapositiva(3, 1, 3, false, 0,5, 1, ip + "imagenes/1_03.png");
@@ -754,16 +758,16 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         Diapositiva diapositiva39 = new Diapositiva(39, 3, 9, false, 0,5, 1, ip + "imagenes/3_09.png");
         Diapositiva diapositiva40 = new Diapositiva(40, 3, 10, false, 0,5, 1, ip + "imagenes/3_10.png");
 
-        Diapositiva diapositiva41 = new Diapositiva(41, 4, 1, false, 0,4, 1, ip + "imagenes/4_01.png");
-        Diapositiva diapositiva42 = new Diapositiva(42, 4, 2, false, 0,4, 1, ip + "imagenes/4_02.png");
-        Diapositiva diapositiva43 = new Diapositiva(43, 4, 3, false, 0,5, 1, ip + "imagenes/4_03.png");
-        Diapositiva diapositiva44 = new Diapositiva(44, 4, 4, false, 0,4, 1, ip + "imagenes/4_04.png");
-        Diapositiva diapositiva45 = new Diapositiva(45, 4, 5, false, 0,4, 1, ip + "imagenes/4_05.png");
-        Diapositiva diapositiva46 = new Diapositiva(46, 4, 6, false, 0,5, 1, ip + "imagenes/4_06.png");
-        Diapositiva diapositiva47 = new Diapositiva(47, 4, 7, false, 0,4, 1, ip + "imagenes/4_07.png");
-        Diapositiva diapositiva48 = new Diapositiva(48, 4, 8, false, 0,4, 1, ip + "imagenes/4_08.png");
-        Diapositiva diapositiva49 = new Diapositiva(49, 4, 9, false, 0,5, 1, ip + "imagenes/4_09.png");
-        Diapositiva diapositiva50 = new Diapositiva(50, 4, 10, false, 0,4, 1, ip + "imagenes/4_10.png");
+        Diapositiva diapositiva41 = new Diapositiva(41, 4, 1, false, 0,5, 1, ip + "imagenes/4_11.png");
+        Diapositiva diapositiva42 = new Diapositiva(42, 4, 2, false, 0,4, 1, ip + "imagenes/4_12.png");
+        Diapositiva diapositiva43 = new Diapositiva(43, 4, 3, false, 0,4, 1, ip + "imagenes/4_13.png");
+        Diapositiva diapositiva44 = new Diapositiva(44, 4, 4, false, 0,5, 1, ip + "imagenes/4_14.png");
+        Diapositiva diapositiva45 = new Diapositiva(45, 4, 5, false, 0,4, 1, ip + "imagenes/4_15.png");
+        Diapositiva diapositiva46 = new Diapositiva(46, 4, 6, false, 0,4, 1, ip + "imagenes/4_16.png");
+        Diapositiva diapositiva47 = new Diapositiva(47, 4, 7, false, 0,4, 1, ip + "imagenes/4_17.png");
+        Diapositiva diapositiva48 = new Diapositiva(48, 4, 8, false, 0,4, 1, ip + "imagenes/4_18.png");
+        Diapositiva diapositiva49 = new Diapositiva(49, 4, 9, false, 0,4, 1, ip + "imagenes/4_19.png");
+        Diapositiva diapositiva50 = new Diapositiva(50, 4, 10, false, 0,4, 1, ip + "imagenes/4_20.png");
 
         Diapositiva diapositiva51 = new Diapositiva(51, 5, 1, true, 0,0, 0, ip + "imagenes/5_01.png");
         Diapositiva diapositiva52 = new Diapositiva(52, 5, 2, false, 0,4, 1, ip + "imagenes/5_02.png");

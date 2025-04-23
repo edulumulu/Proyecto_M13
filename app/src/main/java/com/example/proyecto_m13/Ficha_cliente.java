@@ -567,6 +567,7 @@ public class Ficha_cliente extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
         ib_exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -733,6 +734,7 @@ public class Ficha_cliente extends AppCompatActivity {
         }
         return ok;
     }
+
     /**
      * Poner el nombre del empleado que está logeado
      */
