@@ -559,12 +559,15 @@ public class Ficha_cliente extends AppCompatActivity {
                 //Obtenemos el idEmpleado pasado por la otra actividad
                 int idEmpleado = getIntent().getIntExtra("idEmpleado", -1);
 
+                int edad =Integer.parseInt(et_age.getText().toString());
                 Intent intent = new Intent(Ficha_cliente.this, Actividad_Test_TVPS.class);
-                intent.putExtra("cliente", cliente_selecionado_id);
+                intent.putExtra("idCliente", cliente_selecionado_id);
+                intent.putExtra("edadCliente", edad);
                 intent.putExtra("idEmpleado", idEmpleado);
                 startActivity(intent);
             }
         });
+
         ib_exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -731,6 +734,7 @@ public class Ficha_cliente extends AppCompatActivity {
         }
         return ok;
     }
+
     /**
      * Poner el nombre del empleado que está logeado
      */

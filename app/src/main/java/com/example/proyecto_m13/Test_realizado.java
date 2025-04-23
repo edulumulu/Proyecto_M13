@@ -22,13 +22,6 @@ public class Test_realizado {
         this.resultado = resultado;
     }
 
-    public Test_realizado(int id_test, int id_cliente, int id_empleado, String resultado) {
-        this.id_test = id_test;
-        this.id_cliente = id_cliente;
-        this.id_empleado = id_empleado;
-        this.resultado = resultado;
-    }
-
     public int getId_test_realizado() {
         return id_test_realizado;
     }
