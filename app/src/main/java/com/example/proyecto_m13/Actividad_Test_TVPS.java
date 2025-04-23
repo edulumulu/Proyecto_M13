@@ -36,6 +36,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private int id_cliente;
     private int edad_cliente;
 
+    GestionBBDD gestionBBDD = new GestionBBDD();
+
     private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_10, bt_11, bt_12, bt_13, bt_cambio_test;
     private ImageView iv_imagen, iv_imagen_timer;
     private ArrayList<Diapositiva> diapositivas = new ArrayList<>();
@@ -64,7 +66,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
         inicializar_componentes();
         //Array de diapositivas test
-        diapositivas_De_prueba();
+        //diapositivas_De_prueba();
+        cargar_diapositivas_BBDD();
 
         mostrar_instrucciones(1);
         bt_cambio_test.setVisibility(View.VISIBLE);
@@ -79,6 +82,49 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
     }
 
+
+    private  void cargar_diapositivas_BBDD(){
+        gestionBBDD.listarDiapositivasPorTest(Actividad_Test_TVPS.this, 2, new GestionBBDD.DiapositivasCallback() {
+            @Override
+            public void onDiapositivasListadas(ArrayList<Diapositiva> listaDiapositivas) {
+                if (listaDiapositivas != null && !listaDiapositivas.isEmpty()) {
+                    diapositivas.clear();
+                    diapositivas.addAll(listaDiapositivas);
+                    // Imprimir clientes en Log
+                    for (Diapositiva diapositiva : diapositivas) {
+                        Log.d("Cliente", "ID: " + diapositiva.getId_diapositiva() + ", Nombre: " + diapositiva.getId_estudio());
+                    }
+
+                    // Mostrar mensaje con el número de clientes cargados
+                    Toast.makeText(Actividad_Test_TVPS.this, "Diapositivas cargadas: " + diapositivas.size(), Toast.LENGTH_LONG).show();
+
+
+
+                } else {
+                    Toast.makeText(Actividad_Test_TVPS.this, "No hay diapositivs disponibles", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void guardar_test_realizado_BBDD(Test_realizado test){
+        gestionBBDD.insertarTestRealizado(Actividad_Test_TVPS.this, test, new GestionBBDD.insertarTestCallback() {
+            @Override
+            public void onInsertarTestCallback(String respuesta) {
+
+            }
+        });
+    }
+
+    private int actualizar_cliente_BBDD(int id_cliente, int id_test){
+        gestionBBDD.actualizarEstadoTestCliente(Actividad_Test_TVPS.this, id_cliente, true, id_test, new GestionBBDD.UpdateCompletadoCallback() {
+            @Override
+            public void updateCompletadoCallback(String respuesta) {
+
+            }
+        });
+        return 1;
+    }
 
     /**
      * Método que inicia la parte del test que se solicita como parámetro, siendo este un entero
@@ -268,6 +314,9 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
 
                     resultado_test_resalizado = new Test_realizado(1,1,fecha_realizacion,proxima_revision,id_cliente,id_empleado,conclusion_final);
+
+                    //int id_test_Realizado = guardar_test_realizado_BBDD(resultado_test_resalizado);
+                    //actualizar_cliente_BBDD(id_cliente, id_test_Realizado);
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(Actividad_Test_TVPS.this);
                     builder.setTitle("Resultados Finales del Test")
