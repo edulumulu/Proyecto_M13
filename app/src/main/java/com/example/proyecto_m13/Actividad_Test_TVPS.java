@@ -32,6 +32,7 @@ import java.util.Locale;
 
 public class Actividad_Test_TVPS extends AppCompatActivity {
 
+    public static final String BASE_URL = "http://192.168.1.143/";
     private int id_empleado;
     private int id_cliente;
     private int edad_cliente;
@@ -692,10 +693,11 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * @return
      */
     public String[] obtener_url_fotos_parte_test(int parte_test){
+
         ArrayList<String> urls = new ArrayList<>();
         for (Diapositiva diapo : diapositivas){
             if(diapo.getId_estudio() == parte_test){
-                urls.add(diapo.getFoto());
+                urls.add(BASE_URL+ diapo.getFoto());
             }
         }
         return urls.toArray(new String[0]);
