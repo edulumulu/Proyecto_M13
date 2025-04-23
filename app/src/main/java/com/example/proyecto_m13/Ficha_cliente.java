@@ -824,8 +824,7 @@ public class Ficha_cliente extends AppCompatActivity {
      * @param lista
      * @param buscador
      */
-    public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView
-            buscador) {
+    public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView buscador) {
 
         String[] nombres = new String[lista.size()];
         for (int i = 0; i < lista.size(); i++) {
