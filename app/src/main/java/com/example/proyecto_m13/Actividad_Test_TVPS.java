@@ -41,6 +41,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
     private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_10, bt_11, bt_12, bt_13, bt_cambio_test;
     private ImageView iv_imagen, iv_imagen_timer;
+    private ArrayList<Estudio> lista_estudios = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas2 = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas_parte_test = new ArrayList<>();
@@ -65,12 +66,17 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_test_tvps);
 
+
+
+
         inicializar_componentes();
         //Array de diapositivas test
         //diapositivas_De_prueba();
+        datos_cliente_y_empleado();
         cargar_diapositivas_BBDD();
+        cargar_estudios_BBDD();
 
-        mostrar_instrucciones(1);
+        //mostrar_instrucciones(1);
         bt_cambio_test.setVisibility(View.VISIBLE);
         bt_cambio_test.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +90,9 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     }
 
 
+    /**
+     * Carga la lista de diapositivas con los datos de la consulta de la BBDD
+     */
     private  void cargar_diapositivas_BBDD(){
         gestionBBDD.listarDiapositivasPorTest(Actividad_Test_TVPS.this, 2, new GestionBBDD.DiapositivasCallback() {
             @Override
@@ -108,12 +117,16 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         });
     }
 
+    /**
+     * Guarda los datos del test realizado en la BBDD
+     * @param test
+     */
     private void guardar_test_realizado_BBDD(Test_realizado test){
         gestionBBDD.insertarTestRealizado(Actividad_Test_TVPS.this, test, new GestionBBDD.insertarTestCallback() {
             @Override
             public void onSuccess(int idInsertado) {
                 Toast.makeText(Actividad_Test_TVPS.this, "Insertado con ID: " + idInsertado, Toast.LENGTH_SHORT).show();
-                actualizar_cliente_BBDD(test.getId_cliente(), idInsertado);
+                actualizar_cliente_BBDD(id_cliente, idInsertado);
             }
 
             @Override
@@ -123,6 +136,11 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         });
     }
 
+    /**
+     * Actualiza el cliente en la base de datos
+     * @param id_cliente
+     * @param id_test
+     */
     private void actualizar_cliente_BBDD(int id_cliente, int id_test){
         gestionBBDD.actualizarEstadoTestCliente(Actividad_Test_TVPS.this, id_cliente, true, id_test, new GestionBBDD.UpdateCompletadoCallback() {
             @Override
@@ -132,6 +150,37 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         });
 
     }
+
+    /**
+     * Carga la lista de estudios de la BBDD
+     */
+    private void cargar_estudios_BBDD(){
+        gestionBBDD.listarEstudios(Actividad_Test_TVPS.this, new GestionBBDD.ListarEstudiosCallback() {
+            @Override
+            public void onListarEstudiosCallback(ArrayList<Estudio> estudios) {
+                if (estudios != null && !estudios.isEmpty()) {
+                    lista_estudios.clear();
+                    lista_estudios.addAll(estudios);
+                    // Imprimir clientes en Log
+                    for (Estudio estudio : lista_estudios) {
+                        Log.d("Estudio", "ID: " + estudio.getIdEstudio()  + ", Instrucciones: " + estudio.getDescripcionInstrucciones());
+                    }
+
+                    // Mostrar mensaje con el número de clientes cargados
+                    Toast.makeText(Actividad_Test_TVPS.this , "Estudios cargados: " + lista_estudios.size(), Toast.LENGTH_LONG).show();
+
+                    mostrar_instrucciones(1);
+                    bt_cambio_test.setVisibility(View.VISIBLE);
+
+                } else {
+                    Toast.makeText(Actividad_Test_TVPS.this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
+    }
+
+
 
     /**
      * Método que inicia la parte del test que se solicita como parámetro, siendo este un entero
@@ -213,7 +262,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             // Mostrar imagen con timer y pasados los segundos correspondientes desaparece
             cargar_imagen(iv_imagen_timer, url_fotos[indice]);
             iv_imagen_timer.setVisibility(View.VISIBLE);
-            iniciar_temporizador(3000, parte_test);
+            iniciar_temporizador(1000, parte_test);
 
         } else if (estudio == 4) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
@@ -231,7 +280,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             // igual que la parte 2
             cargar_imagen(iv_imagen_timer, url_fotos[indice]);
             iv_imagen_timer.setVisibility(View.VISIBLE);
-            iniciar_temporizador(3000, parte_test);
+            iniciar_temporizador(1000, parte_test);
 
         } else if (estudio == 6 || estudio == 7) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
@@ -274,9 +323,17 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7,bt_8, bt_9, bt_10, bt_11,bt_12, bt_13});
         iv_imagen.setVisibility(View.GONE);
 
-        mostrar_instrucciones (parte_test +1);
+        if (parte_test < 7){
+            mostrar_instrucciones (parte_test +1);
+            bt_cambio_test.setVisibility(View.VISIBLE);
+        }else {
+            bt_cambio_test.setVisibility(View.VISIBLE);
+            tv_Cambio.setVisibility(View.VISIBLE);
+            //bt_cambio_test.setText("Finalizaste el test\n\nToca la pantalla para finalizar");
+            tv_Cambio.setText("Finalizaste el test\n\nToca la pantalla para finalizar");
+        }
         //tv_Cambio.setText("Has terminado el test " + parte_test + "\n Toca la pantalla para continuar");
-        bt_cambio_test.setVisibility(View.VISIBLE);
+
 
         /**
          * Boton que habilita  mostrar el sigiente test o finalizar la actividad guardando los resultados
@@ -294,30 +351,11 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                     iv_imagen.setImageBitmap(null);
                     pasar_test(contador_test_Terminados+1);
 
-                }
-                else{
-                    bt_cambio_test.setVisibility(View.GONE);
-                    bt_cambio_test.setText("");
-                    tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
-                    datos_cliente_y_empleado();
+                }else{
+                    tv_Cambio.setVisibility(View.GONE);
+                    //bt_cambio_test.setVisibility(View.GONE);
 
                     conclusion_final = contrastar_resultados();
-
-                    //Guardar los datos en la BBDD
-
-
-                    //OBTENER FECHAS
-                        // Fecha actual
-                    //Date fecha_realizacion = new Date();
-                        // Crear un calendario con la fecha actual
-                    //Calendar calendar = Calendar.getInstance();
-                    //calendar.setTime(fecha_realizacion);
-                        // Sumar 6 meses
-                    //calendar.add(Calendar.MONTH, 6);
-                        // Obtener la fecha de próxima revisión
-                    //Date proxima_revision = calendar.getTime();
-                    //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
 
 
                     resultado_test_resalizado = new Test_realizado(2,id_cliente,id_empleado,conclusion_final);
@@ -327,19 +365,24 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(Actividad_Test_TVPS.this);
                     builder.setTitle("Resultados Finales del Test")
-                            .setMessage(resultado_test_resalizado.toString())
+                            .setMessage(resultado_test_resalizado.getResultado())
                             .setPositiveButton("Aceptar", (dialog, which) -> {
                                 // Puedes cerrar o hacer algo al aceptar
                                 dialog.dismiss();
+                                finish();
                             })
                             .setCancelable(false)
                             .show();
 
                     //mostrar_Acrietro_yfallos_finales();
-                    mostrar_Acrietro_yfallos_finales2(conclusion_final);
+                    //mostrar_Acrietro_yfallos_finales2(conclusion_final);
 
                     //Toast.makeText(Actividad_Test_TVPS.this, "Empleado --> "+ id_empleado+" / Cliente --> "+id_cliente + " ,tiene "+edad_cliente+" años", Toast.LENGTH_LONG).show();
-                    tv_Cambio.setVisibility(View.VISIBLE);
+                    //tv_Cambio.setVisibility(View.VISIBLE);
+
+
+
+
 
                 }
             }
@@ -374,19 +417,28 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             parte6 = resultado_ponderado_con_la_media(cont_aciertos_6, 2, 4);
             parte7 = resultado_ponderado_con_la_media(cont_aciertos_7, 2, 4);
 
+            Log.d("TVPS_Debug", "Aciertos por test: " +
+                    cont_aciertos_1 + ", " +
+                    cont_aciertos_2 + ", " +
+                    cont_aciertos_3 + ", " +
+                    cont_aciertos_4 + ", " +
+                    cont_aciertos_5 + ", " +
+                    cont_aciertos_6 + ", " +
+                    cont_aciertos_7
+            );
            contador = contador_critico_de_fallos(2);
 
-            if(contador_aciertos_total >= 5*7){excelencia = true;}
+            if(contador_aciertos_total >= 4*7){excelencia = true;}
 
         } else if (edad_cliente >= 6 && edad_cliente < 10) {
 
             parte1 = resultado_ponderado_con_la_media(cont_aciertos_1, 3, 5);
             parte2 = resultado_ponderado_con_la_media(cont_aciertos_2, 3, 5);
             parte3 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
-            parte4 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
-            parte5 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
-            parte6 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
-            parte7 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
+            parte4 = resultado_ponderado_con_la_media(cont_aciertos_4, 3, 5);
+            parte5 = resultado_ponderado_con_la_media(cont_aciertos_5, 3, 5);
+            parte6 = resultado_ponderado_con_la_media(cont_aciertos_6, 3, 5);
+            parte7 = resultado_ponderado_con_la_media(cont_aciertos_7, 3, 5);
 
             contador = contador_critico_de_fallos(3);
 
@@ -397,12 +449,12 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             parte1 = resultado_ponderado_con_la_media(cont_aciertos_1, 4, 7);
             parte2 = resultado_ponderado_con_la_media(cont_aciertos_2, 4, 7);
             parte3 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
-            parte4 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
-            parte5 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
-            parte6 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
-            parte7 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
+            parte4 = resultado_ponderado_con_la_media(cont_aciertos_4, 4, 7);
+            parte5 = resultado_ponderado_con_la_media(cont_aciertos_5, 4, 7);
+            parte6 = resultado_ponderado_con_la_media(cont_aciertos_6, 4, 7);
+            parte7 = resultado_ponderado_con_la_media(cont_aciertos_7, 4, 7);
 
-            contador = contador_critico_de_fallos(3);
+            contador = contador_critico_de_fallos(4);
 
             if(contador_aciertos_total >= 8*7){excelencia = true;}
 
@@ -411,12 +463,12 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             parte1 = resultado_ponderado_con_la_media(cont_aciertos_1, 5, 9);
             parte2 = resultado_ponderado_con_la_media(cont_aciertos_2, 5, 9);
             parte3 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
-            parte4 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
-            parte5 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
-            parte6 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
-            parte7 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
+            parte4 = resultado_ponderado_con_la_media(cont_aciertos_4, 5, 9);
+            parte5 = resultado_ponderado_con_la_media(cont_aciertos_5, 5, 9);
+            parte6 = resultado_ponderado_con_la_media(cont_aciertos_6, 5, 9);
+            parte7 = resultado_ponderado_con_la_media(cont_aciertos_7, 5, 9);
 
-            contador = contador_critico_de_fallos(3);
+            contador = contador_critico_de_fallos(5);
 
             if(contador_aciertos_total >= 9*7){excelencia = true;}
         }
@@ -451,6 +503,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         if(cont_aciertos_5<aciertos){ contador++;}
         if(cont_aciertos_6<aciertos){ contador++;}
         if(cont_aciertos_7<aciertos){ contador++;}
+
+        Log.d("TVPS_Debug", "Número de test por debajo del mínimo (" + aciertos + "): " + contador);
 
         return contador;
     }
@@ -504,23 +558,16 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * @return
      */
     private String resultado_ponderado_con_la_media(int contador, int minimo, int maximo){
-        if(contador <minimo){
+
+        Log.d("TVPS_Debug", "Test: " + contador + " aciertos. Mínimo: " + minimo + ", Máximo: " + maximo);
+
+        if(contador < minimo){
             return "Está por debajo de la media";
-        }else if(cont_fallos_1 <=minimo &&cont_fallos_1 <=maximo){
+        }else if(contador >=minimo && contador < maximo){
             return "Dentro de los valores normales";
         }else {
             return "Sobresale de la media";
         }
-    }
-
-    /**
-     * Recoge las valores de la actividad anterior: idCliente, idEmpleado y edadCliente y los guarda en variables generales
-     */
-    private void datos_cliente_y_empleado(){
-        id_cliente = getIntent().getIntExtra ("idCliente", -1);
-        id_empleado = getIntent().getIntExtra("idEmpleado", -1);
-        edad_cliente = getIntent().getIntExtra("edadCliente", -1);
-
     }
 
     /**
@@ -625,34 +672,25 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      */
     public void mostrar_instrucciones(int parte_Test){
         tv_instrucciones.setVisibility(View.VISIBLE);
-        switch (parte_Test){
-            case 1:
-                tv_instrucciones.setText("Test "+parte_Test+"\nDiscriminacion Visual\n\nDebes comprar un burro y ponerle una cola\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 2:
-                tv_instrucciones.setText("Has terminado el test 1"+"\n\nTest "+parte_Test+"Discriminacion VisualTest Memoria visual\nMemoriza la figurara\nPasados 10 segundos podras selecionar la figura memorizada\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 3:
-                tv_instrucciones.setText("Has terminado el test 2"+"\n\nTest "+parte_Test+"Relacciones espaciales\nElije la figura qeu es diferente\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 4:
-                tv_instrucciones.setText("Has terminado el test 3"+"\n\nTest "+parte_Test+"Forma constante\nseleciona la figura en la que aprece la misma forma que se muestra arriba\n\nPara comenzar el test toca la pantalla");
 
-                break;
-            case 5:
-                tv_instrucciones.setText("Has terminado el test 4"+"\n\nTest "+parte_Test+"Memoria secuencial\nMemoriza la secuencia\nPasados 10 segundos podras selecionar la secuencia memorizada\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 6:
-                tv_instrucciones.setText("Has terminado el test 5"+"\n\nTest "+parte_Test+"Discriminacion VisualTest Memoria visual\nMemoriza la figurara\nPasados 10 segundos podras selecionar la figura memorizada\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 7:
-                tv_instrucciones.setText("Has terminado el test 6"+"\n\nTest "+parte_Test+"Enclaustramiento visual\nseleciona la figura que muestra en su itneror la figura que está arriba\n\nPara comenzar el test toca la pantalla");
+        boolean encontrado = false;
 
-                break;
-
+        for (Estudio est : lista_estudios) {
+            if (est.getIdEstudio() == parte_Test) {
+                tv_instrucciones.setText("Test " + est.getIdEstudio() + "\n" + est.getDescripcionInstrucciones() + "\n\nPara comenzar el test toca la pantalla");
+                encontrado = true;
+                break; // ✅ sal del bucle cuando lo encuentres
+            }
         }
 
+        if (!encontrado) {
+            //tv_instrucciones.setText("No se encontró el estudio con ID: " + parte_Test);
+            Log.e("mostrar_instrucciones", "No se encontró el estudio con ID: " + parte_Test);
+        }
     }
+
+
+
 
     /**
      * AsyncTask para descargar la imagen en segundo plano
@@ -762,6 +800,18 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         visibilidad_Textviews(false, new TextView[]{tv_instrucciones, tv_Cambio});
     }
 
+
+    /**
+     * Recoge las valores de la actividad anterior: idCliente, idEmpleado y edadCliente y los guarda en variables generales
+     */
+    private void datos_cliente_y_empleado(){
+        id_cliente = getIntent().getIntExtra ("idCliente", -1);
+        id_empleado = getIntent().getIntExtra("idEmpleado", -1);
+        edad_cliente = getIntent().getIntExtra("edadCliente", -1);
+        Toast.makeText(Actividad_Test_TVPS.this, "Edad cliente --> " +edad_cliente , Toast.LENGTH_SHORT).show();
+
+
+    }
 
 
 

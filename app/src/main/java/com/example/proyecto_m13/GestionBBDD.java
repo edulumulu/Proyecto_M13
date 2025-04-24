@@ -726,7 +726,7 @@ public class GestionBBDD {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    URL url = new URL(BASE_URL + "update_test_status.php");
+                    URL url = new URL(BASE_URL + "db_update_test_completado.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type", "application/json; utf-8");

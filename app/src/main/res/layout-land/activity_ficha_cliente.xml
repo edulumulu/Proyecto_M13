@@ -520,7 +520,7 @@
         app:layout_constraintTop_toBottomOf="@id/textView_13" />
 
     -->
-    <TextView
+    <!--<TextView
         android:id="@+id/tv_testsiono"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -541,7 +541,7 @@
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/tv_testsiono"
         app:layout_constraintTop_toTopOf="@id/textView_16" />
-
+-->
     <!--<EditText
         android:id="@+id/et_fecha_TVPS"
         android:layout_width="wrap_content"
@@ -553,7 +553,7 @@
         app:layout_constraintStart_toEndOf="@id/textView_17"
         app:layout_constraintTop_toTopOf="@id/et_testsiono" />
 -->
-    <TextView
+    <!--<TextView
         android:id="@+id/tv_fecha_TVPS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -561,10 +561,10 @@
         android:text="13/02/2024"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/textView_17"
-        app:layout_constraintTop_toTopOf="@id/textView_17" />
+        app:layout_constraintStart_toEndOf="@id/textView_16"
+        app:layout_constraintTop_toTopOf="@id/textView_16" />
 
-
+-->
     <TextView
         android:id="@+id/textView_18"
         android:layout_width="wrap_content"
@@ -572,8 +572,8 @@
         android:layout_marginStart="20dp"
         android:text="Proxima revisión TVPS:"
         android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@id/tv_fecha_TVPS"
-        app:layout_constraintTop_toTopOf="@id/textView_17" />
+        app:layout_constraintStart_toEndOf="@id/textView_16"
+        app:layout_constraintTop_toTopOf="@id/textView_16" />
 
     <!--<EditText
         android:id="@+id/et_fecha_proxTVPS"
@@ -597,6 +597,18 @@
         app:layout_constraintStart_toEndOf="@id/textView_18"
         app:layout_constraintTop_toTopOf="@id/textView_18" />
 
+    <Button
+        android:id="@+id/bt_resultados"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="-20dp"
+        android:layout_marginStart="15dp"
+        android:background="@android:color/darker_gray"
+        android:text="Resultados"
+        android:textSize="18sp"
+        app:backgroundTint="#FF9800"
+        app:layout_constraintStart_toEndOf="@id/tv_fecha_proxTVPS"
+        app:layout_constraintTop_toBottomOf="@id/textView_13"/>
 
     <ImageView
         android:id="@+id/iv_foto"

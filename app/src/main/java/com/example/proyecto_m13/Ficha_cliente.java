@@ -5,6 +5,7 @@ import static Utilidades.Utilidades.eliminar_Cliente_PorId;
 import static Utilidades.Utilidades.fecha_valida;
 import static Utilidades.Utilidades.nombreYDniNoRepetidos;
 import static Utilidades.Utilidades.obtener_cliente_por_id;
+import static Utilidades.Utilidades.visibilidad_EditTest;
 import static Utilidades.Utilidades.visibilidad_Textviews;
 import static Utilidades.Utilidades.visibilidad_botones;
 
@@ -55,11 +56,14 @@ import Utilidades.Utilidades;
 public class Ficha_cliente extends AppCompatActivity {
 
     private static ArrayList<Cliente> lista_clientes = new ArrayList<>();
+    private Test_realizado datos_test_realizado = new Test_realizado();
     GestionBBDD gestionBBDD = new GestionBBDD();
     private int cliente_selecionado_id;
     private Date fecha_nacimiento_Seleccionada;
     private boolean cliente_selecionado = false;
     private String insercion_correcta;
+
+    private int id_desdeActividad_test;
 
 
     //Variables parte izquierda de la app
@@ -67,13 +71,14 @@ public class Ficha_cliente extends AppCompatActivity {
     private AutoCompleteTextView buscar_clientes;
     private Button bt_insert, bt_delete, bt_update, bt_test;
     private Button bt_modificar_aceptar, bt_modificar_salir, bt_insertar_aceptar, bt_insertar_salir;
+    private Button bt_result;
     private ImageButton ib_exit;
     private ImageView iv_foto;
 
     //Variables parte derecha
-    private TextView tv_id, title_id, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail, title_direc, title_street, title_cp, title_city, title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_date_test, title_next_date_test;
+    private TextView tv_id, title_id, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail, title_direc, title_street, title_cp, title_city, title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_next_date_test;
     private EditText et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city;
-    private TextView tv_graduacion, tv_fecha_gradu, tv_tipo_lente, tv_test_tvps, tv_fecha_test_TVPS, tv_next_text;
+    private TextView tv_graduacion, tv_fecha_gradu, tv_tipo_lente,  tv_next_text; //tv_test_tvps, tv_fecha_test_TVPS,
 
 
     @Override
@@ -83,7 +88,7 @@ public class Ficha_cliente extends AppCompatActivity {
         setContentView(R.layout.activity_ficha_cliente);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        relacionar_variables_front_back();
+        //relacionar_variables_front_back();
         inicializar_componentes();
         poner_nombre_Empleado();
 
@@ -93,6 +98,20 @@ public class Ficha_cliente extends AppCompatActivity {
 
 
         cargar_array_list_BBDD();
+
+        if (cliente_selecionado_id > 0){
+            for(Cliente cli : lista_clientes){
+                if(cli.getId() ==cliente_selecionado_id){
+                    cargar_cliente_en_ficha(cli);
+                    //Los campos de los datos del cliente no se pueden editar
+                    campos_ficha_editables(false);
+                    //activo botones restantes
+                    desactivar_activar_Botones(true, new Button[]{bt_update, bt_delete, bt_test});
+                    //Invisibilizo los botones de manipular modificar y de insertar
+                    visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir});
+                }
+            }
+        }
 
 
         /**
@@ -581,7 +600,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
 
     /**
-     * Carga el array con los datos de la consulta de la BBDD
+     * Carga el array con los datos de los clientes de la consulta de la BBDD
      */
     public void cargar_array_list_BBDD() {
         // Metodo que carga la lista en el arrayList
@@ -708,6 +727,19 @@ public class Ficha_cliente extends AppCompatActivity {
 
     }
 
+    public void cargar_datos_test_realizado_por_usuario(int id){
+        gestionBBDD.obtenerTestRealizadoPorId(Ficha_cliente.this, id, new GestionBBDD.TestRealizadoCallback() {
+            @Override
+            public void onTestRealizadoObtenido(Test_realizado testRealizado) {
+                datos_test_realizado = testRealizado;
+                tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
+            }
+        });
+
+
+    }
+
+
 
 
 
@@ -743,20 +775,7 @@ public class Ficha_cliente extends AppCompatActivity {
         tv_user.setText(usuario);
     }
 
-    public void relacionar_variables_front_back() {
 
-        buscar_clientes = findViewById(R.id.autoct_buscador);
-        //sp_clientes = findViewById(R.id.sp_clientes);
-        tv_user = findViewById(R.id.tv_user);
-        title_seleciona = findViewById(R.id.textview_10);
-        title_acciones = findViewById(R.id.textview_11);
-        bt_insert = findViewById(R.id.bt_insert);
-        bt_update = findViewById(R.id.bt_update);
-        bt_delete = findViewById(R.id.bt_delete);
-        bt_test = findViewById(R.id.bt_test);
-        ib_exit = findViewById(R.id.ib_exit);
-        desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
-    }
 
     /**
      * Metodo que muestra los datos de un cliente en la ficha
@@ -783,36 +802,60 @@ public class Ficha_cliente extends AppCompatActivity {
             et_age.setText(String.valueOf(cli.calcularEdad()));
 
 
-            tv_graduacion.setText(cli.getGraduate() ? "True" : "False");
+            if(cli.getGraduate()){
 
-            if (cli.getGraduate()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                Date fechaGraduacion = cli.getDate_graduacion();
+                tv_graduacion.setText(cli.getGraduate() ? "True" : "False");
 
-                tv_fecha_gradu.setText(sdf.format(fechaGraduacion));
+                if (cli.getGraduate()) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    Date fechaGraduacion = cli.getDate_graduacion();
 
-                //tv_fecha_gradu.setText(cli.getDate_graduacion().toString());
-                tv_tipo_lente.setText(cli.getTipo_lentes());
-            } else {
-                tv_fecha_gradu.setVisibility(View.GONE);
-                title_fecha_gradu.setVisibility(View.GONE);
-                tv_tipo_lente.setVisibility(View.GONE);
-                title_tipo_lente.setVisibility(View.GONE);
+                    tv_fecha_gradu.setText(sdf.format(fechaGraduacion));
+
+                    //tv_fecha_gradu.setText(cli.getDate_graduacion().toString());
+                    tv_tipo_lente.setText(cli.getTipo_lentes());
+                } else {
+                    tv_fecha_gradu.setVisibility(View.GONE);
+                    title_fecha_gradu.setVisibility(View.GONE);
+                    tv_tipo_lente.setVisibility(View.GONE);
+                    title_tipo_lente.setVisibility(View.GONE);
+                }
+            }else{
+                visibilidad_Textviews(false, new TextView[]{title_graduacion, title_fecha_gradu, title_tipo_lente, tv_fecha_gradu, tv_tipo_lente, tv_graduacion});
             }
 
+            if(cli.getTest_TVPS()){
 
-            tv_test_tvps.setText(cli.getGraduate() ? "True" : "False");
-            if (cli.getTest_TVPS()) {
-                tv_fecha_test_TVPS.setText("pruebaaaaaa");
-                tv_next_text.setText("pruebaaaaa");
-                //tv_fecha_test_TVPS.setText(cli.get_date_test_TVPS);
-                //tv_next_text.setText(cli.get_next_date_TVPS);
-            } else {
-                tv_fecha_test_TVPS.setVisibility(View.GONE);
-                title_date_test.setVisibility(View.GONE);
-                tv_next_text.setVisibility(View.GONE);
-                title_next_date_test.setVisibility(View.GONE);
+                cargar_datos_test_realizado_por_usuario(cliente_selecionado_id);
+               bt_result.setVisibility(View.VISIBLE);
+                //tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
+
+            }else{
+                visibilidad_Textviews(false, new TextView[]{title_test_TVPS, title_next_date_test, tv_next_text});
+                bt_result.setVisibility(View.GONE);
             }
+
+            if(!cli.getGraduate() && !cli.getTest_TVPS()){
+                tv_fecha_gradu.setVisibility(View.VISIBLE);
+                tv_fecha_gradu.setText("No tiene pruebas diagnósticas todavía");
+            }
+
+            bt_result.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Ficha_cliente.this);
+                    builder.setTitle("Resultados Finales del Test")
+                            .setMessage(datos_test_realizado.getResultado())
+                            .setPositiveButton("Aceptar", (dialog, which) -> {
+                                // Puedes cerrar o hacer algo al aceptar
+                                dialog.dismiss();
+                            })
+                            .setCancelable(false)
+                            .show();
+                }
+            });
+
+
         } else {
             Log.d("cliente nullo", "error cliente nulo - funcion cargar ficha cliente: ");
         }
@@ -953,7 +996,10 @@ public class Ficha_cliente extends AppCompatActivity {
         //Permito que los campos oportunos sean editables
         campos_ficha_editables(true);
 
-        TextView[] textvi = new TextView[]{
+        visibilidad_Textviews(false, new TextView[]{title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS,
+                 title_next_date_test, title_id, tv_id, tv_graduacion, tv_fecha_gradu,
+                tv_tipo_lente, tv_next_text, tv_id});
+        /*TextView[] textvi = new TextView[]{
                 title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS,
                 title_date_test, title_next_date_test, title_id, tv_id, tv_graduacion, tv_fecha_gradu,
                 tv_tipo_lente, tv_test_tvps, tv_fecha_test_TVPS, tv_next_text, tv_id
@@ -961,10 +1007,25 @@ public class Ficha_cliente extends AppCompatActivity {
         //Hago invisible los campos que no van a poder ser ingresados
         for (TextView tv : textvi) {
             tv.setVisibility(View.GONE);
-        }
+        }*/
 
         iv_foto.setVisibility(View.GONE);
 
+    }
+
+    public void relacionar_variables_front_back() {
+
+        buscar_clientes = findViewById(R.id.autoct_buscador);
+        //sp_clientes = findViewById(R.id.sp_clientes);
+        tv_user = findViewById(R.id.tv_user);
+        title_seleciona = findViewById(R.id.textview_10);
+        title_acciones = findViewById(R.id.textview_11);
+        bt_insert = findViewById(R.id.bt_insert);
+        bt_update = findViewById(R.id.bt_update);
+        bt_delete = findViewById(R.id.bt_delete);
+        bt_test = findViewById(R.id.bt_test);
+        ib_exit = findViewById(R.id.ib_exit);
+        desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
     }
 
     /**
@@ -972,6 +1033,18 @@ public class Ficha_cliente extends AppCompatActivity {
      */
     public void inicializar_componentes() {
         //Inicializo los componentes parte izquierda
+
+        buscar_clientes = findViewById(R.id.autoct_buscador);
+        //sp_clientes = findViewById(R.id.sp_clientes);
+        tv_user = findViewById(R.id.tv_user);
+        title_seleciona = findViewById(R.id.textview_10);
+        title_acciones = findViewById(R.id.textview_11);
+        bt_insert = findViewById(R.id.bt_insert);
+        bt_update = findViewById(R.id.bt_update);
+        bt_delete = findViewById(R.id.bt_delete);
+        bt_test = findViewById(R.id.bt_test);
+        ib_exit = findViewById(R.id.ib_exit);
+        desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
 
         ib_exit = findViewById(R.id.ib_exit);
         bt_modificar_aceptar = findViewById(R.id.bt_aceptar);
@@ -982,6 +1055,10 @@ public class Ficha_cliente extends AppCompatActivity {
         bt_modificar_salir.setVisibility(View.GONE);
         bt_insertar_aceptar.setVisibility(View.GONE);
         bt_insertar_salir.setVisibility(View.GONE);
+
+        bt_result = findViewById(R.id.bt_resultados);
+        bt_result.setVisibility(View.GONE);
+
 
 
         //Inicializo componentes de la derecha
@@ -1000,7 +1077,7 @@ public class Ficha_cliente extends AppCompatActivity {
         title_fecha_gradu = findViewById(R.id.textView_14);
         title_tipo_lente = findViewById(R.id.textView_15);
         title_test_TVPS = findViewById(R.id.textView_16);
-        title_date_test = findViewById(R.id.textView_17);
+        //title_date_test = findViewById(R.id.textView_17);
         title_next_date_test = findViewById(R.id.textView_18);
         title_id = findViewById(R.id.textView_19);
 
@@ -1018,8 +1095,8 @@ public class Ficha_cliente extends AppCompatActivity {
         tv_graduacion = findViewById(R.id.tv_graduado);
         tv_fecha_gradu = findViewById(R.id.tv_fecha_graduacion);
         tv_tipo_lente = findViewById(R.id.tv_tipo_lente);
-        tv_test_tvps = findViewById(R.id.tv_testsiono);
-        tv_fecha_test_TVPS = findViewById(R.id.tv_fecha_TVPS);
+        //tv_test_tvps = findViewById(R.id.tv_testsiono);
+       // tv_fecha_test_TVPS = findViewById(R.id.tv_fecha_TVPS);
         tv_next_text = findViewById(R.id.tv_fecha_proxTVPS);
         iv_foto = findViewById(R.id.iv_foto);
         iv_foto.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.foto));
@@ -1046,10 +1123,10 @@ public class Ficha_cliente extends AppCompatActivity {
         };
 
         TextView[] textviews = new TextView[]{
-                tv_id, tv_graduacion, tv_fecha_gradu, tv_tipo_lente, tv_test_tvps, tv_fecha_test_TVPS, tv_next_text, title_datos_person,
+                tv_id, tv_graduacion, tv_fecha_gradu, tv_tipo_lente, tv_next_text, title_datos_person,
                 title_dni, title_age, title_tlf, title_tutor, title_mail, title_direc, title_street, title_cp, title_city, title_purebas,
-                title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_date_test, title_next_date_test, title_id
-        };
+                 title_id, title_graduacion, title_fecha_gradu, title_tipo_lente,title_test_TVPS,  title_next_date_test
+        }; //tv_test_tvps, tv_fecha_test_TVPS,title_date_test,
 
         for (EditText editText : editTexts) {
             editText.setVisibility(visibility);

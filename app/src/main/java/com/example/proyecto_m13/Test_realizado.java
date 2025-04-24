@@ -1,6 +1,9 @@
 package com.example.proyecto_m13;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class Test_realizado {
 
@@ -11,6 +14,10 @@ public class Test_realizado {
     int id_cliente;
     int id_empleado ;
     String resultado;
+
+    public Test_realizado(){
+
+    }
 
     public Test_realizado(int id_test_realizado, int id_test, Date fecha, Date fecha_proxima_revision, int id_cliente, int id_empleado, String resultado) {
         this.id_test_realizado = id_test_realizado;
@@ -83,5 +90,16 @@ public class Test_realizado {
 
     public void setResultado(String resultado) {
         this.resultado = resultado;
+    }
+
+    public String fecha_proxima_buen_formato() {
+
+        if (fecha_proxima_revision == null) {
+            return "Fecha no disponible"; // O lo que prefieras mostrar
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String fecha_formato = sdf.format(fecha_proxima_revision);
+
+        return fecha_formato;
     }
 }

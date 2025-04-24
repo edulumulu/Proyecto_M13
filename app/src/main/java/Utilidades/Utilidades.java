@@ -185,10 +185,18 @@ public class Utilidades {
         }
     }
 
-    public static void visibilidad_Textviews(boolean mostrar, TextView[] botones) {
+    public static void visibilidad_Textviews(boolean mostrar, TextView[] textViews) {
         int visibility = mostrar ? View.VISIBLE : View.GONE;
 
-        for (TextView tv : botones) {
+        for (TextView tv : textViews) {
+            tv.setVisibility(visibility);
+        }
+    }
+
+    public static void visibilidad_EditTest(boolean mostrar, EditText[] editest) {
+        int visibility = mostrar ? View.VISIBLE : View.GONE;
+
+        for (TextView tv : editest) {
             tv.setVisibility(visibility);
         }
     }
