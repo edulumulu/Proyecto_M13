@@ -418,7 +418,7 @@
         app:layout_constraintStart_toEndOf="@id/textView_13"
         app:layout_constraintTop_toBottomOf="@id/textView_12" />
 -->
-    <TextView
+    <!--<TextView
         android:id="@+id/tv_graduado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -429,15 +429,15 @@
         app:layout_constraintStart_toEndOf="@id/textView_13"
         app:layout_constraintTop_toTopOf="@id/textView_13" />
 
-
+-->
     <TextView
         android:id="@+id/textView_14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:text="Última graduación:"
+        android:text="Fecha:"
         android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@id/tv_graduado"
+        app:layout_constraintStart_toEndOf="@id/textView_13"
         app:layout_constraintTop_toTopOf="@id/textView_13" />
 
     <!--<EditText
@@ -456,7 +456,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
-        android:text="13/02/2024"
+        android:text=""
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_14"
@@ -490,7 +490,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
-        android:text="Lentillas"
+        android:text=""
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_15"

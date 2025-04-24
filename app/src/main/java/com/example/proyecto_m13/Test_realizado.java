@@ -1,5 +1,7 @@
 package com.example.proyecto_m13;
 
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -102,4 +104,24 @@ public class Test_realizado {
 
         return fecha_formato;
     }
+
+    public boolean es_posible_realizar_tvps() {
+        if (fecha_proxima_revision == null) {
+            return true;
+        }
+
+        // Si la fecha es anterior al año 2000, por ejemplo, la consideramos inválida
+        Calendar fechaMinValida = Calendar.getInstance();
+        fechaMinValida.set(2000, Calendar.JANUARY, 1);
+
+        if (fecha_proxima_revision.before(fechaMinValida.getTime())) {
+            return true;
+        }
+
+        Log.d("Fecha", "fecha_proxima_revision: " + fecha_proxima_revision);
+
+        Date fechaActual = new Date();
+        return fechaActual.after(fecha_proxima_revision);
+    }
+
 }

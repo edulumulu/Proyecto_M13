@@ -374,7 +374,7 @@ public class GestionBBDD {
                     jsonModificar.put("graduado", cliente.getGraduate() ? 1 : 0);
                     jsonModificar.put("tipo_lente", cliente.getTipo_lentes() != null ? cliente.getTipo_lentes() : JSONObject.NULL);
                     jsonModificar.put("test_completado", cliente.getTest_TVPS() ? 1 : 0);
-                    jsonModificar.put("resultado_test", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
+                    jsonModificar.put("id_test_realizado", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
 
                     // Se envía el objeto JSON en el cuerpo de la solicitud
                     OutputStream os = conexion.getOutputStream();
