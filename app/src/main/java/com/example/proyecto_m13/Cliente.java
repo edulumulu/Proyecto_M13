@@ -226,6 +226,10 @@ public class Cliente {
         this.ciudad = ciudad;
     }
 
+    /**
+     * Calcula la edad del cliente devolviendo un entero
+     * @return
+     */
     public int calcularEdad() {
         if (date_born == null) {
             return 0; // Si no tiene fecha de nacimiento, devolver 0 o el valor que desees

@@ -105,6 +105,10 @@ public class Test_realizado {
         return fecha_formato;
     }
 
+    /**
+     * Dice si el test puede ser pasado o no comparando la fecha actul con la fecha de proxima revisión, en caso de retornar nullo permite hacer el test
+     * @return
+     */
     public boolean es_posible_realizar_tvps() {
         if (fecha_proxima_revision == null) {
             return true;
