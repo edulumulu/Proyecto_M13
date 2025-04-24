@@ -123,14 +123,17 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         });
     }
 
-    private void actualizar_cliente_BBDD(int id_cliente, int id_test){
+    private void actualizar_cliente_BBDD(int id_cliente, int id_test) {
         gestionBBDD.actualizarEstadoTestCliente(Actividad_Test_TVPS.this, id_cliente, true, id_test, new GestionBBDD.UpdateCompletadoCallback() {
             @Override
-            public void updateCompletadoCallback(String respuesta) {
-
+            public void onUpdateCompletado(boolean success, String message) {
+                if (success) {
+                    Toast.makeText(Actividad_Test_TVPS.this, "Actualizado con éxito: " + message, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(Actividad_Test_TVPS.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
     }
 
     /**

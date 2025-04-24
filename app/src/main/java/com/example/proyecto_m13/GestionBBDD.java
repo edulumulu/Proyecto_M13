@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.1.143/";
+    public static final String BASE_URL = "http://192.168.0.105/";
 
 
     @SuppressLint("StaticFieldLeak")
@@ -124,10 +124,8 @@ public class GestionBBDD {
         void onError(String mensajeError);
     }
 
-
-
     public interface UpdateCompletadoCallback {
-        void updateCompletadoCallback(String respuesta);
+        void onUpdateCompletado(boolean success, String message);
     }
 
     public interface ListarEstudiosCallback {
@@ -726,10 +724,11 @@ public class GestionBBDD {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    URL url = new URL(BASE_URL + "update_test_status.php");
+                    URL url = new URL(BASE_URL + "db_update_test_completado.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
                     conexion.setRequestMethod("POST");
                     conexion.setRequestProperty("Content-Type", "application/json; utf-8");
+                    conexion.setRequestProperty("Accept", "application/json");
                     conexion.setDoOutput(true);
 
                     // Crear JSON con los datos a enviar
@@ -740,11 +739,12 @@ public class GestionBBDD {
 
                     // Enviar JSON al servidor
                     OutputStream os = conexion.getOutputStream();
-                    os.write(json.toString().getBytes("UTF-8"));
+                    byte[] input = json.toString().getBytes("utf-8");
+                    os.write(input, 0, input.length);
                     os.close();
 
                     // Leer respuesta del servidor
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "utf-8"));
                     StringBuilder response = new StringBuilder();
                     String line;
                     while ((line = br.readLine()) != null) {
@@ -761,26 +761,19 @@ public class GestionBBDD {
             }
 
             @Override
-            protected void onPostExecute(String response) {
-                if (response != null) {
+            protected void onPostExecute(String result) {
+                if (result != null) {
                     try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
-
-                        if ("correcto".equals(estado)) {
-                            Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show();
-                            if (callback != null) callback.updateCompletadoCallback(mensaje);
-                        } else {
-                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
-                            if (callback != null) callback.updateCompletadoCallback("Error: " + mensaje);
-                        }
+                        JSONObject jsonResponse = new JSONObject(result);
+                        boolean success = jsonResponse.getBoolean("success");
+                        String message = jsonResponse.getString("message");
+                        callback.onUpdateCompletado(success, message);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
+                        Log.e("ERROR_JSON", "Respuesta inválida: " + result, e);
+                        callback.onUpdateCompletado(false, "Error al procesar la respuesta: " + e.getMessage());
                     }
                 } else {
-                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
+                    callback.onUpdateCompletado(false, "Error de conexión");
                 }
             }
         }.execute();

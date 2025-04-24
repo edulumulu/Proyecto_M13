@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         btIniciar = findViewById(R.id.btIniciar);
         ivState = findViewById(R.id.ivState);
 
-     //Pruebas.pruebas(this);
+     //Pruebas.actualizarTestDePrueba(this);
 
         ivState.setOnClickListener(new View.OnClickListener() {
             @Override
