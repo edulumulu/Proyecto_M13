@@ -1,16 +1,25 @@
 package com.example.proyecto_m13;
 
+import android.util.Log;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class Test_realizado {
 
-    int id_test_realizado ;
-    int id_test;
-    Date fecha;
-    Date fecha_proxima_revision;
-    int id_cliente;
-    int id_empleado ;
-    String resultado;
+    private int id_test_realizado ;
+    private  int id_test;
+    private Date fecha;
+    private  Date fecha_proxima_revision;
+    private int id_cliente;
+    private int id_empleado ;
+    private String resultado;
+
+    public Test_realizado(){
+
+    }
 
     public Test_realizado(int id_test_realizado, int id_test, Date fecha, Date fecha_proxima_revision, int id_cliente, int id_empleado, String resultado) {
         this.id_test_realizado = id_test_realizado;
@@ -84,4 +93,39 @@ public class Test_realizado {
     public void setResultado(String resultado) {
         this.resultado = resultado;
     }
+
+    public String fecha_proxima_buen_formato() {
+
+        if (fecha_proxima_revision == null) {
+            return "Fecha no disponible"; // O lo que prefieras mostrar
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String fecha_formato = sdf.format(fecha_proxima_revision);
+
+        return fecha_formato;
+    }
+
+    /**
+     * Dice si el test puede ser pasado o no comparando la fecha actul con la fecha de proxima revisión, en caso de retornar nullo permite hacer el test
+     * @return
+     */
+    public boolean es_posible_realizar_tvps() {
+        if (fecha_proxima_revision == null) {
+            return true;
+        }
+
+        // Si la fecha es anterior al año 2000, por ejemplo, la consideramos inválida
+        Calendar fechaMinValida = Calendar.getInstance();
+        fechaMinValida.set(2000, Calendar.JANUARY, 1);
+
+        if (fecha_proxima_revision.before(fechaMinValida.getTime())) {
+            return true;
+        }
+
+        Log.d("Fecha", "fecha_proxima_revision: " + fecha_proxima_revision);
+
+        Date fechaActual = new Date();
+        return fechaActual.after(fecha_proxima_revision);
+    }
+
 }

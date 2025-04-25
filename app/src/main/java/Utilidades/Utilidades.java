@@ -1,18 +1,11 @@
 package Utilidades;
 
-import android.content.Context;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.proyecto_m13.Cliente;
-import com.example.proyecto_m13.GestionBBDD;
-import com.example.proyecto_m13.Test_realizado;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,6 +15,7 @@ import java.util.Date;
 
 public class Utilidades {
 
+    //MÉTODOS  RELACIONADOS CON EL USO DE LISTAS DE LAS DISTINTAS CLASES DE LA APP
     /**
      * Método que devuelve un ArrayList de empleados prefijado
      *
@@ -47,20 +41,54 @@ public class Utilidades {
     }
 
     /**
-     * Método que comprba si los editText están vacios
+     * Metodo que retorna un cliente del ArrayList a partir de su id
      *
-     * @param campos
+     * @param id
      * @return
      */
-    public static boolean campos_estan_vacios(EditText... campos) {
-        for (EditText campo : campos) {
-            if (campo.getText().toString().trim().isEmpty()) {
-                return true;
+    public static Cliente obtener_cliente_por_id(int id, ArrayList<Cliente> listaclientes) {
+        for (Cliente cliente : listaclientes) {
+            if (cliente.getId() == id) {
+                return cliente; // Retorna el cliente si encuentra coincidencia
             }
         }
-        return false;
+        return null;
     }
 
+    /**
+     * Método que elimina un cliente del array list por id
+     *
+     * @param clienteId
+     * @return
+     */
+    public static boolean eliminar_Cliente_PorId(int clienteId, ArrayList<Cliente> listaclientes) {
+
+        boolean ok = false;
+        for (int i = 0; i < listaclientes.size(); i++) {
+            Cliente cliente = listaclientes.get(i);
+
+            // Si encontramos al cliente con el ID correspondiente
+            if (cliente.getId() == clienteId) {
+                // Actualizar el cliente con los nuevos datos
+                listaclientes.remove(i);
+                ok = true;
+                break;  // Salir del bucle cuando encontramos al cliente
+            }
+        }
+        return ok;
+
+        /*boolean ok = false;
+        for(Cliente cli : lista_clientes){
+            if(cli.getId() == clienteId){
+                lista_clientes.remove(cli);
+                ok = true;
+            }
+        }
+        return ok;*/
+    }
+
+
+    //COMPROBACIONES
     /**
      * Método para saber si han pasado 18 años de la fecha introducida
      *
@@ -104,22 +132,6 @@ public class Utilidades {
         return edad >= 1 && edad <= 100;
     }
 
-
-    /**
-     * Metodo que retorna un cliente del ArrayList a partir de su id
-     *
-     * @param id
-     * @return
-     */
-    public static Cliente obtener_cliente_por_id(int id, ArrayList<Cliente> listaclientes) {
-        for (Cliente cliente : listaclientes) {
-            if (cliente.getId() == id) {
-                return cliente; // Retorna el cliente si encuentra coincidencia
-            }
-        }
-        return null;
-    }
-
     /**
      * Metodo para comprobar que el nombre y apellidos o el dni no coincida con otro cliente del arraylist
      * @param id
@@ -144,39 +156,12 @@ public class Utilidades {
     }
 
 
+    //MÉTODOS RELACIONADO CON LA UTILIZACION DE LOS COMPONETTES VISUALES
     /**
-     * Método que elimina un cliente del array list por id
-     *
-     * @param clienteId
-     * @return
+     * Permite hacer visible o invisible una cantidad indeterminada de botones
+     * @param mostrar
+     * @param botones
      */
-    public static boolean eliminar_Cliente_PorId(int clienteId, ArrayList<Cliente> listaclientes) {
-
-        boolean ok = false;
-        for (int i = 0; i < listaclientes.size(); i++) {
-            Cliente cliente = listaclientes.get(i);
-
-            // Si encontramos al cliente con el ID correspondiente
-            if (cliente.getId() == clienteId) {
-                // Actualizar el cliente con los nuevos datos
-                listaclientes.remove(i);
-                ok = true;
-                break;  // Salir del bucle cuando encontramos al cliente
-            }
-        }
-        return ok;
-
-        /*boolean ok = false;
-        for(Cliente cli : lista_clientes){
-            if(cli.getId() == clienteId){
-                lista_clientes.remove(cli);
-                ok = true;
-            }
-        }
-        return ok;*/
-    }
-
-
     public static void visibilidad_botones(boolean mostrar, Button[] botones) {
         int visibility = mostrar ? View.VISIBLE : View.GONE;
 
@@ -185,18 +170,56 @@ public class Utilidades {
         }
     }
 
-    public static void visibilidad_Textviews(boolean mostrar, TextView[] botones) {
+    /**
+     * Permite hacer visible o invisible una cantidad indeterminada de Textviews
+     * @param mostrar
+     * @param textViews
+     */
+    public static void visibilidad_Textviews(boolean mostrar, TextView[] textViews) {
         int visibility = mostrar ? View.VISIBLE : View.GONE;
 
-        for (TextView tv : botones) {
+        for (TextView tv : textViews) {
             tv.setVisibility(visibility);
         }
     }
 
+    /**
+     * Permite hacer visible o invisible una cantidad indeterminada de EditTests
+     * @param mostrar
+     * @param editest
+     */
+    public static void visibilidad_EditTest(boolean mostrar, EditText[] editest) {
+        int visibility = mostrar ? View.VISIBLE : View.GONE;
+
+        for (TextView tv : editest) {
+            tv.setVisibility(visibility);
+        }
+    }
+
+    /**
+     * Permite activar o desactivar una cantidad indeterminada de botones
+     * @param habilitados
+     * @param botones
+     */
     public static void desactivar_activar_Botones(boolean habilitados, Button[] botones) {
         for (Button bt : botones) {
             bt.setEnabled(habilitados); // Habilita o deshabilita cada botón
         }
+    }
+
+    /**
+     * Método que comprba si los editText están vacios
+     *
+     * @param campos
+     * @return
+     */
+    public static boolean campos_estan_vacios(EditText... campos) {
+        for (EditText campo : campos) {
+            if (campo.getText().toString().trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

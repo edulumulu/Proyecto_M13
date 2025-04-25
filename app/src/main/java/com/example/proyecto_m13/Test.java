@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class Test {
 
-    int id_test;
-    String nombre_test;
-    ArrayList<Diapositiva> diapositivas;
+    private int id_test;
+    private String nombre_test;
+    private ArrayList<Diapositiva> diapositivas;
 
     public Test(int id_test) {
         this.id_test = id_test;

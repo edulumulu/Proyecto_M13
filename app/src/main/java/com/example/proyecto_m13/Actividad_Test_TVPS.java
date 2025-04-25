@@ -4,6 +4,7 @@ import static Utilidades.Utilidades.visibilidad_Textviews;
 import static Utilidades.Utilidades.visibilidad_botones;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -36,13 +37,14 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private int id_empleado;
     private int id_cliente;
     private int edad_cliente;
+    private String nombre_empleado;
 
-    GestionBBDD gestionBBDD = new GestionBBDD();
+    private GestionBBDD gestionBBDD = new GestionBBDD();
 
     private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_10, bt_11, bt_12, bt_13, bt_cambio_test;
     private ImageView iv_imagen, iv_imagen_timer;
+    private ArrayList<Estudio> lista_estudios = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas = new ArrayList<>();
-    private ArrayList<Diapositiva> diapositivas2 = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas_parte_test = new ArrayList<>();
     private Test_realizado resultado_test_resalizado;
     private String conclusion_final;
@@ -53,6 +55,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private int cont_aciertos_general, cont_aciertos_1, cont_aciertos_2, cont_aciertos_3, cont_aciertos_4, cont_aciertos_5, cont_aciertos_6, cont_aciertos_7;
 
     private int fallos_permitidos = 2;
+    private int tiempo_diapositiva = 1000;
     private int indice_actual = 0;
     private int contador_test_Terminados = 0;
 
@@ -65,12 +68,15 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_test_tvps);
 
+
         inicializar_componentes();
         //Array de diapositivas test
         //diapositivas_De_prueba();
+        datos_cliente_y_empleado();
         cargar_diapositivas_BBDD();
+        cargar_estudios_BBDD();
 
-        mostrar_instrucciones(1);
+        //mostrar_instrucciones(1);
         bt_cambio_test.setVisibility(View.VISIBLE);
         bt_cambio_test.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +90,10 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     }
 
 
+    //CONJUNTO DE MÉTODOS QUE HACEN CONSULTAS Y MODIFICACIONES EN LA BBDD
+    /**
+     * Carga la lista de diapositivas con los datos de la consulta de la BBDD
+     */
     private  void cargar_diapositivas_BBDD(){
         gestionBBDD.listarDiapositivasPorTest(Actividad_Test_TVPS.this, 2, new GestionBBDD.DiapositivasCallback() {
             @Override
@@ -99,8 +109,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                     // Mostrar mensaje con el número de clientes cargados
                     Toast.makeText(Actividad_Test_TVPS.this, "Diapositivas cargadas: " + diapositivas.size(), Toast.LENGTH_LONG).show();
 
-
-
                 } else {
                     Toast.makeText(Actividad_Test_TVPS.this, "No hay diapositivs disponibles", Toast.LENGTH_SHORT).show();
                 }
@@ -108,12 +116,16 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         });
     }
 
+    /**
+     * Guarda los datos del test realizado en la BBDD
+     * @param test
+     */
     private void guardar_test_realizado_BBDD(Test_realizado test){
         gestionBBDD.insertarTestRealizado(Actividad_Test_TVPS.this, test, new GestionBBDD.insertarTestCallback() {
             @Override
             public void onSuccess(int idInsertado) {
                 Toast.makeText(Actividad_Test_TVPS.this, "Insertado con ID: " + idInsertado, Toast.LENGTH_SHORT).show();
-                actualizar_cliente_BBDD(test.getId_cliente(), idInsertado);
+                actualizar_cliente_BBDD(id_cliente, idInsertado);
             }
 
             @Override
@@ -123,7 +135,12 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         });
     }
 
-    private void actualizar_cliente_BBDD(int id_cliente, int id_test) {
+    /**
+     * Actualiza el cliente en la base de datos
+     * @param id_cliente
+     * @param id_test
+     */
+    private void actualizar_cliente_BBDD(int id_cliente, int id_test){
         gestionBBDD.actualizarEstadoTestCliente(Actividad_Test_TVPS.this, id_cliente, true, id_test, new GestionBBDD.UpdateCompletadoCallback() {
             @Override
             public void onUpdateCompletado(boolean success, String message) {
@@ -137,6 +154,38 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     }
 
     /**
+     * Carga la lista de estudios de la BBDD
+     */
+    private void cargar_estudios_BBDD(){
+        gestionBBDD.listarEstudios(Actividad_Test_TVPS.this, new GestionBBDD.ListarEstudiosCallback() {
+            @Override
+            public void onListarEstudiosCallback(ArrayList<Estudio> estudios) {
+                if (estudios != null && !estudios.isEmpty()) {
+                    lista_estudios.clear();
+                    lista_estudios.addAll(estudios);
+                    // Imprimir clientes en Log
+                    for (Estudio estudio : lista_estudios) {
+                        Log.d("Estudio", "ID: " + estudio.getIdEstudio()  + ", Instrucciones: " + estudio.getDescripcionInstrucciones());
+                    }
+
+                    // Mostrar mensaje con el número de clientes cargados
+                    Toast.makeText(Actividad_Test_TVPS.this , "Estudios cargados: " + lista_estudios.size(), Toast.LENGTH_LONG).show();
+
+                    mostrar_instrucciones(1);
+                    bt_cambio_test.setVisibility(View.VISIBLE);
+
+                } else {
+                    Toast.makeText(Actividad_Test_TVPS.this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
+    }
+
+
+
+    //METODOES QUE INTERACTUAN CON LOS ELEMENTOS DE LA ACTIVIDAD: BOTONES, IMÁGENES, ACCIONES, TEXTVIEWS, ETC
+    /**
      * Método que inicia la parte del test que se solicita como parámetro, siendo este un entero
      * @param parte_test
      */
@@ -149,13 +198,11 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         Log.d("TEST", "Parte: " + parte_test + " | URLs cargadas: " + url_fotos.length);
 
         indice_actual = 0; // RESETEO ASEGURADO
-        // CORRECCIÓN: Guardamos las diapositivas actuales para el temporizador
-       // diapositivas2 = diapositivas_parte_test;
 
-        // Solo mostramos la primera diapositiva
+        // Solo muestro la primera diapositiva
         mostrar_diapositiva_y_botones(diapositivas_parte_test, indice_actual, parte_test);
 
-        // Listener para botones cuando NO hay timer
+        // Listener para botones cuando la diapositiva no tiene  timer
         View.OnClickListener answerListener = view -> {
             int boton_presionado = Integer.parseInt(((Button) view).getText().toString());
             Log.d("Respuesta", "Usuario eligió: " + boton_presionado);
@@ -216,7 +263,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             // Mostrar imagen con timer y pasados los segundos correspondientes desaparece
             cargar_imagen(iv_imagen_timer, url_fotos[indice]);
             iv_imagen_timer.setVisibility(View.VISIBLE);
-            iniciar_temporizador(3000, parte_test);
+            iniciar_temporizador(tiempo_diapositiva, parte_test);
 
         } else if (estudio == 4) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
@@ -234,7 +281,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             // igual que la parte 2
             cargar_imagen(iv_imagen_timer, url_fotos[indice]);
             iv_imagen_timer.setVisibility(View.VISIBLE);
-            iniciar_temporizador(3000, parte_test);
+            iniciar_temporizador(tiempo_diapositiva, parte_test);
 
         } else if (estudio == 6 || estudio == 7) {
             cargar_imagen(iv_imagen, url_fotos[indice]);
@@ -269,17 +316,26 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private void finalizar_test(int parte_test){
 
         indice_actual = 0;
+
+        //Toast de comprobacion se pueden comentar
         Toast.makeText(this, "ACIERTOS --> " +cont_aciertos_general + " /  FALLOS --> "+ cont_fallos_general, Toast.LENGTH_SHORT).show();
-        contador_fallos(parte_test);
-        contador_aciertos(parte_test);
         Toast.makeText(this, "Fin del test", Toast.LENGTH_SHORT).show();
 
+        contador_fallos(parte_test);
+        contador_aciertos(parte_test);
         visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7,bt_8, bt_9, bt_10, bt_11,bt_12, bt_13});
         iv_imagen.setVisibility(View.GONE);
 
-        mostrar_instrucciones (parte_test +1);
-        //tv_Cambio.setText("Has terminado el test " + parte_test + "\n Toca la pantalla para continuar");
-        bt_cambio_test.setVisibility(View.VISIBLE);
+        //Si no se han superado las 7 partes del test se pasa a la siguiente parte si no se muestra mensaje de finalizacion
+        if (parte_test < 7){
+            mostrar_instrucciones (parte_test +1);
+            bt_cambio_test.setVisibility(View.VISIBLE);
+        }else {
+            bt_cambio_test.setVisibility(View.VISIBLE);
+            tv_Cambio.setVisibility(View.VISIBLE);
+            //bt_cambio_test.setText("Finalizaste el test\n\nToca la pantalla para finalizar");
+            tv_Cambio.setText("Finalizaste el test\n\nToca la pantalla para finalizar");
+        }
 
         /**
          * Boton que habilita  mostrar el sigiente test o finalizar la actividad guardando los resultados
@@ -297,32 +353,9 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                     iv_imagen.setImageBitmap(null);
                     pasar_test(contador_test_Terminados+1);
 
-                }
-                else{
-                    bt_cambio_test.setVisibility(View.GONE);
-                    bt_cambio_test.setText("");
-                    tv_Cambio.setText("Finalizaste todos los test \n!!!Enhorabuena!!!");
-                    datos_cliente_y_empleado();
-
+                }else{
+                    tv_Cambio.setVisibility(View.GONE);
                     conclusion_final = contrastar_resultados();
-
-                    //Guardar los datos en la BBDD
-
-
-                    //OBTENER FECHAS
-                        // Fecha actual
-                    //Date fecha_realizacion = new Date();
-                        // Crear un calendario con la fecha actual
-                    //Calendar calendar = Calendar.getInstance();
-                    //calendar.setTime(fecha_realizacion);
-                        // Sumar 6 meses
-                    //calendar.add(Calendar.MONTH, 6);
-                        // Obtener la fecha de próxima revisión
-                    //Date proxima_revision = calendar.getTime();
-                    //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
-
-
                     resultado_test_resalizado = new Test_realizado(2,id_cliente,id_empleado,conclusion_final);
 
                    guardar_test_realizado_BBDD(resultado_test_resalizado);
@@ -330,21 +363,22 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(Actividad_Test_TVPS.this);
                     builder.setTitle("Resultados Finales del Test")
-                            .setMessage(resultado_test_resalizado.toString())
+                            .setMessage(resultado_test_resalizado.getResultado())
                             .setPositiveButton("Aceptar", (dialog, which) -> {
-                                // Puedes cerrar o hacer algo al aceptar
                                 dialog.dismiss();
+
+                                Intent intent = new Intent(Actividad_Test_TVPS.this, Ficha_cliente.class);
+                                intent.putExtra("idCliente", id_cliente);
+                                intent.putExtra("usuario", nombre_empleado);
+
+                                startActivity(intent);
+                                finish();
                             })
                             .setCancelable(false)
                             .show();
-
-                    //mostrar_Acrietro_yfallos_finales();
-                    mostrar_Acrietro_yfallos_finales2(conclusion_final);
-
-                    //Toast.makeText(Actividad_Test_TVPS.this, "Empleado --> "+ id_empleado+" / Cliente --> "+id_cliente + " ,tiene "+edad_cliente+" años", Toast.LENGTH_LONG).show();
-                    tv_Cambio.setVisibility(View.VISIBLE);
-
                 }
+
+
             }
         });
     }
@@ -363,11 +397,19 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         String parte5 = "No hay resultados";
         String parte6 = "No hay resultados";
         String parte7 = "No hay resultados";
+
         int contador_aciertos_total = cont_aciertos_1 + cont_aciertos_2 +cont_aciertos_3 + cont_aciertos_4 +cont_aciertos_5 + cont_aciertos_6 +cont_aciertos_7;
         String valoracion = null;
         boolean excelencia=false;
         int contador = 0;
 
+        /**
+         * Según la edad :
+         * - Obtiene una frase que estipula el grado de satisfacción de la parte del test realizado
+         * - Contabiliza la cantidad de aciertos y si no supera los minimos establecidos aumenta el contador de eficiencia
+         * - Finalmente constrastando esa eficiencia llega a una conclusión general
+         * Toda esta información finalmente lo recoge un string que es devuelto
+         */
         if (edad_cliente < 6) {
             parte1 = resultado_ponderado_con_la_media(cont_aciertos_1, 2, 4);
             parte2 = resultado_ponderado_con_la_media(cont_aciertos_2, 2, 4);
@@ -379,17 +421,17 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
            contador = contador_critico_de_fallos(2);
 
-            if(contador_aciertos_total >= 5*7){excelencia = true;}
+            if(contador_aciertos_total >= 4*7){excelencia = true;}
 
         } else if (edad_cliente >= 6 && edad_cliente < 10) {
 
             parte1 = resultado_ponderado_con_la_media(cont_aciertos_1, 3, 5);
             parte2 = resultado_ponderado_con_la_media(cont_aciertos_2, 3, 5);
             parte3 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
-            parte4 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
-            parte5 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
-            parte6 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
-            parte7 = resultado_ponderado_con_la_media(cont_aciertos_3, 3, 5);
+            parte4 = resultado_ponderado_con_la_media(cont_aciertos_4, 3, 5);
+            parte5 = resultado_ponderado_con_la_media(cont_aciertos_5, 3, 5);
+            parte6 = resultado_ponderado_con_la_media(cont_aciertos_6, 3, 5);
+            parte7 = resultado_ponderado_con_la_media(cont_aciertos_7, 3, 5);
 
             contador = contador_critico_de_fallos(3);
 
@@ -400,12 +442,12 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             parte1 = resultado_ponderado_con_la_media(cont_aciertos_1, 4, 7);
             parte2 = resultado_ponderado_con_la_media(cont_aciertos_2, 4, 7);
             parte3 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
-            parte4 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
-            parte5 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
-            parte6 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
-            parte7 = resultado_ponderado_con_la_media(cont_aciertos_3, 4, 7);
+            parte4 = resultado_ponderado_con_la_media(cont_aciertos_4, 4, 7);
+            parte5 = resultado_ponderado_con_la_media(cont_aciertos_5, 4, 7);
+            parte6 = resultado_ponderado_con_la_media(cont_aciertos_6, 4, 7);
+            parte7 = resultado_ponderado_con_la_media(cont_aciertos_7, 4, 7);
 
-            contador = contador_critico_de_fallos(3);
+            contador = contador_critico_de_fallos(4);
 
             if(contador_aciertos_total >= 8*7){excelencia = true;}
 
@@ -414,12 +456,12 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             parte1 = resultado_ponderado_con_la_media(cont_aciertos_1, 5, 9);
             parte2 = resultado_ponderado_con_la_media(cont_aciertos_2, 5, 9);
             parte3 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
-            parte4 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
-            parte5 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
-            parte6 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
-            parte7 = resultado_ponderado_con_la_media(cont_aciertos_3, 5, 9);
+            parte4 = resultado_ponderado_con_la_media(cont_aciertos_4, 5, 9);
+            parte5 = resultado_ponderado_con_la_media(cont_aciertos_5, 5, 9);
+            parte6 = resultado_ponderado_con_la_media(cont_aciertos_6, 5, 9);
+            parte7 = resultado_ponderado_con_la_media(cont_aciertos_7, 5, 9);
 
-            contador = contador_critico_de_fallos(3);
+            contador = contador_critico_de_fallos(5);
 
             if(contador_aciertos_total >= 9*7){excelencia = true;}
         }
@@ -454,6 +496,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         if(cont_aciertos_5<aciertos){ contador++;}
         if(cont_aciertos_6<aciertos){ contador++;}
         if(cont_aciertos_7<aciertos){ contador++;}
+
+        Log.d("TVPS_Debug", "Número de test por debajo del mínimo (" + aciertos + "): " + contador);
 
         return contador;
     }
@@ -507,9 +551,12 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * @return
      */
     private String resultado_ponderado_con_la_media(int contador, int minimo, int maximo){
-        if(contador <minimo){
+
+        Log.d("TVPS_Debug", "Test: " + contador + " aciertos. Mínimo: " + minimo + ", Máximo: " + maximo);
+
+        if(contador < minimo){
             return "Está por debajo de la media";
-        }else if(cont_fallos_1 <=minimo &&cont_fallos_1 <=maximo){
+        }else if(contador >=minimo && contador < maximo){
             return "Dentro de los valores normales";
         }else {
             return "Sobresale de la media";
@@ -517,60 +564,22 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     }
 
     /**
-     * Recoge las valores de la actividad anterior: idCliente, idEmpleado y edadCliente y los guarda en variables generales
-     */
-    private void datos_cliente_y_empleado(){
-        id_cliente = getIntent().getIntExtra ("idCliente", -1);
-        id_empleado = getIntent().getIntExtra("idEmpleado", -1);
-        edad_cliente = getIntent().getIntExtra("edadCliente", -1);
-
-    }
-
-    /**
      * Guarda los fallos realizados en el test en la variable correspondiente a cada parte
      * @param parte_test
      */
-    public void contador_fallos(int parte_test){
-        // Usamos switch para manejar las diferentes partes del test
-        switch(parte_test) {
-            case 1:
-                cont_fallos_1 = cont_fallos_general; // Asignamos los fallos a la parte 1
-                cont_fallos_general = 0; // Reiniciamos el contador general de fallos
-                break;
+    public void contador_fallos(int parte_test) {
+        int valor = cont_fallos_general;
+        cont_fallos_general = 0;
 
-            case 2:
-                cont_fallos_2 = cont_fallos_general; // Asignamos los fallos a la parte 2
-                cont_fallos_general = 0; // Reiniciamos el contador general de fallos
-                break;
-
-            case 3:
-                cont_fallos_3 = cont_fallos_general; // Asignamos los fallos a la parte 3
-                cont_fallos_general = 0; // Reiniciamos el contador general de fallos
-                break;
-
-            case 4:
-                cont_fallos_4 = cont_fallos_general; // Asignamos los fallos a la parte 4
-                cont_fallos_general = 0; // Reiniciamos el contador general de fallos
-                break;
-
-            case 5:
-                cont_fallos_5 = cont_fallos_general; // Asignamos los fallos a la parte 5
-                cont_fallos_general = 0; // Reiniciamos el contador general de fallos
-                break;
-
-            case 6:
-                cont_fallos_6 = cont_fallos_general; // Asignamos los fallos a la parte 6
-                cont_fallos_general = 0; // Reiniciamos el contador general de fallos
-                break;
-
-            case 7:
-                cont_fallos_7 = cont_fallos_general; // Asignamos los fallos a la parte 7
-                cont_fallos_general = 0; // Reiniciamos el contador general de fallos
-                break;
-
-            default:
-                // Si la parte del test no es válida (fuera del rango 1-7), no se hace nada
-                break;
+        switch (parte_test) {
+            case 1: cont_fallos_1 = valor; break;
+            case 2: cont_fallos_2 = valor; break;
+            case 3: cont_fallos_3 = valor; break;
+            case 4: cont_fallos_4 = valor; break;
+            case 5: cont_fallos_5 = valor; break;
+            case 6: cont_fallos_6 = valor; break;
+            case 7: cont_fallos_7 = valor; break;
+            default: break;
         }
     }
 
@@ -578,47 +587,19 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * Guarda los aciertos conseguidos en el test en la variable correspondiente a cada parte
      * @param parte_test
      */
-    public void contador_aciertos(int parte_test){
+    public void contador_aciertos(int parte_test) {
+        int valor = cont_aciertos_general;
+        cont_aciertos_general = 0;
 
-        switch(parte_test) {
-            case 1:
-                cont_aciertos_1 = cont_aciertos_general; // Asignamos los aciertos a la parte 1
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 2:
-                cont_aciertos_2 = cont_aciertos_general; // Asignamos los aciertos a la parte 2
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 3:
-                cont_aciertos_3 = cont_aciertos_general; // Asignamos los aciertos a la parte 3
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 4:
-                cont_aciertos_4 = cont_aciertos_general; // Asignamos los aciertos a la parte 4
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 5:
-                cont_aciertos_5 = cont_aciertos_general; // Asignamos los aciertos a la parte 5
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 6:
-                cont_aciertos_6 = cont_aciertos_general; // Asignamos los aciertos a la parte 6
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 7:
-                cont_aciertos_7 = cont_aciertos_general; // Asignamos los aciertos a la parte 7
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            default:
-                // Si la parte del test no es válida (fuera del rango 1-7), no se hace nada
-                break;
+        switch (parte_test) {
+            case 1: cont_aciertos_1 = valor; break;
+            case 2: cont_aciertos_2 = valor; break;
+            case 3: cont_aciertos_3 = valor; break;
+            case 4: cont_aciertos_4 = valor; break;
+            case 5: cont_aciertos_5 = valor; break;
+            case 6: cont_aciertos_6 = valor; break;
+            case 7: cont_aciertos_7 = valor; break;
+            default: break;
         }
     }
 
@@ -628,33 +609,21 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      */
     public void mostrar_instrucciones(int parte_Test){
         tv_instrucciones.setVisibility(View.VISIBLE);
-        switch (parte_Test){
-            case 1:
-                tv_instrucciones.setText("Test "+parte_Test+"\nDiscriminacion Visual\n\nDebes comprar un burro y ponerle una cola\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 2:
-                tv_instrucciones.setText("Has terminado el test 1"+"\n\nTest "+parte_Test+"Discriminacion VisualTest Memoria visual\nMemoriza la figurara\nPasados 10 segundos podras selecionar la figura memorizada\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 3:
-                tv_instrucciones.setText("Has terminado el test 2"+"\n\nTest "+parte_Test+"Relacciones espaciales\nElije la figura qeu es diferente\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 4:
-                tv_instrucciones.setText("Has terminado el test 3"+"\n\nTest "+parte_Test+"Forma constante\nseleciona la figura en la que aprece la misma forma que se muestra arriba\n\nPara comenzar el test toca la pantalla");
 
-                break;
-            case 5:
-                tv_instrucciones.setText("Has terminado el test 4"+"\n\nTest "+parte_Test+"Memoria secuencial\nMemoriza la secuencia\nPasados 10 segundos podras selecionar la secuencia memorizada\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 6:
-                tv_instrucciones.setText("Has terminado el test 5"+"\n\nTest "+parte_Test+"Discriminacion VisualTest Memoria visual\nMemoriza la figurara\nPasados 10 segundos podras selecionar la figura memorizada\n\nPara comenzar el test toca la pantalla");
-                break;
-            case 7:
-                tv_instrucciones.setText("Has terminado el test 6"+"\n\nTest "+parte_Test+"Enclaustramiento visual\nseleciona la figura que muestra en su itneror la figura que está arriba\n\nPara comenzar el test toca la pantalla");
+        boolean encontrado = false;
 
-                break;
-
+        for (Estudio est : lista_estudios) {
+            if (est.getIdEstudio() == parte_Test) {
+                tv_instrucciones.setText("Test " + est.getIdEstudio() + "\n" + est.getDescripcionInstrucciones() + "\n\nPara comenzar el test toca la pantalla");
+                encontrado = true;
+                break; // ✅ sal del bucle cuando lo encuentres
+            }
         }
 
+        if (!encontrado) {
+            //tv_instrucciones.setText("No se encontró el estudio con ID: " + parte_Test);
+            Log.e("mostrar_instrucciones", "No se encontró el estudio con ID: " + parte_Test);
+        }
     }
 
     /**
@@ -766,9 +735,22 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     }
 
 
+    /**
+     * Recoge las valores de la actividad anterior: idCliente, idEmpleado y edadCliente y los guarda en variables generales
+     */
+    private void datos_cliente_y_empleado(){
+        id_cliente = getIntent().getIntExtra ("idCliente", -1);
+        id_empleado = getIntent().getIntExtra("idEmpleado", -1);
+        edad_cliente = getIntent().getIntExtra("edadCliente", -1);
+        nombre_empleado = getIntent().getStringExtra("usuario");
+        Toast.makeText(Actividad_Test_TVPS.this, "Edad cliente --> " +edad_cliente , Toast.LENGTH_SHORT).show();
 
 
-    //Metodos que he usado para ir probando
+    }
+
+
+
+    //MÉTODOS DE PRUEBA PREVIOS AL FUNCIONAMIENTO DE LAS CONSULTAS EN LA BASE DE DATOS
     public void diapositivas_De_prueba(){
 
         //"http://192.168.1.143/"    casa
