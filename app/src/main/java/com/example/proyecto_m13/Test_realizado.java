@@ -9,13 +9,13 @@ import java.util.Locale;
 
 public class Test_realizado {
 
-    int id_test_realizado ;
-    int id_test;
-    Date fecha;
-    Date fecha_proxima_revision;
-    int id_cliente;
-    int id_empleado ;
-    String resultado;
+    private int id_test_realizado ;
+    private  int id_test;
+    private Date fecha;
+    private  Date fecha_proxima_revision;
+    private int id_cliente;
+    private int id_empleado ;
+    private String resultado;
 
     public Test_realizado(){
 

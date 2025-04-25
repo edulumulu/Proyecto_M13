@@ -5,24 +5,22 @@ import java.util.Date;
 import java.time.LocalDate;
 
 public class Cliente {
-    int id;
-    String name;
-    String surname;
-    String dni;
-    Date date_born;
-    int tlf;
-    String email;
-    String tutor;
-    boolean graduate;
-    Date date_graduacion;
-    String tipo_lentes;
-    boolean Test_TVPS;
-    int id_test_realizado;
-    //String date_test_TVPS;
-    //String next_date_TVPS;
-    String street;
-    int cp;
-    String ciudad;
+    private int id;
+    private String name;
+    private String surname;
+    private String dni;
+    private Date date_born;
+    private int tlf;
+    private String email;
+    private String tutor;
+    private boolean graduate;
+    private Date date_graduacion;
+    private  String tipo_lentes;
+    private boolean Test_TVPS;
+    private int id_test_realizado;
+    private String street;
+    private int cp;
+    private String ciudad;
 
     public Cliente(int id) {
         this.id = id;

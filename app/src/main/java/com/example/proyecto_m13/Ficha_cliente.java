@@ -58,12 +58,12 @@ public class Ficha_cliente extends AppCompatActivity {
     private static ArrayList<Cliente> lista_clientes = new ArrayList<>();
     private Test_realizado datos_test_realizado = new Test_realizado();
     GestionBBDD gestionBBDD = new GestionBBDD();
+    private String nombre_empleado;
     private int cliente_selecionado_id;
     private Date fecha_nacimiento_Seleccionada;
     private boolean cliente_selecionado = false;
 
-    private int id_desdeActividad_test;
-
+    private int id_desde_Actividad_test;
 
     //Variables parte izquierda de la app
     private TextView tv_user, title_seleciona, title_acciones;
@@ -96,21 +96,28 @@ public class Ficha_cliente extends AppCompatActivity {
         }
 
 
-        cargar_array_list_BBDD();
+        id_desde_Actividad_test = getIntent().getIntExtra("idCliente", -1);
 
-        if (cliente_selecionado_id > 0){
-            for(Cliente cli : lista_clientes){
-                if(cli.getId() ==cliente_selecionado_id){
-                    cargar_cliente_en_ficha(cli);
-                    //Los campos de los datos del cliente no se pueden editar
-                    campos_ficha_editables(false);
-                    //activo botones restantes
-                    desactivar_activar_Botones(true, new Button[]{bt_update, bt_delete, bt_test});
-                    //Invisibilizo los botones de manipular modificar y de insertar
-                    visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir});
+        if (id_desde_Actividad_test > 0){
+
+            cargar_array_list_BBDD();
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                cliente_selecionado_id = id_desde_Actividad_test;
+                for(Cliente cli : lista_clientes){
+                    if(cli.getId() == cliente_selecionado_id){
+                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                        cargar_cliente_en_ficha(cli);
+
+                    }
                 }
-            }
+            }, 2000); // 5000 milisegundos = 5 segundos
+
+        }else{
+            cargar_array_list_BBDD();
         }
+
+
 
 
         /**
@@ -267,23 +274,10 @@ public class Ficha_cliente extends AppCompatActivity {
                 Cliente cliente= new Cliente(id ,nombre,
                         surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
                         tutor, street, cp, city, tipo);
-
-                //insertar_cliente_aqui_BBDD(cliente);
-
-                /*cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
-                visibilidad_botones(false, new Button[]{bt_insertar_aceptar, bt_insertar_salir});
-                campos_ficha_editables(false);
-
-                visibilidad_Textviews(true, new TextView[]{title_purebas, title_tutor});
-                iv_foto.setVisibility(View.VISIBLE);
-                et_tutor.setVisibility(View.VISIBLE);
-                tv_id.setVisibility(View.GONE);
-                title_age.setText("Edad:");
-                desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});*/
+                
                 if (lista_clientes.add(cliente_Array)){
                     insertar_cliente_aqui_BBDD(cliente);
-                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                        cargar_array_list_BBDD();
+
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
                         actualizar_nombres_buscador(lista_clientes, buscar_clientes);
 
@@ -292,14 +286,16 @@ public class Ficha_cliente extends AppCompatActivity {
                         campos_ficha_editables(false);
 
                         //Visibilizo elementos
-                        visibilidad_Textviews(true, new TextView[]{title_purebas, title_tutor} );
+                        //visibilidad_Textviews(true, new TextView[]{title_purebas, title_tutor} );
                         iv_foto.setVisibility(View.VISIBLE);
                         et_tutor.setVisibility(View.VISIBLE);
-                        tv_id.setVisibility(View.GONE);
+
+                        visibilidad_Textviews(false, new TextView[]{tv_id, title_id});
+                            title_purebas.setVisibility(View.VISIBLE);
+
                         title_age.setText("Edad:");
                         desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
-                        }, 2000); // 5000 milisegundos = 5 segundos
-                    }, 2000); // 5000 milisegundos = 5 segundos
+                        }, 3000); // 5000 milisegundos = 5 segundos
 
                 }
 
@@ -494,7 +490,7 @@ public class Ficha_cliente extends AppCompatActivity {
                         campos_ficha_editables(false);
                         visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
 
-                        visibilidad_Textviews(true,  new TextView[]{title_id, tv_id, title_purebas, title_test_TVPS, title_graduacion, title_tutor});
+                        visibilidad_Textviews(true,  new TextView[]{title_id, tv_id, title_purebas, title_tutor});
 
                         iv_foto.setVisibility(View.VISIBLE);
                         et_tutor.setVisibility(View.VISIBLE);
@@ -612,6 +608,7 @@ public class Ficha_cliente extends AppCompatActivity {
         intent.putExtra("idCliente", cliente_selecionado_id);
         intent.putExtra("edadCliente", edad);
         intent.putExtra("idEmpleado", idEmpleado);
+        intent.putExtra("usuario", nombre_empleado);
         startActivity(intent);
     }
 
@@ -769,8 +766,20 @@ public class Ficha_cliente extends AppCompatActivity {
         gestionBBDD.obtenerTestRealizadoPorId(Ficha_cliente.this, id, new GestionBBDD.TestRealizadoCallback() {
             @Override
             public void onTestRealizadoObtenido(Test_realizado testRealizado) {
+
                 datos_test_realizado = testRealizado;
+
                 tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
+                bt_result.setVisibility(View.VISIBLE);
+
+                Toast.makeText(
+                        Ficha_cliente.this,
+                        "ID Cliente: " + testRealizado.getId_cliente() +
+                                "\nID Test: " + testRealizado.getId_test_realizado() +
+                                "\nFecha próxima revisión: " + testRealizado.getFecha_proxima_revision() +
+                                "\nResultado: " + testRealizado.getResultado(),
+                        Toast.LENGTH_LONG
+                ).show();
             }
         });
     }
@@ -809,6 +818,13 @@ public class Ficha_cliente extends AppCompatActivity {
      */
     public void cargar_cliente_en_ficha(Cliente cli) {
 
+        //Los campos de los datos del cliente no se pueden editar
+        campos_ficha_editables(false);
+        //activo botones restantes
+        desactivar_activar_Botones(true, new Button[]{bt_update, bt_delete, bt_test});
+        //Invisibilizo los botones de manipular modificar y de insertar
+        visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir});
+
         if (cli != null) {
             //Hago visible los campos de la ficha y cargo los datos
             campos_ficha_visibilidad(true);
@@ -845,12 +861,12 @@ public class Ficha_cliente extends AppCompatActivity {
 
             if(cli.getTest_TVPS()){
 
-                cargar_datos_test_realizado_por_usuario_BBDD(cliente_selecionado_id);
-               bt_result.setVisibility(View.VISIBLE);
+                cargar_datos_test_realizado_por_usuario_BBDD(cli.getId_test_realizado());
+               //bt_result.setVisibility(View.VISIBLE);
                 //tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
 
             }else{
-                datos_test_realizado =null;
+                datos_test_realizado =new Test_realizado();
                 visibilidad_Textviews(false, new TextView[]{title_test_TVPS, title_next_date_test, tv_next_text});
                 bt_result.setVisibility(View.GONE);
             }
@@ -1232,8 +1248,12 @@ public class Ficha_cliente extends AppCompatActivity {
      * Poner el nombre del empleado que está logeado
      */
     public void poner_nombre_Empleado() {
-        String usuario = getIntent().getStringExtra("usuario");
-        tv_user.setText(usuario);
+
+            nombre_empleado = getIntent().getStringExtra("usuario");
+            tv_user.setText(nombre_empleado);
+
+
+
     }
 
 

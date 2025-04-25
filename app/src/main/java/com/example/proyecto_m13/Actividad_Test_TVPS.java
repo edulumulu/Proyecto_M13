@@ -4,6 +4,7 @@ import static Utilidades.Utilidades.visibilidad_Textviews;
 import static Utilidades.Utilidades.visibilidad_botones;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -36,14 +37,14 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private int id_empleado;
     private int id_cliente;
     private int edad_cliente;
+    private String nombre_empleado;
 
-    GestionBBDD gestionBBDD = new GestionBBDD();
+    private GestionBBDD gestionBBDD = new GestionBBDD();
 
     private Button bt_1, bt_2, bt_3, bt_4, bt_5, bt_6, bt_7, bt_8, bt_9, bt_10, bt_11, bt_12, bt_13, bt_cambio_test;
     private ImageView iv_imagen, iv_imagen_timer;
     private ArrayList<Estudio> lista_estudios = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas = new ArrayList<>();
-    private ArrayList<Diapositiva> diapositivas2 = new ArrayList<>();
     private ArrayList<Diapositiva> diapositivas_parte_test = new ArrayList<>();
     private Test_realizado resultado_test_resalizado;
     private String conclusion_final;
@@ -312,13 +313,13 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private void finalizar_test(int parte_test){
 
         indice_actual = 0;
-        contador_fallos(parte_test);
-        contador_aciertos(parte_test);
 
         //Toast de comprobacion se pueden comentar
         Toast.makeText(this, "ACIERTOS --> " +cont_aciertos_general + " /  FALLOS --> "+ cont_fallos_general, Toast.LENGTH_SHORT).show();
         Toast.makeText(this, "Fin del test", Toast.LENGTH_SHORT).show();
 
+        contador_fallos(parte_test);
+        contador_aciertos(parte_test);
         visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7,bt_8, bt_9, bt_10, bt_11,bt_12, bt_13});
         iv_imagen.setVisibility(View.GONE);
 
@@ -361,13 +362,20 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                     builder.setTitle("Resultados Finales del Test")
                             .setMessage(resultado_test_resalizado.getResultado())
                             .setPositiveButton("Aceptar", (dialog, which) -> {
-                                // Puedes cerrar o hacer algo al aceptar
                                 dialog.dismiss();
+
+                                Intent intent = new Intent(Actividad_Test_TVPS.this, Ficha_cliente.class);
+                                intent.putExtra("idCliente", id_cliente);
+                                intent.putExtra("usuario", nombre_empleado);
+
+                                startActivity(intent);
                                 finish();
                             })
                             .setCancelable(false)
                             .show();
                 }
+
+
             }
         });
     }
@@ -571,51 +579,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             default: break;
         }
     }
-/*
-    public void contador_fallos(int parte_test){
-        // Usamos switch para manejar las diferentes partes del test
-        switch(parte_test) {
-            case 1:
-                cont_fallos_1 = cont_fallos_general;
-                cont_fallos_general = 0;
-                break;
-
-            case 2:
-                cont_fallos_2 = cont_fallos_general;
-                cont_fallos_general = 0;
-                break;
-
-            case 3:
-                cont_fallos_3 = cont_fallos_general;
-                cont_fallos_general = 0;
-                break;
-
-            case 4:
-                cont_fallos_4 = cont_fallos_general;
-                cont_fallos_general = 0;
-                break;
-
-            case 5:
-                cont_fallos_5 = cont_fallos_general;
-                cont_fallos_general = 0;
-                break;
-
-            case 6:
-                cont_fallos_6 = cont_fallos_general;
-                cont_fallos_general = 0;
-                break;
-
-            case 7:
-                cont_fallos_7 = cont_fallos_general;
-                cont_fallos_general = 0;
-                break;
-
-            default:
-
-                break;
-        }
-    }
-*/
 
     /**
      * Guarda los aciertos conseguidos en el test en la variable correspondiente a cada parte
@@ -636,49 +599,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             default: break;
         }
     }
-    /*public void contador_aciertos(int parte_test){
-
-        switch(parte_test) {
-            case 1:
-                cont_aciertos_1 = cont_aciertos_general; // Asignamos los aciertos a la parte 1
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 2:
-                cont_aciertos_2 = cont_aciertos_general; // Asignamos los aciertos a la parte 2
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 3:
-                cont_aciertos_3 = cont_aciertos_general; // Asignamos los aciertos a la parte 3
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 4:
-                cont_aciertos_4 = cont_aciertos_general; // Asignamos los aciertos a la parte 4
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 5:
-                cont_aciertos_5 = cont_aciertos_general; // Asignamos los aciertos a la parte 5
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 6:
-                cont_aciertos_6 = cont_aciertos_general; // Asignamos los aciertos a la parte 6
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            case 7:
-                cont_aciertos_7 = cont_aciertos_general; // Asignamos los aciertos a la parte 7
-                cont_aciertos_general = 0; // Reiniciamos el contador general de aciertos
-                break;
-
-            default:
-                // Si la parte del test no es válida (fuera del rango 1-7), no se hace nada
-                break;
-        }
-    }*/
 
     /**
      * Muestra las instrucciones según el test que se va a realizar
@@ -819,6 +739,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         id_cliente = getIntent().getIntExtra ("idCliente", -1);
         id_empleado = getIntent().getIntExtra("idEmpleado", -1);
         edad_cliente = getIntent().getIntExtra("edadCliente", -1);
+        nombre_empleado = getIntent().getStringExtra("usuario");
         Toast.makeText(Actividad_Test_TVPS.this, "Edad cliente --> " +edad_cliente , Toast.LENGTH_SHORT).show();
 
 
