@@ -478,7 +478,7 @@ public class Ficha_cliente extends AppCompatActivity {
                 boolean test_tvps = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTest_TVPS();
 
 
-                Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, graduado, fecha_gradu1, tipo, test_tvps, street, cp, city);
+                Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor,street, cp, city);
 
                 if (modificar_Cliente_EnLista(cliente_selecionado_id, cli)) {
 
