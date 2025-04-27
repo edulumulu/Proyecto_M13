@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.0.105/";
+    public static final String BASE_URL = "http://192.168.56.1/";
 
 
     @SuppressLint("StaticFieldLeak")
@@ -340,7 +340,7 @@ public class GestionBBDD {
             protected String doInBackground(Void... voids) {
                 try {
                     // Se establece la URL del servicio que procesará la modificación del cliente
-                    URL url = new URL(BASE_URL + "db_update.php");
+                    URL url = new URL(BASE_URL + "db_update_cliente.php");
                     HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
 
                     // Se configura la conexión para enviar una solicitud POST con datos en formato JSON
@@ -365,14 +365,9 @@ public class GestionBBDD {
 
                     // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
                     jsonModificar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
-                    jsonModificar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
 
                     // Se manejan los valores opcionales, enviando null en caso de que no tengan datos
                     jsonModificar.put("tutor_legal", cliente.getTutor() != null ? cliente.getTutor() : JSONObject.NULL);
-                    jsonModificar.put("graduado", cliente.getGraduate() ? 1 : 0);
-                    jsonModificar.put("tipo_lente", cliente.getTipo_lentes() != null ? cliente.getTipo_lentes() : JSONObject.NULL);
-                    jsonModificar.put("test_completado", cliente.getTest_TVPS() ? 1 : 0);
-                    jsonModificar.put("id_test_realizado", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
 
                     // Se envía el objeto JSON en el cuerpo de la solicitud
                     OutputStream os = conexion.getOutputStream();

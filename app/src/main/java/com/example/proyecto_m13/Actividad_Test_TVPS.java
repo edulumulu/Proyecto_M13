@@ -33,7 +33,7 @@ import java.util.Locale;
 
 public class Actividad_Test_TVPS extends AppCompatActivity {
 
-    public static final String BASE_URL = "http://192.168.1.143/";
+    public static final String BASE_URL = "http://192.168.56.1/";
     private int id_empleado;
     private int id_cliente;
     private int edad_cliente;
