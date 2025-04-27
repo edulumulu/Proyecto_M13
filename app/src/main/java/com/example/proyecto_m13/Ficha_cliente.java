@@ -431,25 +431,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     et_tutor.setText("");
                 }
 
-               /* Date fecha_gradu;
-                String texto_fecha_gra = tv_fecha_gradu.getText().toString();
-                if (!texto_fecha_gra.isEmpty()) {
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        fecha_gradu = sdf.parse(texto_fecha_gra);
 
-                        if (fecha_gradu != null) {
-                            // Usar la fecha según sea necesario
-                            Log.d("Fecha Nacimiento", "Fecha: " + fecha_gradu.toString());
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        Toast.makeText(Ficha_cliente.this, "El formato de la fecha de lentillas", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    // Si el campo está vacío, manejarlo
-                    Toast.makeText(Ficha_cliente.this, "Por favor ingresa una fecha", Toast.LENGTH_SHORT).show();
-                }*/
                 //Recogemos contenido de los editTest
                 String nombre = et_name.getText().toString();
                 String surname = et_surname.getText().toString();
@@ -466,14 +448,6 @@ public class Ficha_cliente extends AppCompatActivity {
                 Date fecha_gradu1 = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_graduacion();
                 String tipo = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTipo_lentes();
                 int id_test_realizado =  obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getId_test_realizado();
-
-               /* if (tipo == null) {
-                    Toast.makeText(Ficha_cliente.this, "ATENCION VARIABLE NULL", Toast.LENGTH_SHORT).show();
-                    return;
-                } else {
-                    Toast.makeText(Ficha_cliente.this, "---------------------", Toast.LENGTH_SHORT).show();
-
-                }*/
 
                 boolean test_tvps = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTest_TVPS();
 

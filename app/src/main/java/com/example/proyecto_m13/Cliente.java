@@ -26,7 +26,7 @@ public class Cliente {
         this.id = id;
     }
 
-    //Constructor con todo
+    //Constructor con al que le falta id_test_realizado
     public Cliente(int id, String name, String surname, String dni, Date date_born, int tlf, String email, String tutor, boolean graduate, Date date_graduacion, String tipo_lentes, boolean test_TVPS, String street, int cp, String ciudad){
         this.id = id;
         this.name = name;
@@ -76,7 +76,7 @@ public class Cliente {
         this.tipo_lentes = tipo;
     }
 
-    //Constructor con id_test_realizado
+    //Constructor con todo
     public Cliente(int id, String name, String surname, String dni, Date date_born, int tlf, String email, String tutor, boolean graduate, Date date_graduacion, String tipo_lentes, boolean test_TVPS, int id_test_realizado, String street, int cp, String ciudad){
         this.id = id;
         this.name = name;
