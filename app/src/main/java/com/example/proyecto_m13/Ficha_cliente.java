@@ -119,7 +119,6 @@ public class Ficha_cliente extends AppCompatActivity {
 
 
 
-
         /**
          * Borrar testo del buscador cuando se hace click
          */
@@ -432,7 +431,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     et_tutor.setText("");
                 }
 
-                Date fecha_gradu;
+               /* Date fecha_gradu;
                 String texto_fecha_gra = tv_fecha_gradu.getText().toString();
                 if (!texto_fecha_gra.isEmpty()) {
                     try {
@@ -450,7 +449,7 @@ public class Ficha_cliente extends AppCompatActivity {
                 } else {
                     // Si el campo está vacío, manejarlo
                     Toast.makeText(Ficha_cliente.this, "Por favor ingresa una fecha", Toast.LENGTH_SHORT).show();
-                }
+                }*/
                 //Recogemos contenido de los editTest
                 String nombre = et_name.getText().toString();
                 String surname = et_surname.getText().toString();
@@ -466,19 +465,22 @@ public class Ficha_cliente extends AppCompatActivity {
                 boolean graduado = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getGraduate();
                 Date fecha_gradu1 = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_graduacion();
                 String tipo = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTipo_lentes();
+                int id_test_realizado =  obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getId_test_realizado();
 
-                if (tipo == null) {
+               /* if (tipo == null) {
                     Toast.makeText(Ficha_cliente.this, "ATENCION VARIABLE NULL", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
                     Toast.makeText(Ficha_cliente.this, "---------------------", Toast.LENGTH_SHORT).show();
 
-                }
+                }*/
 
                 boolean test_tvps = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTest_TVPS();
 
 
-                Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor,street, cp, city);
+                Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada,
+                        tlf, email, tutor, graduado, fecha_gradu1, tipo, test_tvps, id_test_realizado, street, cp, city);
+
 
                 if (modificar_Cliente_EnLista(cliente_selecionado_id, cli)) {
 
