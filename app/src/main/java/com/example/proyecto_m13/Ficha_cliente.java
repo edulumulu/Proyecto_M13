@@ -766,21 +766,26 @@ public class Ficha_cliente extends AppCompatActivity {
         gestionBBDD.obtenerTestRealizadoPorId(Ficha_cliente.this, id, new GestionBBDD.TestRealizadoCallback() {
             @Override
             public void onTestRealizadoObtenido(Test_realizado testRealizado) {
+                if (testRealizado != null) {
+                    datos_test_realizado = testRealizado;
 
-                datos_test_realizado = testRealizado;
+                    tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
+                    bt_result.setVisibility(View.VISIBLE);
 
-
-                tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
-                bt_result.setVisibility(View.VISIBLE);
-
-                Toast.makeText(
-                        Ficha_cliente.this,
-                        "ID Cliente: " + testRealizado.getId_cliente() +
-                                "\nID Test: " + testRealizado.getId_test_realizado() +
-                                "\nFecha próxima revisión: " + testRealizado.getFecha_proxima_revision() +
-                                "\nResultado: " + testRealizado.getResultado(),
-                        Toast.LENGTH_LONG
-                ).show();
+                    Toast.makeText(
+                            Ficha_cliente.this,
+                            "ID Cliente: " + testRealizado.getId_cliente() +
+                                    "\nID Test: " + testRealizado.getId_test_realizado() +
+                                    "\nFecha próxima revisión: " + testRealizado.getFecha_proxima_revision() +
+                                    "\nResultado: " + testRealizado.getResultado(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                } else {
+                    // Si no hay test, ocultamos campos relacionados
+                    visibilidad_Textviews(false, new TextView[]{title_test_TVPS, title_next_date_test, tv_next_text});
+                    bt_result.setVisibility(View.GONE);
+                    Toast.makeText(Ficha_cliente.this, "Este cliente no tiene test TVPS realizado.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -844,6 +849,7 @@ public class Ficha_cliente extends AppCompatActivity {
             et_age.setText(String.valueOf(cli.calcularEdad()));
 
 
+
             if(cli.getGraduate()){
 
                 //tv_graduacion.setText(cli.getGraduate() ? "True" : "False");
@@ -871,6 +877,7 @@ public class Ficha_cliente extends AppCompatActivity {
                 visibilidad_Textviews(false, new TextView[]{title_test_TVPS, title_next_date_test, tv_next_text});
                 bt_result.setVisibility(View.GONE);
             }
+
 
             if(!cli.getGraduate() && !cli.getTest_TVPS()){
                 tv_fecha_gradu.setVisibility(View.VISIBLE);
