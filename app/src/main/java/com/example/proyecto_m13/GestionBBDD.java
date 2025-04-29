@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.1.143/";
+    public static final String BASE_URL = "http://192.168.1.145/";
 
 
     @SuppressLint("StaticFieldLeak")

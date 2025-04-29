@@ -769,6 +769,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 datos_test_realizado = testRealizado;
 
+
                 tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
                 bt_result.setVisibility(View.VISIBLE);
 
