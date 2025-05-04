@@ -2,7 +2,6 @@ package com.example.proyecto_m13;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.time.LocalDate;
 
 public class Cliente {
     private int id;
@@ -94,6 +93,20 @@ public class Cliente {
         this.street = street;
         this.cp = cp;
         this.ciudad = ciudad;
+    }
+
+    public Cliente(int id, String name, String surname, String dni, Date date_born, int tlf, String email, String tutor, int cp, String ciudad, String street) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.dni = dni;
+        this.date_born = date_born;
+        this.tlf = tlf;
+        this.email = email;
+        this.tutor = tutor;
+        this.cp = cp;
+        this.ciudad = ciudad;
+        this.street = street;
     }
 
     public int getId() {

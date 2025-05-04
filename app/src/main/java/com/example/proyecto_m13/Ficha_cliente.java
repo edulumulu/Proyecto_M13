@@ -275,8 +275,8 @@ public class Ficha_cliente extends AppCompatActivity {
                         surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
                         tutor, street, cp, city, tipo);
                 
-                if (lista_clientes.add(cliente_Array)){
-                    insertar_cliente_aqui_BBDD(cliente);
+                if (lista_clientes.add(cliente)){
+                    insertar_cliente_aqui_BBDD(cliente_Array);
 
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
                         actualizar_nombres_buscador(lista_clientes, buscar_clientes);
@@ -328,6 +328,8 @@ public class Ficha_cliente extends AppCompatActivity {
 
                 // Desactivo botones hasta quwe se resuelva accion
                 desactivar_activar_Botones(false, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+                bt_result.setVisibility(View.GONE);
+                visibilidad_Textviews(false, new TextView[]{title_graduacion, title_fecha_gradu, title_tipo_lente, tv_fecha_gradu, tv_tipo_lente,title_test_TVPS, title_next_date_test, tv_next_text, title_purebas});
 
                 if (tv_id.getText().toString().isEmpty()) {
                     Toast.makeText(Ficha_cliente.this, "Debes selecionar un cliente previamente", Toast.LENGTH_SHORT).show();
@@ -432,25 +434,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     et_tutor.setText("");
                 }
 
-                Date fecha_gradu;
-                String texto_fecha_gra = tv_fecha_gradu.getText().toString();
-                if (!texto_fecha_gra.isEmpty()) {
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        fecha_gradu = sdf.parse(texto_fecha_gra);
 
-                        if (fecha_gradu != null) {
-                            // Usar la fecha según sea necesario
-                            Log.d("Fecha Nacimiento", "Fecha: " + fecha_gradu.toString());
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        Toast.makeText(Ficha_cliente.this, "El formato de la fecha de lentillas", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    // Si el campo está vacío, manejarlo
-                    Toast.makeText(Ficha_cliente.this, "Por favor ingresa una fecha", Toast.LENGTH_SHORT).show();
-                }
                 //Recogemos contenido de los editTest
                 String nombre = et_name.getText().toString();
                 String surname = et_surname.getText().toString();
@@ -463,44 +447,30 @@ public class Ficha_cliente extends AppCompatActivity {
                 String tutor = et_tutor.getText().toString();
 
 
-                boolean graduado = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getGraduate();
-                Date fecha_gradu1 = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_graduacion();
-                String tipo = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTipo_lentes();
-
-                if (tipo == null) {
-                    Toast.makeText(Ficha_cliente.this, "ATENCION VARIABLE NULL", Toast.LENGTH_SHORT).show();
-                    return;
-                } else {
-                    Toast.makeText(Ficha_cliente.this, "---------------------", Toast.LENGTH_SHORT).show();
-
-                }
-
-                boolean test_tvps = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getTest_TVPS();
-
-
-                Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, graduado, fecha_gradu1, tipo, test_tvps, street, cp, city);
-
-                if (modificar_Cliente_EnLista(cliente_selecionado_id, cli)) {
+                Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, cp, city, street);
+                //Toast.makeText(Ficha_cliente.this, "El id del cliente es : "+cli.getId(), Toast.LENGTH_LONG).show();
 
                     modificar_cliente_aqui_BBDD(cli);
 
                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
-                        cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
-                        campos_ficha_editables(false);
-                        visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
+                            cargar_array_list_BBDD();
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                            actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                            cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
+                            campos_ficha_editables(false);
+                            visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
 
-                        visibilidad_Textviews(true,  new TextView[]{title_id, tv_id, title_purebas, title_tutor});
+                            visibilidad_Textviews(true,  new TextView[]{title_purebas, title_tutor});
 
-                        iv_foto.setVisibility(View.VISIBLE);
-                        et_tutor.setVisibility(View.VISIBLE);
-                        title_age.setText("Edad:");
+                            iv_foto.setVisibility(View.VISIBLE);
+                            //et_tutor.setVisibility(View.VISIBLE);
+                            title_age.setText("Edad:");
 
-                        et_age.setText(String.valueOf(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).calcularEdad()));
-                        desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
-                    }, 2000); // 5000 milisegundos = 5 segundos
+                            et_age.setText(String.valueOf(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).calcularEdad()));
+                            desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+                        }, 1500); // 5000 milisegundos = 5 segundos
+                    }, 1500); // 5000 milisegundos = 5 segundos
 
-                }
 
             }
 
@@ -904,21 +874,6 @@ public class Ficha_cliente extends AppCompatActivity {
      * @param lista
      * @param buscador
      */
-    /*public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView buscador) {
-
-        String[] nombres = new String[lista.size()];
-        for (int i = 0; i < lista.size(); i++) {
-            Cliente cli = lista.get(i);
-            //nombres[i] = cli.getName();
-            nombres[i] = cli.getName() + " " + cli.getSurname();
-
-            //AutoCompletText
-            ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, nombres);
-            buscador.setAdapter(adaptador);
-            buscador.setThreshold(1);
-
-        }
-    }*/
     public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView buscador) {
         String[] nombres = new String[lista.size()];
         for (int i = 0; i < lista.size(); i++) {
