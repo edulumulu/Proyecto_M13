@@ -263,25 +263,44 @@ public class Ficha_cliente extends AppCompatActivity {
                 String city = et_city.getText().toString();
                 String tutor = et_tutor.getText().toString();
                 String tipo = "sin datos";
-                int id =0;
-                for(Cliente cli : lista_clientes){
-                    id = cli.getId()+1;
+
+
+
+                /*int maxId = 0;
+                for (Cliente cli : lista_clientes) {
+                    if (cli.getId() > maxId) {
+                        maxId = cli.getId();
+                    }
                 }
+                int id = maxId + 1;
+*/
 
                 Cliente cliente_Array = new Cliente(nombre,
                         surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
                         tutor, street, cp, city, tipo);
-                Cliente cliente= new Cliente(id ,nombre,
+                /*Cliente cliente= new Cliente(id ,nombre,
                         surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
-                        tutor, street, cp, city, tipo);
+                        tutor, street, cp, city, tipo);*/
                 
-                if (lista_clientes.add(cliente)){
+                //if (lista_clientes.add(cliente)){
                     insertar_cliente_aqui_BBDD(cliente_Array);
 
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        cargar_array_list_BBDD();
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
+
+                            int maxId = 0;
+                            for (Cliente cli : lista_clientes) {
+                                if (cli.getId() > maxId) {
+                                    maxId = cli.getId();
+                                }
+                            }
+                            cliente_selecionado_id = maxId;
+                            Toast.makeText(Ficha_cliente.this , "el id es : "+maxId ,Toast.LENGTH_LONG).show();
+                            //int id = maxId + 1;
                         actualizar_nombres_buscador(lista_clientes, buscar_clientes);
 
-                        cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
+                        cargar_cliente_en_ficha(obtener_cliente_por_id(maxId, lista_clientes));
                         visibilidad_botones(false, new Button[]{bt_insertar_aceptar, bt_insertar_salir});
                         campos_ficha_editables(false);
 
@@ -289,6 +308,7 @@ public class Ficha_cliente extends AppCompatActivity {
                         //visibilidad_Textviews(true, new TextView[]{title_purebas, title_tutor} );
                         iv_foto.setVisibility(View.VISIBLE);
                         et_tutor.setVisibility(View.VISIBLE);
+                        visibilidad_Textviews(true, new TextView[]{tv_id, title_id});
 
                         visibilidad_Textviews(false, new TextView[]{tv_id, title_id});
                             title_purebas.setVisibility(View.VISIBLE);
@@ -296,8 +316,9 @@ public class Ficha_cliente extends AppCompatActivity {
                         title_age.setText("Edad:");
                         desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
                         }, 3000); // 5000 milisegundos = 5 segundos
+                    }, 3000); // 5000 milisegundos = 5 segundos
 
-                }
+                //}
 
 
             }
