@@ -90,6 +90,11 @@ public class Utilidades {
         return ok;*/
     }
 
+    /**
+     * Mñetodo que convierte una fecha en un String con formato determinado
+     * @param fecha
+     * @return
+     */
     public static String formatear_Fecha_string (Date fecha){
         String texto= "";
         if(fecha != null){
@@ -98,6 +103,12 @@ public class Utilidades {
         return texto;
     }
 
+    /**
+     * Metodo que convierte un String en Date si tiene el formato adecuado
+     * @param fecha_texto
+     * @return
+     * @throws ParseException
+     */
     public static Date formatear_texto_a_fecha (String fecha_texto) throws ParseException {
         Date fecha =  null;
         if(fecha_texto != null){
