@@ -3,6 +3,8 @@ package com.example.proyecto_m13;
 import static Utilidades.Utilidades.desactivar_activar_Botones;
 import static Utilidades.Utilidades.eliminar_Cliente_PorId;
 import static Utilidades.Utilidades.fecha_valida;
+import static Utilidades.Utilidades.formatear_Fecha_string;
+import static Utilidades.Utilidades.formatear_texto_a_fecha;
 import static Utilidades.Utilidades.nombreYDniNoRepetidos;
 import static Utilidades.Utilidades.obtener_cliente_por_id;
 import static Utilidades.Utilidades.visibilidad_EditTest;
@@ -117,9 +119,6 @@ public class Ficha_cliente extends AppCompatActivity {
             cargar_array_list_BBDD();
         }
 
-
-
-
         /**
          * Borrar testo del buscador cuando se hace click
          */
@@ -190,8 +189,7 @@ public class Ficha_cliente extends AppCompatActivity {
                         String textoFecha = et_age.getText().toString();
                         if (!textoFecha.isEmpty()) {
                             try {
-                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                                fecha_nacimiento_Seleccionada = sdf.parse(textoFecha);  // Convertir el texto en un objeto Date
+                                fecha_nacimiento_Seleccionada = formatear_texto_a_fecha(textoFecha);
 
                                 if (fecha_nacimiento_Seleccionada != null && fecha_valida(fecha_nacimiento_Seleccionada)) {
                                     if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
@@ -264,25 +262,10 @@ public class Ficha_cliente extends AppCompatActivity {
                 String tutor = et_tutor.getText().toString();
                 String tipo = "sin datos";
 
-
-
-                /*int maxId = 0;
-                for (Cliente cli : lista_clientes) {
-                    if (cli.getId() > maxId) {
-                        maxId = cli.getId();
-                    }
-                }
-                int id = maxId + 1;
-*/
-
                 Cliente cliente_Array = new Cliente(nombre,
                         surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
                         tutor, street, cp, city, tipo);
-                /*Cliente cliente= new Cliente(id ,nombre,
-                        surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
-                        tutor, street, cp, city, tipo);*/
-                
-                //if (lista_clientes.add(cliente)){
+
                     insertar_cliente_aqui_BBDD(cliente_Array);
 
                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -309,16 +292,14 @@ public class Ficha_cliente extends AppCompatActivity {
                         iv_foto.setVisibility(View.VISIBLE);
                         et_tutor.setVisibility(View.VISIBLE);
                         visibilidad_Textviews(true, new TextView[]{tv_id, title_id});
-
-                        visibilidad_Textviews(false, new TextView[]{tv_id, title_id});
                             title_purebas.setVisibility(View.VISIBLE);
 
                         title_age.setText("Edad:");
                         desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
-                        }, 3000); // 5000 milisegundos = 5 segundos
-                    }, 3000); // 5000 milisegundos = 5 segundos
+                        }, 2000); // 5000 milisegundos = 5 segundos
+                    }, 2000); // 5000 milisegundos = 5 segundos
 
-                //}
+
 
 
             }
@@ -361,11 +342,9 @@ public class Ficha_cliente extends AppCompatActivity {
                 iv_foto.setVisibility(View.GONE);
                 campos_ficha_editables(true);
                 title_age.setText("Fecha de nacimiento:");
-                //Aquí quiero que el piker pueda ser usado
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date fechaNacimiento = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_born();
-                et_age.setText(sdf.format(fechaNacimiento));
+                et_age.setText(formatear_Fecha_string(fechaNacimiento));
 
                 et_age.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -376,9 +355,7 @@ public class Ficha_cliente extends AppCompatActivity {
                             public void onDateSelected(Date selectedDate) {
                                 // Guardar la fecha seleccionada en la variable
                                 fecha_nacimiento_Seleccionada = selectedDate;
-
-                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                                et_age.setText(sdf.format(fecha_nacimiento_Seleccionada));
+                                et_age.setText(formatear_Fecha_string(fecha_nacimiento_Seleccionada));
                             }
                         });
                     }
@@ -400,8 +377,7 @@ public class Ficha_cliente extends AppCompatActivity {
                         String textoFecha = et_age.getText().toString();
                         if (!textoFecha.isEmpty()) {
                             try {
-                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                                fecha_nacimiento_Seleccionada = sdf.parse(textoFecha);  // Convertir el texto en un objeto Date
+                                fecha_nacimiento_Seleccionada = formatear_texto_a_fecha(textoFecha);  // Convertir el texto en un objeto Date
 
                                 if (fecha_nacimiento_Seleccionada != null) {
 
@@ -607,9 +583,9 @@ public class Ficha_cliente extends AppCompatActivity {
      * Muestra un dialogo que hay que aceptar con la frase que se pasa como parámetro
      * @param texto
      */
-    public void mostrar_dialogo(String texto){
+    public void mostrar_dialogo(String texto ){
         AlertDialog.Builder builder = new AlertDialog.Builder(Ficha_cliente.this);
-        builder.setTitle("Resultados Finales del Test")
+        builder.setTitle("Resultados Finales del Test ")
                 .setMessage(texto)
                 .setPositiveButton("Aceptar", (dialog, which) -> {
                     // Puedes cerrar o hacer algo al aceptar
@@ -842,27 +818,14 @@ public class Ficha_cliente extends AppCompatActivity {
 
 
             if(cli.getGraduate()){
-
-                //tv_graduacion.setText(cli.getGraduate() ? "True" : "False");
-
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    Date fechaGraduacion = cli.getDate_graduacion();
-
-                    tv_fecha_gradu.setText(sdf.format(fechaGraduacion));
-
-                    //tv_fecha_gradu.setText(cli.getDate_graduacion().toString());
+                    tv_fecha_gradu.setText(formatear_Fecha_string(cli.getDate_graduacion()));
                     tv_tipo_lente.setText(cli.getTipo_lentes());
-
             }else{
                 visibilidad_Textviews(false, new TextView[]{title_graduacion, title_fecha_gradu, title_tipo_lente, tv_fecha_gradu, tv_tipo_lente});//, tv_graduacion
             }
 
             if(cli.getTest_TVPS()){
-
                 cargar_datos_test_realizado_por_usuario_BBDD(cli.getId_test_realizado());
-               //bt_result.setVisibility(View.VISIBLE);
-                //tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
-
             }else{
                 datos_test_realizado =new Test_realizado();
                 visibilidad_Textviews(false, new TextView[]{title_test_TVPS, title_next_date_test, tv_next_text});
@@ -879,7 +842,7 @@ public class Ficha_cliente extends AppCompatActivity {
             bt_result.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mostrar_dialogo(datos_test_realizado.getResultado());
+                    mostrar_dialogo(cargar_datos_en_boton_resultado(cli, datos_test_realizado));
                 }
             });
 
@@ -888,6 +851,21 @@ public class Ficha_cliente extends AppCompatActivity {
             Log.d("cliente nullo", "error cliente nulo - funcion cargar ficha cliente: ");
         }
     }
+
+    public String cargar_datos_en_boton_resultado(Cliente cli, Test_realizado testRealizado){
+
+        String fecha_test = formatear_Fecha_string(testRealizado.getFecha());
+        String fecha_prox = formatear_Fecha_string(testRealizado.getFecha_proxima_revision());;
+
+        return "ID Test: " + testRealizado.getId_test_realizado() +
+                "\n Cliente: " + cli.getName() +" "+ cli.getSurname() +
+                "\nFecha de realización: " + fecha_test +
+                "\nFecha próxima revisión: " + fecha_prox +
+                "\nResultado: \n\n" + testRealizado.getResultado();
+
+    }
+
+
 
     /**
      * Modifica los nombres de los clientes en el buscador según se haya actualizado la lista de clientes
@@ -952,8 +930,7 @@ public class Ficha_cliente extends AppCompatActivity {
 
         // Verificar formato fecha y modificar la fecha en variable general
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            fecha_nacimiento_Seleccionada = sdf.parse(et_age.getText().toString().trim());
+            fecha_nacimiento_Seleccionada = formatear_texto_a_fecha(et_age.getText().toString().trim());
             Log.d("Fecha Nacimiento", "Fecha: " + fecha_nacimiento_Seleccionada.toString());
         } catch (ParseException e) {
             e.printStackTrace();
@@ -1016,9 +993,7 @@ public class Ficha_cliente extends AppCompatActivity {
                     public void onDateSelected(Date selectedDate) {
                         // Guardar la fecha seleccionada en la variable
                         fecha_nacimiento_Seleccionada = selectedDate;
-                        // Actualizar el campo EditText con la fecha seleccionada (por ejemplo, et_age)
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                        et_age.setText(sdf.format(fecha_nacimiento_Seleccionada));
+                        et_age.setText(formatear_Fecha_string(fecha_nacimiento_Seleccionada));
                     }
                 });
             }

@@ -12,8 +12,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class Utilidades {
+
+    private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     //MÉTODOS  RELACIONADOS CON EL USO DE LISTAS DE LAS DISTINTAS CLASES DE LA APP
     /**
@@ -85,6 +88,22 @@ public class Utilidades {
             }
         }
         return ok;*/
+    }
+
+    public static String formatear_Fecha_string (Date fecha){
+        String texto= "";
+        if(fecha != null){
+            texto =  sdf.format(fecha);
+        }
+        return texto;
+    }
+
+    public static Date formatear_texto_a_fecha (String fecha_texto) throws ParseException {
+        Date fecha =  null;
+        if(fecha_texto != null){
+            fecha =  sdf.parse(fecha_texto);
+        }
+        return fecha;
     }
 
 
