@@ -60,14 +60,11 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private int contador_test_Terminados = 0;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_test_tvps);
-
 
         inicializar_componentes();
         //Array de diapositivas test
@@ -86,11 +83,20 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                 pasar_test(1);
             }
         });
-
     }
 
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(Actividad_Test_TVPS.this, "Se ha detenido el test sin guardar los cambios", Toast.LENGTH_LONG).show();
+        super.onBackPressed();
+    }
 
-    //CONJUNTO DE MÉTODOS QUE HACEN CONSULTAS Y MODIFICACIONES EN LA BBDD
+    @Override
+    protected void onStop() {
+        Toast.makeText(Actividad_Test_TVPS.this, "Se ha detenido el test sin guardar los cambios", Toast.LENGTH_LONG).show();
+        super.onStop();
+    }
+//CONJUNTO DE MÉTODOS QUE HACEN CONSULTAS Y MODIFICACIONES EN LA BBDD
     /**
      * Carga la lista de diapositivas con los datos de la consulta de la BBDD
      */
@@ -105,7 +111,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                     for (Diapositiva diapositiva : diapositivas) {
                         Log.d("Cliente", "ID: " + diapositiva.getId_diapositiva() + ", Nombre: " + diapositiva.getId_estudio());
                     }
-
                     // Mostrar mensaje con el número de clientes cargados
                     Toast.makeText(Actividad_Test_TVPS.this, "Diapositivas cargadas: " + diapositivas.size(), Toast.LENGTH_LONG).show();
 
@@ -144,10 +149,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         gestionBBDD.actualizarEstadoTestCliente(Actividad_Test_TVPS.this, id_cliente, true, id_test, new GestionBBDD.UpdateCompletadoCallback() {
             @Override
             public void updateCompletadoCallback(String respuesta) {
-
             }
         });
-
     }
 
     /**
@@ -164,18 +167,14 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                     for (Estudio estudio : lista_estudios) {
                         Log.d("Estudio", "ID: " + estudio.getIdEstudio()  + ", Instrucciones: " + estudio.getDescripcionInstrucciones());
                     }
-
                     // Mostrar mensaje con el número de clientes cargados
                     Toast.makeText(Actividad_Test_TVPS.this , "Estudios cargados: " + lista_estudios.size(), Toast.LENGTH_LONG).show();
-
                     mostrar_instrucciones(1);
                     bt_cambio_test.setVisibility(View.VISIBLE);
-
                 } else {
                     Toast.makeText(Actividad_Test_TVPS.this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
                 }
             }
-
         });
     }
 
@@ -311,7 +310,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * @param parte_test
      */
     private void finalizar_test(int parte_test){
-
         indice_actual = 0;
 
         //Toast de comprobacion se pueden comentar
@@ -330,7 +328,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         }else {
             bt_cambio_test.setVisibility(View.VISIBLE);
             tv_Cambio.setVisibility(View.VISIBLE);
-            //bt_cambio_test.setText("Finalizaste el test\n\nToca la pantalla para finalizar");
             tv_Cambio.setText("Finalizaste el test\n\nToca la pantalla para finalizar");
         }
 
@@ -495,7 +492,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         if(cont_aciertos_7<aciertos){ contador++;}
 
         Log.d("TVPS_Debug", "Número de test por debajo del mínimo (" + aciertos + "): " + contador);
-
         return contador;
     }
 
@@ -505,7 +501,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * @return
      */
     private String valoracion_individual(boolean excelencia, int contador){
-
         String valoracion = "";
 
         if (!excelencia){
@@ -531,12 +526,10 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                 case 7:
                     valoracion = "Tiene siete áreas poco desarrolladas. el retraso madurativo es elevado, se necesita trabajo con un especialista";
                     break;
-
             }
         }else{
             valoracion = "El cómputo de aciertos es extraordinario, su percepción visual es excelente";
         }
-
         return valoracion;
     }
 
@@ -548,7 +541,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * @return
      */
     private String resultado_ponderado_con_la_media(int contador, int minimo, int maximo){
-
         Log.d("TVPS_Debug", "Test: " + contador + " aciertos. Mínimo: " + minimo + ", Máximo: " + maximo);
 
         if(contador < minimo){
@@ -606,7 +598,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      */
     public void mostrar_instrucciones(int parte_Test){
         tv_instrucciones.setVisibility(View.VISIBLE);
-
         boolean encontrado = false;
 
         for (Estudio est : lista_estudios) {
@@ -662,7 +653,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * @return
      */
     public String[] obtener_url_fotos_parte_test(int parte_test){
-
         ArrayList<String> urls = new ArrayList<>();
         for (Diapositiva diapo : diapositivas){
             if(diapo.getId_estudio() == parte_test){
@@ -683,7 +673,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             if(diapo.getId_estudio() == parte_test){
                 diapositivas_parte_test.add(diapo);
             }
-
         }
         return diapositivas_parte_test;
     }
@@ -701,10 +690,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
      * Inicia los componentes de la actividad y los deja invisibles hasta nueva orden
      */
     private void inicializar_componentes(){
-
         iv_imagen = findViewById(R.id.iv_imagen);
         iv_imagen_timer = findViewById(R.id.iv_imagen_timer);
-
         tv_instrucciones = findViewById(R.id.tv_instrucciones);
         tv_Cambio = findViewById(R.id.tv_cambio);
 
@@ -723,8 +710,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         bt_13 = findViewById(R.id.bt_13);
         bt_cambio_test = findViewById(R.id.bt_cambio_test);
 
-
-
         visibilidad_botones(false, new Button[]{bt_1, bt_2, bt_3,bt_4, bt_5, bt_6, bt_7,bt_8, bt_9, bt_10, bt_11,bt_12, bt_13, bt_cambio_test });
         iv_imagen_timer.setVisibility(View.GONE);
         tv_Cambio.setVisibility(View.GONE);
@@ -741,8 +726,6 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         edad_cliente = getIntent().getIntExtra("edadCliente", -1);
         nombre_empleado = getIntent().getStringExtra("usuario");
         Toast.makeText(Actividad_Test_TVPS.this, "Edad cliente --> " +edad_cliente , Toast.LENGTH_SHORT).show();
-
-
     }
 
 
