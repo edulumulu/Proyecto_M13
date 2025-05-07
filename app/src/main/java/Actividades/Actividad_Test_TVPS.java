@@ -1,4 +1,4 @@
-package com.example.proyecto_m13;
+package Actividades;
 
 import static Utilidades.Utilidades.visibilidad_Textviews;
 import static Utilidades.Utilidades.visibilidad_botones;
@@ -21,15 +21,16 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import Clases.Diapositiva;
+import Clases.Estudio;
+import BBDD.GestionBBDD;
+import com.example.proyecto_m13.R;
+import Clases.Test_realizado;
+
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 public class Actividad_Test_TVPS extends AppCompatActivity {
 

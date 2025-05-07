@@ -5,7 +5,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.proyecto_m13.Cliente;
+import Clases.Cliente;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

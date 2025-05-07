@@ -18,15 +18,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Actividad_Test_TVPS"
+            android:name="Actividades.Actividad_Test_TVPS"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".Ficha_cliente"
+            android:name="Actividades.Ficha_cliente"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".MainActivity"
+            android:name="Actividades.MainActivity"
             android:exported="true"
             android:screenOrientation="landscape">
             <intent-filter>

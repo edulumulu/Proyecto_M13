@@ -1,13 +1,11 @@
-package com.example.proyecto_m13;
+package Actividades;
 
 import static Utilidades.Utilidades.desactivar_activar_Botones;
-import static Utilidades.Utilidades.eliminar_Cliente_PorId;
 import static Utilidades.Utilidades.fecha_valida;
 import static Utilidades.Utilidades.formatear_Fecha_string;
 import static Utilidades.Utilidades.formatear_texto_a_fecha;
 import static Utilidades.Utilidades.nombreYDniNoRepetidos;
 import static Utilidades.Utilidades.obtener_cliente_por_id;
-import static Utilidades.Utilidades.visibilidad_EditTest;
 import static Utilidades.Utilidades.visibilidad_Textviews;
 import static Utilidades.Utilidades.visibilidad_botones;
 
@@ -42,15 +40,19 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import Clases.Cliente;
+import Interfaces.DatePickerCallback;
+import BBDD.GestionBBDD;
+import com.example.proyecto_m13.R;
+import Clases.Test_realizado;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import Utilidades.Utilidades;
 

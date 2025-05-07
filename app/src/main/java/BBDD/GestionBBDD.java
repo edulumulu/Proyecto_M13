@@ -1,4 +1,4 @@
-package com.example.proyecto_m13;
+package BBDD;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -20,6 +20,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import Actividades.Ficha_cliente;
+import Clases.Cliente;
+import Clases.Diapositiva;
+import Clases.Estudio;
+import Clases.Test_realizado;
 
 public class GestionBBDD {
     public static final String BASE_URL = "http://192.168.1.145/";

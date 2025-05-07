@@ -1,4 +1,4 @@
-package com.example.proyecto_m13;
+package Clases;
 
 public class Estudio {
     private int idEstudio;
