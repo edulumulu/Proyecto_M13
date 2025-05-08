@@ -28,9 +28,15 @@ import Clases.Estudio;
 import Clases.Test_realizado;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.1.145/";
+    public static final String BASE_URL = "http://192.168.0.105/";
 
-
+    /**
+     * Valida las credenciales del usuario mediante una petición al servidor.
+     *
+     * @param context Contexto de la aplicación
+     * @param usuario Nombre de usuario
+     * @param contrasena Contraseña del usuario
+     */
     @SuppressLint("StaticFieldLeak")
     public void comprobarCredenciales (Context context, String usuario, String contrasena){
         new AsyncTask<Void, Void, String>(){
@@ -140,7 +146,12 @@ public class GestionBBDD {
         void onListarEstudiosCallback(ArrayList<Estudio> estudios);
     }
 
-
+    /**
+     * Obtiene un ArrayList de clientes desde el servidor.
+     *
+     * @param context Contexto de la aplicación
+     * @param callback Callback para manejar la respuesta con la lista de clientes
+     */
     @SuppressLint("StaticFieldLeak")
     public void listarClientes(Context context, final ClienteCallback callback) {
         new AsyncTask<Void, Void, ArrayList<Cliente>>() {
@@ -237,6 +248,13 @@ public class GestionBBDD {
         }.execute();
     }
 
+    /**
+     * Inserta un nuevo cliente en la base de datos.
+     *
+     * @param context Contexto de la aplicación
+     * @param cliente Cliente que se desea insertar
+     * @param callback Callback para manejar la respuesta del servidor
+     */
     @SuppressLint("StaticFieldLeak")
     public void insertarCliente(Context context, Cliente cliente, final insertCallback callback) {
 
@@ -431,6 +449,14 @@ public class GestionBBDD {
             }
         }.execute();
     }*/
+
+    /**
+     * Actualiza los datos de un cliente en la base de datos.
+     *
+     * @param context Contexto de la aplicación
+     * @param cliente Cliente con los datos actualizados
+     * @param callback Callback para manejar la respuesta del servidor
+     */
     @SuppressLint("StaticFieldLeak")
     public void modificarCliente(Context context, Cliente cliente, final updateCallback callback) {
         new AsyncTask<Void, Void, String>() {
@@ -522,6 +548,13 @@ public class GestionBBDD {
         }.execute();
     }
 
+    /**
+     * Elimina un cliente de la base de datos.
+     *
+     * @param context Contexto de la aplicación
+     * @param id_cliente ID del cliente a eliminar
+     * @param callback Callback para manejar la respuesta del servidor
+     */
     @SuppressLint("StaticFieldLeak")
     public void eliminarCliente(Context context, int id_cliente, final deleteCallback callback) {
         new AsyncTask<Void, Void, String>() {
@@ -580,6 +613,13 @@ public class GestionBBDD {
         }.execute();
     }
 
+    /**
+     * Lista las diapositivas asociadas a un test.
+     *
+     * @param context Contexto de la aplicación
+     * @param idTest ID del test
+     * @param callback Callback para manejar la lista de diapositivas
+     */
     @SuppressLint("StaticFieldLeak")
     public void listarDiapositivasPorTest(Context context, final int idTest, final DiapositivasCallback callback) {
         new AsyncTask<Void, Void, ArrayList<Diapositiva>>() {
@@ -652,6 +692,13 @@ public class GestionBBDD {
         }.execute();
     }
 
+    /**
+     * Obtiene los datos de un test realizado por su ID.
+     *
+     * @param context Contexto de la aplicación
+     * @param idTestRealizado ID del test realizado
+     * @param callback Callback para manejar los datos del test
+     */
     @SuppressLint("StaticFieldLeak")
     public void obtenerTestRealizadoPorId(final Context context, final int idTestRealizado, final TestRealizadoCallback callback) {
         new AsyncTask<Void, Void, Test_realizado>() {
@@ -729,6 +776,13 @@ public class GestionBBDD {
         }.execute();
     }
 
+    /**
+     * Inserta un nuevo registro de test realizado.
+     *
+     * @param context Contexto de la aplicación
+     * @param test Objeto Test_realizado a insertar
+     * @param callback Callback para manejar el resultado del servidor
+     */
     @SuppressLint("StaticFieldLeak")
     public void insertarTestRealizado(Context context, Test_realizado test, final insertarTestCallback callback) {
         new AsyncTask<Void, Void, String>() {
@@ -816,6 +870,15 @@ public class GestionBBDD {
         }.execute();
     }
 
+    /**
+     * Actualiza el estado del test completado en el cliente.
+     *
+     * @param context Contexto de la aplicación
+     * @param idCliente ID del cliente
+     * @param testCompletado Estado del test (true si completado)
+     * @param idTestRealizado ID del test realizado
+     * @param callback Callback para manejar la respuesta del servidor
+     */
     @SuppressLint("StaticFieldLeak")
     public void actualizarEstadoTestCliente(Context context, int idCliente, boolean testCompletado, int idTestRealizado, final UpdateCompletadoCallback callback) {
         new AsyncTask<Void, Void, String>() {
