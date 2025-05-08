@@ -4,9 +4,9 @@ package Utilidades;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.proyecto_m13.Estudio;
-import com.example.proyecto_m13.Test_realizado;
-import com.example.proyecto_m13.GestionBBDD;
+import Clases.Estudio;
+import Clases.Test_realizado;
+import BBDD.GestionBBDD;
 
 import java.util.ArrayList;
 

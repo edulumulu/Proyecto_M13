@@ -5,6 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Ficha_cliente">
+    tools:context="Actividades.Ficha_cliente">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

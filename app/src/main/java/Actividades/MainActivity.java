@@ -1,11 +1,9 @@
-package com.example.proyecto_m13;
+package Actividades;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.text.InputType;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,16 +13,8 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-
-import javax.security.auth.callback.Callback;
-
-import Utilidades.*;
+import BBDD.GestionBBDD;
+import com.example.proyecto_m13.R;
 
 
 public class MainActivity extends AppCompatActivity {
