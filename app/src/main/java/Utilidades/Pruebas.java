@@ -19,25 +19,6 @@ public class Pruebas {
         // Aquí puedes seguir agregando otras pruebas
     }
 
-    public static void actualizarTestDePrueba(Context context) {
-        int idCliente = 1;
-        int idTestRealizado = 2;
-        boolean testCompletado = true;
-
-        GestionBBDD gestionBBDD = new GestionBBDD();
-
-        gestionBBDD.actualizarEstadoTestCliente(context, idCliente, testCompletado, idTestRealizado, new GestionBBDD.UpdateCompletadoCallback() {
-            @Override
-            public void onUpdateCompletado(boolean success, String message) {
-                if (success) {
-                    Log.d("ActualizarTest", "Actualización exitosa: " + message);
-                } else {
-                    Log.e("ActualizarTest", "Error en la actualización: " + message);
-                }
-            }
-        });
-    }
-
     public static void insertarTestDePrueba(Context context) {
         Test_realizado test = new Test_realizado(2, 2, 1, "Aprobado");
         GestionBBDD gestionBBDD = new GestionBBDD();

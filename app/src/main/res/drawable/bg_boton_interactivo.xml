@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- DESHABILITADO -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="#DCD2BD" /> <!-- apagado -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- PRESIONADO -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#CBB994" /> <!-- dorado oscuro -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- CON FOCO -->
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#D6C3A1" /> <!-- suave más claro -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- NORMAL (color restaurado) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#D9C49B" /> <!-- champagne base -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

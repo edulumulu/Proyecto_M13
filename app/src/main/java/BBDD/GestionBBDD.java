@@ -136,8 +136,6 @@ public class GestionBBDD {
         void onError(String mensajeError);
     }
 
-
-
     public interface UpdateCompletadoCallback {
         void updateCompletadoCallback(String respuesta);
     }

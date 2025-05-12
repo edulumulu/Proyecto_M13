@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/FondoDegradado"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -42,6 +43,7 @@
         app:layout_constraintBottom_toTopOf="@id/guideline_horizontal_02"/>
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,6 +57,7 @@
         app:layout_constraintBottom_toTopOf="@id/guideline_horizontal_02"/>
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_surname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -72,7 +75,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:text="Datos personales"
-
         android:textSize="25sp"
         app:layout_constraintStart_toStartOf="@id/guideline_vertical_center"
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_02" />
@@ -91,6 +93,7 @@
         app:layout_constraintTop_toBottomOf="@id/textView" />
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_dni"
         android:layout_width="130dp"
         android:layout_height="45dp"
@@ -114,6 +117,7 @@
         app:layout_constraintTop_toTopOf="@id/textView_2" />
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_age"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -138,8 +142,9 @@
 
     <EditText
         android:id="@+id/et_tel"
-        android:layout_width="120dp"
-        android:layout_height="45dp"
+        style="@style/EditTextDiseño"
+        android:layout_width="130dp"
+        android:layout_height="44dp"
         android:layout_marginStart="7dp"
         android:layout_marginTop="5dp"
         android:inputType="number"
@@ -160,6 +165,7 @@
         app:layout_constraintTop_toTopOf="@id/textView_3" />
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_tutor"
         android:layout_width="220dp"
         android:layout_height="45dp"
@@ -181,6 +187,7 @@
         app:layout_constraintTop_toBottomOf="@id/textView_3" />
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_mail"
         android:layout_width="wrap_content"
         android:layout_height="45dp"
@@ -215,6 +222,7 @@
         app:layout_constraintTop_toBottomOf="@id/textView_6" />
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_street"
         android:layout_width="200dp"
         android:layout_height="45dp"
@@ -236,6 +244,7 @@
         app:layout_constraintTop_toTopOf="@id/textView_7" />
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_cp"
         android:layout_width="100dp"
         android:layout_height="45dp"
@@ -258,6 +267,7 @@
         app:layout_constraintTop_toTopOf="@id/textView_7" />
 
     <EditText
+        style="@style/EditTextDiseño"
         android:id="@+id/et_city"
         android:layout_width="200dp"
         android:layout_height="45dp"
@@ -355,7 +365,6 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/textView_15"
         app:layout_constraintTop_toTopOf="@id/textView_15" />
-    -->
 
     <TextView
         android:id="@+id/textView_16"
@@ -388,14 +397,13 @@
         app:layout_constraintStart_toEndOf="@id/textView_18"
         app:layout_constraintTop_toTopOf="@id/textView_18" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_resultados"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginBottom="-20dp"
         android:layout_marginStart="15dp"
-        android:background="@android:color/darker_gray"
-        app:backgroundTint="#F7F244AA"
         android:text="Resultados"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/tv_fecha_proxTVPS"
@@ -460,111 +468,103 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textview_10" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_insert"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginTop="30dp"
-        android:background="@android:color/darker_gray"
         android:text="Nuevo cliente"
         android:textSize="18sp"
-        app:backgroundTint="#F7F244AA"
         app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textview_11" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_update"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginTop="7dp"
-        android:background="@android:color/darker_gray"
         android:text="Modificar"
         android:textSize="18sp"
-        app:backgroundTint="#F7F244AA"
         app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bt_insert" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_delete"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginTop="7dp"
-        android:background="@android:color/darker_gray"
         android:text="Eliminar"
         android:textSize="18sp"
-        app:backgroundTint="#F7F244AA"
         app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bt_update" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_test"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginTop="7dp"
-        android:background="@android:color/darker_gray"
         android:text="Test TVPS"
         android:textSize="18sp"
-        app:backgroundTint="#F7F244AA"
         app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bt_delete" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_aceptar"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginBottom="15dp"
         android:layout_marginEnd="40dp"
-        android:background="@android:color/darker_gray"
         android:text="Aceptar"
         android:textSize="18sp"
-        app:backgroundTint="#F7F244AA"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_aceptar_insert"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginBottom="15dp"
         android:layout_marginEnd="40dp"
-        android:background="@android:color/darker_gray"
         android:text="Aceptar"
         android:textSize="18sp"
-        app:backgroundTint="#F7F244AA"
         app:layout_constraintBottom_toBottomOf="@id/guideline_horizontal_08"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_06" />
 
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_salir"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginEnd="50dp"
         android:layout_marginBottom="15dp"
-        android:background="@android:color/darker_gray"
         android:text="Salir"
         android:textSize="18sp"
-        app:backgroundTint="#F7F244AA"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/bt_aceptar"
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_salir_insertar"
+        style="@style/BotonInteractivo"
         android:layout_width="160dp"
         android:layout_height="50dp"
         android:layout_marginEnd="50dp"
         android:layout_marginBottom="15dp"
-        android:background="@android:color/darker_gray"
         android:text="Salir"
         android:textSize="18sp"
-        app:backgroundTint="#F7F244AA"
         app:layout_constraintBottom_toBottomOf="@id/guideline_horizontal_08"
         app:layout_constraintEnd_toStartOf="@id/bt_aceptar_insert"
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_06" />

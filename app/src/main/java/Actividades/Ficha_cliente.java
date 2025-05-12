@@ -1068,8 +1068,9 @@ public class Ficha_cliente extends AppCompatActivity {
             editText.setEnabled(editables);
 
             // Cambiar color de texto y fondo
-            editText.setTextColor(editables ? Color.BLUE : Color.BLACK); // Cambiar a negro
-            editText.setBackgroundColor(editables ? Color.LTGRAY : Color.WHITE); // Fondo blanco o transparente
+            editText.setTextColor(Color.parseColor("#2B2B2B"));
+            //editText.setTextColor(editables ? Color.BLUE : Color.BLACK); // Cambiar a negro
+            //editText.setBackgroundColor(editables ? Color.LTGRAY : Color.WHITE); // Fondo blanco o transparente
         }
 
     }
