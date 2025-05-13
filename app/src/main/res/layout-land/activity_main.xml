@@ -1,61 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
     tools:context="Actividades.MainActivity">
 
-
-    <EditText
-        android:id="@+id/etContrasena"
-        android:layout_width="256dp"
-        android:layout_height="52dp"
-        android:ems="10"
-        android:hint="Contraseña"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.528"
-        app:layout_constraintStart_toStartOf="parent"
+    <!-- Nuevo: Título con icono de ojo -->
+    <ImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ojo"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.498" />
+        app:layout_constraintBottom_toTopOf="@id/etUsuario"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+       />
 
     <EditText
         android:id="@+id/etUsuario"
         android:layout_width="256dp"
         android:layout_height="52dp"
+        android:background="@drawable/edittext_optical_bg"
         android:ems="10"
         android:hint="Usuario"
+        android:padding="16dp"
+        android:textColor="#263238"
+        android:textColorHint="#78909C"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.528"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintVertical_bias="0.498" />
+
+    <EditText
+        android:id="@+id/etContrasena"
+        android:layout_width="256dp"
+        android:layout_height="52dp"
+        android:background="@drawable/edittext_optical_bg"
+        android:ems="10"
+        android:hint="Contraseña"
+        android:inputType="textPassword"
+        android:padding="16dp"
+        android:textColor="#263238"
+        android:textColorHint="#78909C"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.682" />
 
     <Button
         android:id="@+id/btIniciar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="#268296"
         android:text="Iniciar Sesión"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.52"
+        app:layout_constraintHorizontal_bias="0.499"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.779" />
+        app:layout_constraintVertical_bias="0.845" />
 
     <ImageView
         android:id="@+id/ivState"
         android:layout_width="30dp"
         android:layout_height="25dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.611"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/invisible" />
+        app:layout_constraintBottom_toBottomOf="@id/etContrasena"
+        app:layout_constraintEnd_toEndOf="@id/etContrasena"
+        app:layout_constraintTop_toTopOf="@id/etContrasena"
+        app:srcCompat="@drawable/invisible"
+        app:layout_goneMarginRight="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
