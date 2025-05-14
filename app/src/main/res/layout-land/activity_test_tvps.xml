@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="0dp"
-    tools:context="Actividades.Actividad_Test_TVPS">
+    tools:context="Actividades.Actividad_Test_TVPS"
+    android:background="#FFFFFF">
 
     <!-- Imagen ajustada al ancho de la pantalla, altura proporcional -->
     <ImageView
@@ -165,11 +166,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guide_75" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_cambio_test"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
+        android:background="@drawable/bg_gradient"
         android:elevation="0dp"
         android:stateListAnimator="@null"
         android:text="4"
