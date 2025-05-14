@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 public class Actividad_Test_TVPS extends AppCompatActivity {
 
-    public static final String BASE_URL = "http://192.168.56.1/";
+    public static final String BASE_URL = "http://192.168.1.145/";
     private int id_empleado;
     private int id_cliente;
     private int edad_cliente;
@@ -356,7 +356,14 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                    guardar_test_realizado_BBDD(resultado_test_resalizado);
                     //actualizar_cliente_BBDD(id_cliente, id_test_Realizado);
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Actividad_Test_TVPS.this);
+                    Intent intent = new Intent(Actividad_Test_TVPS.this, Ficha_cliente.class);
+                    intent.putExtra("idCliente", id_cliente);
+                    intent.putExtra("usuario", nombre_empleado);
+
+                    startActivity(intent);
+                    finish();
+
+                    /*AlertDialog.Builder builder = new AlertDialog.Builder(Actividad_Test_TVPS.this);
                     builder.setTitle("Resultados Finales del Test")
                             .setMessage(resultado_test_resalizado.getResultado())
                             .setPositiveButton("Aceptar", (dialog, which) -> {
@@ -370,7 +377,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                                 finish();
                             })
                             .setCancelable(false)
-                            .show();
+                            .show();*/
                 }
 
 
@@ -603,7 +610,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
         for (Estudio est : lista_estudios) {
             if (est.getIdEstudio() == parte_Test) {
-                tv_instrucciones.setText("Test " + est.getIdEstudio() + "\n" + est.getDescripcionInstrucciones() + "\n\nPara comenzar el test toca la pantalla");
+                tv_instrucciones.setText("Parte " + est.getIdEstudio() + "\n" + est.getDescripcionInstrucciones() + "\n\nToca la pantalla para comenzar");
                 encontrado = true;
                 break; // ✅ sal del bucle cuando lo encuentres
             }
