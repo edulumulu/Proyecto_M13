@@ -766,11 +766,16 @@ public class Ficha_cliente extends AppCompatActivity {
             et_cp.setText(String.valueOf(cli.getCp()));
             et_tlf.setText(String.valueOf(cli.getTlf()));
             et_mail.setText(cli.getEmail());
-            et_tutor.setText(cli.getTutor());
             et_street.setText(cli.getStreet());
             et_age.setText(String.valueOf(cli.calcularEdad()));
 
             //Compruebo si el cliente está graduado
+            if (cli.calcularEdad() < 18){
+                et_tutor.setText(cli.getTutor());
+            }else {
+                et_tutor.setVisibility(View.GONE);
+                title_tutor.setVisibility(View.GONE);
+            }
             if (cli.getGraduate()) {
                 tv_fecha_gradu.setText(formatear_Fecha_string(cli.getDate_graduacion()));
                 tv_tipo_lente.setText(cli.getTipo_lentes());
