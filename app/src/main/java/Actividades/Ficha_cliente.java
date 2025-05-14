@@ -920,7 +920,7 @@ public class Ficha_cliente extends AppCompatActivity {
         }
         // Pongo un testo hint a cada campo
         et_name.setHint("Escribe el nombre");
-        et_surname.setHint("Escribe el nombre");
+        et_surname.setHint("Escribe el apellido");
         et_dni.setHint("Escriba aquí");
         et_tlf.setHint("Escriba aquí");
         et_tutor.setHint("Si es menor de edad");
@@ -1068,8 +1068,9 @@ public class Ficha_cliente extends AppCompatActivity {
             editText.setEnabled(editables);
 
             // Cambiar color de texto y fondo
-            editText.setTextColor(editables ? Color.BLUE : Color.BLACK); // Cambiar a negro
-            editText.setBackgroundColor(editables ? Color.LTGRAY : Color.WHITE); // Fondo blanco o transparente
+            editText.setTextColor(editables ? Color.GRAY : Color.BLACK); // Cambiar a negro
+            // Usando ContextCompat para mejor compatibilidad
+            editText.setBackgroundResource(editables ? R.drawable.edittext_optical_bg: android.R.color.transparent);
         }
 
     }

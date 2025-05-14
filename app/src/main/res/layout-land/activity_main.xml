@@ -61,7 +61,9 @@
         android:id="@+id/btIniciar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#268296"
+        android:background="@drawable/bg_boton_redondeado"
+
+        app:backgroundTint="#673AB7"
         android:text="Iniciar Sesión"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -75,6 +77,7 @@
         android:id="@+id/ivState"
         android:layout_width="30dp"
         android:layout_height="25dp"
+        android:layout_marginRight="5dp"
         app:layout_constraintBottom_toBottomOf="@id/etContrasena"
         app:layout_constraintEnd_toEndOf="@id/etContrasena"
         app:layout_constraintTop_toTopOf="@id/etContrasena"
