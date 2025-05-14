@@ -28,7 +28,7 @@ import Clases.Estudio;
 import Clases.Test_realizado;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.1.145/";
+    public static final String BASE_URL = "http://192.168.56.1/";
 
     /**
      * Valida las credenciales del usuario mediante una petición al servidor.

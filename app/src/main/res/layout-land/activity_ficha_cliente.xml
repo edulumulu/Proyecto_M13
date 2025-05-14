@@ -503,7 +503,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textview_10" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
         android:id="@+id/bt_insert"
         android:layout_width="160dp"
         android:layout_height="50dp"
@@ -516,7 +518,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textview_11" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
         android:id="@+id/bt_update"
         android:layout_width="160dp"
         android:layout_height="50dp"
@@ -529,7 +533,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bt_insert" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
         android:id="@+id/bt_delete"
         android:layout_width="160dp"
         android:layout_height="50dp"
@@ -542,7 +548,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bt_update" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
         android:id="@+id/bt_test"
         android:layout_width="160dp"
         android:layout_height="50dp"
@@ -555,7 +563,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bt_delete" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
         android:id="@+id/bt_aceptar"
         android:layout_width="160dp"
         android:layout_height="50dp"
@@ -569,7 +579,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_08" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
         android:id="@+id/bt_aceptar_insert"
         android:layout_width="160dp"
         android:layout_height="50dp"
@@ -584,7 +596,9 @@
         app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_06" />
 
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
         android:id="@+id/bt_salir"
         android:layout_width="160dp"
         android:layout_height="50dp"
@@ -598,7 +612,9 @@
         app:layout_constraintEnd_toStartOf="@id/bt_aceptar"
         app:layout_constraintTop_toTopOf="@id/bt_aceptar" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
         android:id="@+id/bt_salir_insertar"
         android:layout_width="160dp"
         android:layout_height="50dp"
