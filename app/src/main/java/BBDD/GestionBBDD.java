@@ -1,960 +1,1126 @@
-package BBDD;
+package Actividades;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
+import static Utilidades.Utilidades.desactivar_activar_Botones;
+import static Utilidades.Utilidades.fecha_valida;
+import static Utilidades.Utilidades.formatear_Fecha_string;
+import static Utilidades.Utilidades.formatear_texto_a_fecha;
+import static Utilidades.Utilidades.nombreYDniNoRepetidos;
+import static Utilidades.Utilidades.obtener_cliente_por_id;
+import static Utilidades.Utilidades.visibilidad_Textviews;
+import static Utilidades.Utilidades.visibilidad_botones;
+
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.os.Bundle;
+
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
+import android.text.InputType;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import Clases.Cliente;
+import Interfaces.DatePickerCallback;
+import BBDD.GestionBBDD;
+import com.example.proyecto_m13.R;
+import Clases.Test_realizado;
+
+import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
-import Actividades.Ficha_cliente;
-import Clases.Cliente;
-import Clases.Diapositiva;
-import Clases.Estudio;
-import Clases.Test_realizado;
-
-public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.56.1/";
+import Utilidades.Utilidades;
 
 
-    @SuppressLint("StaticFieldLeak")
-    public void comprobarCredenciales (Context context, String usuario, String contrasena){
-        new AsyncTask<Void, Void, String>(){
+public class Ficha_cliente extends AppCompatActivity {
 
-            @Override
-            protected String doInBackground(Void... voids){
-                try{
-                    URL url = new URL(BASE_URL +"db_validation.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-                    conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type","application/json; utf-8");
-                    conexion.setDoOutput(true);
+    private static ArrayList<Cliente> lista_clientes = new ArrayList<>();
+    private Test_realizado datos_test_realizado = new Test_realizado();
+    GestionBBDD gestionBBDD = new GestionBBDD();
+    private String nombre_empleado;
+    private int cliente_selecionado_id;
+    private Date fecha_nacimiento_Seleccionada;
+    private boolean cliente_selecionado = false;
+    private int id_desde_Actividad_test;
 
-                    JSONObject jsonValidar = new JSONObject();
-                    jsonValidar.put("usuario", usuario);
-                    jsonValidar.put("contrasena", contrasena);
+    //Variables parte izquierda de la app
+    private TextView tv_user, title_seleciona, title_acciones;
+    private AutoCompleteTextView buscar_clientes;
+    private Button bt_insert, bt_delete, bt_update, bt_test;
+    private Button bt_modificar_aceptar, bt_modificar_salir, bt_insertar_aceptar, bt_insertar_salir;
+    private Button bt_result;
+    private ImageButton ib_exit;
+    private ImageView iv_foto;
 
-                    OutputStream os = conexion.getOutputStream();
-                    os.write(jsonValidar.toString().getBytes("UTF-8"));
-                    os.close();
+    //Variables parte derecha
+    private TextView tv_id, title_id, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail, title_direc, title_street, title_cp, title_city, title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_next_date_test;
+    private EditText et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city;
+    private TextView tv_fecha_gradu, tv_tipo_lente, tv_next_text; //tv_test_tvps, tv_fecha_test_TVPS,tv_graduacion,
 
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null){
-                        response.append(responseLine.trim());
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_ficha_cliente);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        //relacionar_variables_front_back();
+        inicializar_componentes();
+        poner_nombre_Empleado();
+
+        if (!buscar_clientes.isSelected()) {
+            campos_ficha_visibilidad(false);
+        }
+
+        id_desde_Actividad_test = getIntent().getIntExtra("idCliente", -1);
+
+        if (id_desde_Actividad_test > 0) {
+
+            cargar_array_list_BBDD();
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                cliente_selecionado_id = id_desde_Actividad_test;
+                for (Cliente cli : lista_clientes) {
+                    if (cli.getId() == cliente_selecionado_id) {
+                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                        cargar_cliente_en_ficha(cli);
                     }
-                    br.close();
-                    return response.toString();
+                }
+            }, 1500); // 5000 milisegundos = 5 segundos
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.d("ServerResponse", "Respuesta del servidor: MMMALA");
+        } else {
+            cargar_array_list_BBDD();
+        }
 
-                    return null;
+        /**
+         * Borrar testo del buscador cuando se hace click
+         */
+        buscar_clientes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buscar_clientes.setText("");
+            }
+        });
+
+        /**
+        Abre la ficha del cliente cuando se clicak sobre su nombre
+         */
+        buscar_clientes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String eleccion = (String) adapterView.getItemAtPosition(i);
+                for (Cliente cli : lista_clientes) {
+                    if (eleccion.equalsIgnoreCase(cli.getName() + " " + cli.getSurname())) {
+                        cliente_selecionado = true;
+                        cliente_selecionado_id = cli.getId();
+                        Log.d("Cliente seleccionado", "ID: " + cliente_selecionado_id);
+
+                        //Hago visible los campos de la ficha y cargo los datos
+                        cargar_cliente_en_ficha(cli);
+                        //Los campos de los datos del cliente no se pueden editar
+                        campos_ficha_editables(false);
+                        //activo botones restantes
+                        desactivar_activar_Botones(true, new Button[]{bt_update, bt_delete, bt_test});
+                        //Invisibilizo los botones de manipular modificar y de insertar
+                        visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir});
+                        break;
+                    }
+
                 }
             }
-
-            protected void onPostExecute(String response) {
-                if (response != null) {
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
-
-                        if ("correcto".equals(estado)) {
-                            // Extraer el ID devuelto, que en el PHP se envía en el campo "id"
-                            int idEmpleado = jsonResponse.getInt("id");
-                            Toast.makeText(context, "Inicio de sesión exitoso. ID: " + idEmpleado, Toast.LENGTH_LONG).show();
-
-                            // Crear el Intent para pasar al siguiente Activit
-                            Intent intent = new Intent(context, Ficha_cliente.class);
-                            intent.putExtra("usuario", usuario);
-                            intent.putExtra("idEmpleado", idEmpleado);
-                            context.startActivity(intent);
-
-                        } else {
-                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
-                }
-            }
-        }.execute();
-    }
-
-    public interface ClienteCallback {
-        void onClientesListados(ArrayList<Cliente> listaClientes);
-    }
-
-    public interface insertCallback {
-        void onClienteInsertado(String respuesta);
-    }
-
-    public interface updateCallback {
-        void onClienteModificado(String respuesta);
-    }
-
-    public interface deleteCallback {
-        void onClienteEliminado(String respuesta);
-    }
-
-    public interface DiapositivasCallback {
-        void onDiapositivasListadas(ArrayList<Diapositiva> listaDiapositivas);
-    }
-
-    public interface TestRealizadoCallback {
-        void onTestRealizadoObtenido(Test_realizado testRealizado);
-    }
-
-    public interface insertarTestCallback {
-        void onSuccess(int idInsertado);
-        void onError(String mensajeError);
-    }
+        });
 
 
-
-    public interface UpdateCompletadoCallback {
-        void updateCompletadoCallback(String respuesta);
-    }
-
-    public interface ListarEstudiosCallback {
-        void onListarEstudiosCallback(ArrayList<Estudio> estudios);
-    }
-
-
-    @SuppressLint("StaticFieldLeak")
-    public void listarClientes(Context context, final ClienteCallback callback) {
-        new AsyncTask<Void, Void, ArrayList<Cliente>>() {
+        //BOTONES RELACIONADOS CON LA INSERCIÓN DE CLIENTES
+        bt_insert.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected ArrayList<Cliente> doInBackground(Void... voids) {
-                ArrayList<Cliente> listaClientes = new ArrayList<>();
-                try {
-                    URL url = new URL(BASE_URL + "db_select_clientes.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-                    conexion.setRequestMethod("GET");
-                    conexion.setRequestProperty("Accept", "application/json");
+            public void onClick(View view) {
 
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "utf-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
+                desactivar_activar_Botones(false, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
 
-                    JSONObject jsonObject = new JSONObject(response.toString());
-                    String estado = jsonObject.getString("estado");
+                bt_result.setVisibility(View.GONE);
+                //Vista del formulario editable
+                preparar_formulario_insert();
+                //Aparicon de botones de interacción
+                visibilidad_botones(true, new Button[]{bt_insertar_aceptar, bt_insertar_salir});
+                et_tutor.setEnabled(false);
 
-                    if (estado.equals("correcto")) {
-                        JSONArray jsonListado = jsonObject.getJSONArray("datos");
-                        for (int i = 0; i < jsonListado.length(); i++) {
-                            JSONObject jsonCliente = jsonListado.getJSONObject(i);
+                //Comprobar que cuando se selecciona fecha si es menor de edad aparece el campo tutor
+                et_age.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-                            // Convertir fecha de nacimiento
-                            Date dateBorn = null;
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String textoFecha = et_age.getText().toString();
+                        if (!textoFecha.isEmpty()) {
                             try {
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                                dateBorn = sdf.parse(jsonCliente.getString("date_born"));
-                            } catch (Exception e) {
-                                Log.e("Error", "Fecha de nacimiento inválida: " + jsonCliente.optString("date_born"));
-                            }
+                                fecha_nacimiento_Seleccionada = formatear_texto_a_fecha(textoFecha);
 
-                            // Convertir fecha de graduación (puede ser null)
-                            Date dateGraduacion = null;
-                            try {
-                                String dateGraduacionStr = jsonCliente.optString("date_graduacion", "").trim();
-                                if (!dateGraduacionStr.isEmpty() && !dateGraduacionStr.equalsIgnoreCase("null")) {
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                                    dateGraduacion = sdf.parse(dateGraduacionStr);
+                                if (fecha_nacimiento_Seleccionada != null && fecha_valida(fecha_nacimiento_Seleccionada)) {
+                                    if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
+                                        title_tutor.setVisibility(View.GONE);
+                                        et_tutor.setVisibility(View.GONE);
+                                        et_tutor.setText(null);
+                                        et_tutor.setEnabled(false);
+                                        Log.d("Fecha", "Es mayor de edad, se deshabilita el campo tutor");
+                                    } else {
+                                        title_tutor.setVisibility(View.VISIBLE);
+                                        et_tutor.setVisibility(View.VISIBLE);
+                                        et_tutor.setEnabled(true);  // Habilitar campo tutor si es menor de edad
+                                        Log.d("Fecha", "Es menor de edad, se habilita el campo tutor");
+                                    }
                                 }
-                            } catch (Exception e) {
-                                Log.e("Error", "Fecha de graduación inválida: " + jsonCliente.optString("date_graduacion"));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
                             }
-
-                            // Conversión de booleanos
-                            boolean graduate = jsonCliente.optString("graduate", "0").equals("1");
-                            boolean testTVPS = jsonCliente.optString("Test_TVPS", "0").equals("1");
-
-                            // Recoger id_test_realizado y asignarlo al atributo id_test_completado
-                            int id_test_completado = jsonCliente.optInt("id_test_realizado", 0);
-
-                            // Crear objeto Cliente
-                            Cliente cliente = new Cliente(
-                                    jsonCliente.getInt("id"),
-                                    jsonCliente.getString("name"),
-                                    jsonCliente.getString("surname"),
-                                    jsonCliente.getString("dni"),
-                                    dateBorn,
-                                    jsonCliente.getInt("tlf"),
-                                    jsonCliente.getString("email"),
-                                    jsonCliente.optString("tutor", ""),
-                                    graduate,
-                                    dateGraduacion,
-                                    jsonCliente.optString("tipo_lentes", ""),
-                                    testTVPS,
-                                    id_test_completado,
-                                    jsonCliente.getString("street"),
-                                    jsonCliente.getInt("cp"),
-                                    jsonCliente.getString("ciudad")
-                            );
-
-                            listaClientes.add(cliente);
                         }
                     }
+                });
 
-                } catch (Exception e) {
-                    Log.e("Error", "Error al obtener los clientes", e);
-                }
-                return listaClientes;
+
             }
+        });
 
+        bt_insertar_aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected void onPostExecute(ArrayList<Cliente> listaClientes) {
-                if (callback != null) {
-                    callback.onClientesListados(listaClientes);
-                } else {
-                    Log.e("Error", "Callback es null en listarClientes");
-                }
-            }
-        }.execute();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    public void insertarCliente(Context context, Cliente cliente, final insertCallback callback) {
-
-        new AsyncTask<Void, Void, String>() {
-            //String respuesta = null;
-            @Override
-            protected String doInBackground(Void... voids) {
-                try {
-                    // Se establece la URL del servicio donde se enviarán los datos
-                    URL url = new URL(BASE_URL+"db_insert.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-
-                    // Se configura la conexión para enviar una solicitud POST con datos en formato JSON
-                    conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
-                    conexion.setDoOutput(true);
-
-                    // Se define un formateador de fechas para convertir objetos Date a cadenas en formato "yyyy-MM-dd"
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-                    // Se crea un objeto JSON con los datos del cliente a insertar en la base de datos
-                    JSONObject jsonInsertar = new JSONObject();
-                    jsonInsertar.put("dni", cliente.getDni());
-                    jsonInsertar.put("nombre", cliente.getName());
-                    jsonInsertar.put("apellidos", cliente.getSurname());
-                    jsonInsertar.put("telefono", cliente.getTlf());
-                    jsonInsertar.put("email", cliente.getEmail());
-                    jsonInsertar.put("calle", cliente.getStreet());
-                    jsonInsertar.put("c_p", cliente.getCp());
-                    jsonInsertar.put("ciudad", cliente.getCiudad());
-                    jsonInsertar.put("tutor_legal", cliente.getTutor());
-                    jsonInsertar.put("tipo_lente", cliente.getTipo_lentes());
-
-                    /* Lo dejo comentado porque en ficha cliente veo que utiliza el constructor sin estos datos
-                    jsonInsertar.put("graduado", cliente.getGraduate());
-                    jsonInsertar.put("tipo_lente", cliente.getTipo_lentes());
-                    jsonInsertar.put("test_completado", cliente.getTest_TVPS());
-                    jsonInsertar.put("resultado_test", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
-                    */
-
-                    // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
-                    jsonInsertar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
-                    //jsonInsertar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
-
-
-                    // objeto JSON que se envia
-                    OutputStream os = conexion.getOutputStream();
-                    os.write(jsonInsertar.toString().getBytes("UTF-8"));
-                    os.close();
-
-                    // Se recibe y procesa la respuesta del servidor
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
+            public void onClick(View view) {
+                // Verificar si el nombre y apellido ya están registrados en la base de datos
+                for (Cliente cli : lista_clientes) {
+                    if (et_name.getText().toString().equalsIgnoreCase(cli.getName()) &&
+                            et_surname.getText().toString().equalsIgnoreCase(cli.getSurname())) {
+                        Toast.makeText(Ficha_cliente.this, "El usuario con ese nombre y apellido ya está registrado", Toast.LENGTH_SHORT).show();
                     }
-                    br.close();
-
-
-                    // Se retorna la respuesta obtenida del servidor
-                    return response.toString();
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                    if (et_dni.getText().toString().equalsIgnoreCase(cli.getDni())) {
+                        Toast.makeText(Ficha_cliente.this, "El usuario con ese DNI ya está registrado", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
 
-            @Override
-            protected void onPostExecute(String response) {
-                //boolean ok = false;
-                if (response != null) {
-                    try {
-                        // Se procesa la respuesta del servidor, interpretando los datos en formato JSON
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
+                //Comprobacion general de los campos rellenos
+                if (!comprobación_de_relleno_formulario()) {
+                    return;
+                }
 
-                        // Se verifica si la inserción fue exitosa y se muestra un mensaje acorde
-                        if ("correcto".equals(estado)) {
-                            Toast.makeText(context, "Cliente insertado correctamente", Toast.LENGTH_LONG).show();
-                            //ok = true;
-                        } else {
-                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
+                //Si es menor de edad comprueba que se rellene el campo tutor
+                if (!Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada) &&
+                        (et_tutor.getText().toString().trim().isEmpty() || et_tutor.getText().toString().equalsIgnoreCase("Si es menor de edad"))) {
+                    Toast.makeText(Ficha_cliente.this, "Al ser menor debes incluir un tutor", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
+                //Si es mayor de edad comprueba que el tutor esté vacío
+                if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
+                    et_tutor.setHint(null);
+                    et_tutor.setText("");
+                }
+
+                //recopilación del contenido de los campos
+                String nombre = et_name.getText().toString();
+                String surname = et_surname.getText().toString();
+                String dni = et_dni.getText().toString();
+                int tlf = Integer.parseInt(et_tlf.getText().toString());
+                String email = et_mail.getText().toString();
+                String street = et_street.getText().toString();
+                int cp = Integer.parseInt(et_cp.getText().toString());
+                String city = et_city.getText().toString();
+                String tutor = et_tutor.getText().toString();
+                String tipo = "sin datos";
+
+                Cliente cliente_Array = new Cliente(nombre,
+                        surname, dni, fecha_nacimiento_Seleccionada, tlf, email,
+                        tutor, street, cp, city, tipo);
+
+                insertar_cliente_aqui_BBDD(cliente_Array);
+
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    cargar_array_list_BBDD();
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+
+                        int maxId = 0;
+                        for (Cliente cli : lista_clientes) {
+                            if (cli.getId() > maxId) {
+                                maxId = cli.getId();
+                            }
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
+                        cliente_selecionado_id = maxId;
+                        Toast.makeText(Ficha_cliente.this, "el id es : " + maxId, Toast.LENGTH_LONG).show();
+                        //int id = maxId + 1;
+                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
 
-                    }
+                        cargar_cliente_en_ficha(obtener_cliente_por_id(maxId, lista_clientes));
+                        visibilidad_botones(false, new Button[]{bt_insertar_aceptar, bt_insertar_salir});
+                        campos_ficha_editables(false);
+
+                        //Visibilizo elementos
+                        iv_foto.setVisibility(View.VISIBLE);
+                        et_tutor.setVisibility(View.VISIBLE);
+                        visibilidad_Textviews(true, new TextView[]{tv_id, title_id});
+                        title_purebas.setVisibility(View.VISIBLE);
+
+                        title_age.setText("Edad:");
+                        desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+                    }, 1000); // 5000 milisegundos = 5 segundos
+                }, 1500); // 5000 milisegundos = 5 segundos
+
+
+            }
+        });
+
+        bt_insertar_salir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                title_age.setText("Edad");
+                campos_ficha_visibilidad(false);
+                visibilidad_botones(false, new Button[]{bt_insertar_salir, bt_insertar_aceptar});
+
+                if (cliente_selecionado) {
+                    desactivar_activar_Botones(true, new Button[]{bt_delete, bt_test, bt_update, bt_insert});
                 } else {
-                    // Se muestra un mensaje si hubo un problema con la conexión al servidor
-                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
-                    // ok = true;
+                    desactivar_activar_Botones(false, new Button[]{bt_delete, bt_test, bt_update});
+                    bt_insert.setEnabled(true);
                 }
-                //return ok;
             }
-        }.execute();
-    }
+        });
 
 
-    /*@SuppressLint("StaticFieldLeak")
-    public void modificarCliente(Context context, Cliente cliente, final updateCallback callback) {
-        new AsyncTask<Void, Void, String>() {
+        //BOTONES RELACIONADOS CON LA MODIFICACIÓN DE CLIENTES
+        bt_update.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected String doInBackground(Void... voids) {
-                try {
-                    // Se establece la URL del servicio que procesará la modificación del cliente
-                    URL url = new URL(BASE_URL + "db_update.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+            public void onClick(View view) {
 
-                    // Se configura la conexión para enviar una solicitud POST con datos en formato JSON
-                    conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
-                    conexion.setDoOutput(true);
+                // Desactivo botones hasta quwe se resuelva accion
+                desactivar_activar_Botones(false, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+                bt_result.setVisibility(View.GONE);
+                visibilidad_Textviews(false, new TextView[]{title_graduacion, title_fecha_gradu, title_tipo_lente, tv_fecha_gradu, tv_tipo_lente, title_test_TVPS, title_next_date_test, tv_next_text, title_purebas});
 
-                    // Se define un formateador de fechas para convertir objetos Date a cadenas en formato "yyyy-MM-dd"
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-                    // Se crea un objeto JSON con los datos del cliente a modificar
-                    JSONObject jsonModificar = new JSONObject();
-                    jsonModificar.put("id_cliente", cliente.getId());
-                    jsonModificar.put("dni", cliente.getDni());
-                    jsonModificar.put("nombre", cliente.getName());
-                    jsonModificar.put("apellidos", cliente.getSurname());
-                    jsonModificar.put("telefono", cliente.getTlf());
-                    jsonModificar.put("email", cliente.getEmail());
-                    jsonModificar.put("calle", cliente.getStreet());
-                    jsonModificar.put("c_p", cliente.getCp());
-                    jsonModificar.put("ciudad", cliente.getCiudad());
-
-                    // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
-                    jsonModificar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
-                    jsonModificar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
-
-                    // Se manejan los valores opcionales, enviando null en caso de que no tengan datos
-                    jsonModificar.put("tutor_legal", cliente.getTutor() != null ? cliente.getTutor() : JSONObject.NULL);
-                    jsonModificar.put("graduado", cliente.getGraduate() ? 1 : 0);
-                    jsonModificar.put("tipo_lente", cliente.getTipo_lentes() != null ? cliente.getTipo_lentes() : JSONObject.NULL);
-                    jsonModificar.put("test_completado", cliente.getTest_TVPS() ? 1 : 0);
-                    jsonModificar.put("id_test_realizado", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
-
-                    // Se envía el objeto JSON en el cuerpo de la solicitud
-                    OutputStream os = conexion.getOutputStream();
-                    os.write(jsonModificar.toString().getBytes("UTF-8"));
-                    os.close();
-
-                    // Se recibe y procesa la respuesta del servidor
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    br.close();
-
-                    // Se retorna la respuesta obtenida del servidor
-                    return response.toString();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                if (tv_id.getText().toString().isEmpty()) {
+                    Toast.makeText(Ficha_cliente.this, "Debes selecionar un cliente previamente", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            }
+                visibilidad_botones(true, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
+                iv_foto.setVisibility(View.GONE);
+                campos_ficha_editables(true);
+                title_age.setText("Fecha de nacimiento:");
 
-            @Override
-            protected void onPostExecute(String response) {
-                if (response != null) {
-                    try {
-                        // Se procesa la respuesta del servidor, interpretando los datos en formato JSON
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
+                Date fechaNacimiento = obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getDate_born();
+                et_age.setText(formatear_Fecha_string(fechaNacimiento));
 
-                        // Se verifica si la modificación fue exitosa y se muestra un mensaje acorde
-                        if ("correcto".equals(estado)) {
-                            Toast.makeText(context, "Cliente modificado correctamente", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
+                et_age.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Mostrar el DatePicker y obtener la fecha seleccionada
+                        mostrarDatePicker(new DatePickerCallback() {
+                            @Override
+                            public void onDateSelected(Date selectedDate) {
+                                // Guardar la fecha seleccionada en la variable
+                                fecha_nacimiento_Seleccionada = selectedDate;
+                                et_age.setText(formatear_Fecha_string(fecha_nacimiento_Seleccionada));
+                            }
+                        });
                     }
-                } else {
-                    // Se muestra un mensaje si hubo un problema con la conexión al servidor
-                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
-                }
-            }
-        }.execute();
-    }*/
-    @SuppressLint("StaticFieldLeak")
-    public void modificarCliente(Context context, Cliente cliente, final updateCallback callback) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                try {
-                    // Se establece la URL del servicio que procesará la modificación del cliente
-                    URL url = new URL(BASE_URL + "db_update_2.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
+                });
 
-                    // Se configura la conexión para enviar una solicitud POST con datos en formato JSON
-                    conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
-                    conexion.setDoOutput(true);
+                et_age.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-                    // Se define un formateador de fechas para convertir objetos Date a cadenas en formato "yyyy-MM-dd"
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {  }
 
-                    // Se crea un objeto JSON con los datos del cliente a modificar
-                    JSONObject jsonModificar = new JSONObject();
-                    jsonModificar.put("id_cliente", cliente.getId());
-                    jsonModificar.put("dni", cliente.getDni());
-                    jsonModificar.put("nombre", cliente.getName());
-                    jsonModificar.put("apellidos", cliente.getSurname());
-                    jsonModificar.put("telefono", cliente.getTlf());
-                    jsonModificar.put("email", cliente.getEmail());
-                    jsonModificar.put("calle", cliente.getStreet());
-                    jsonModificar.put("c_p", cliente.getCp());
-                    jsonModificar.put("ciudad", cliente.getCiudad());
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String textoFecha = et_age.getText().toString();
+                        if (!textoFecha.isEmpty()) {
+                            try {
+                                fecha_nacimiento_Seleccionada = formatear_texto_a_fecha(textoFecha);  // Convertir el texto en un objeto Date
 
-                    // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
-                    jsonModificar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
-                    //jsonModificar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
+                                if (fecha_nacimiento_Seleccionada != null) {
 
-                    // Se manejan los valores opcionales, enviando null en caso de que no tengan datos
-                    jsonModificar.put("tutor_legal", cliente.getTutor() != null ? cliente.getTutor() : JSONObject.NULL);
-                    //jsonModificar.put("graduado", cliente.getGraduate() ? 1 : 0);
-                   // jsonModificar.put("tipo_lente", cliente.getTipo_lentes() != null ? cliente.getTipo_lentes() : JSONObject.NULL);
-                   // jsonModificar.put("test_completado", cliente.getTest_TVPS() ? 1 : 0);
-                   // jsonModificar.put("id_test_realizado", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
-
-                    // Se envía el objeto JSON en el cuerpo de la solicitud
-                    OutputStream os = conexion.getOutputStream();
-                    os.write(jsonModificar.toString().getBytes("UTF-8"));
-                    os.close();
-
-                    // Se recibe y procesa la respuesta del servidor
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    br.close();
-
-                    // Se retorna la respuesta obtenida del servidor
-                    return response.toString();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(String response) {
-                if (response != null) {
-                    try {
-                        // Se procesa la respuesta del servidor, interpretando los datos en formato JSON
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
-
-                        // Se verifica si la modificación fue exitosa y se muestra un mensaje acorde
-                        if ("correcto".equals(estado)) {
-                            Toast.makeText(context, "Cliente modificado correctamente", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    // Se muestra un mensaje si hubo un problema con la conexión al servidor
-                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
-                }
-            }
-        }.execute();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    public void eliminarCliente(Context context, int id_cliente, final deleteCallback callback) {
-        new AsyncTask<Void, Void, String>() {
-
-            @Override
-            protected String doInBackground(Void... voids) {
-                try {
-                    URL url = new URL(BASE_URL+"db_delete.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-                    conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
-                    conexion.setDoOutput(true);
-
-                    JSONObject jsonEliminar = new JSONObject();
-                    jsonEliminar.put("id_cliente", id_cliente);
-
-                    OutputStream os = conexion.getOutputStream();
-                    os.write(jsonEliminar.toString().getBytes("UTF-8"));
-                    os.close();
-
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    br.close();
-                    return response.toString();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            protected void onPostExecute(String response) {
-                if (response != null) {
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
-
-                        if ("correcto".equals(estado)) {
-                            Toast.makeText(context, "Cliente eliminado correctamente", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(context, mensaje, Toast.LENGTH_LONG).show();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
-                }
-            }
-        }.execute();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    public void listarDiapositivasPorTest(Context context, final int idTest, final DiapositivasCallback callback) {
-        new AsyncTask<Void, Void, ArrayList<Diapositiva>>() {
-            @Override
-            protected ArrayList<Diapositiva> doInBackground(Void... voids) {
-                ArrayList<Diapositiva> listaDiapositivas = new ArrayList<>();
-                try {
-                    // Construimos la URL, pasando idTest como parámetro GET
-                    URL url = new URL(BASE_URL + "db_diapositivas_by_test.php?id_test=" + idTest);
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-                    conexion.setRequestMethod("GET");
-                    conexion.setRequestProperty("Accept", "application/json");
-
-                    // Leemos la respuesta del servidor
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String linea;
-                    while ((linea = br.readLine()) != null) {
-                        response.append(linea);
-                    }
-                    br.close();
-
-                    // Procesar el JSON
-                    JSONObject jsonResponse = new JSONObject(response.toString());
-                    String estado = jsonResponse.getString("estado");
-
-                    if (estado.equals("correcto")) {
-                        JSONArray datos = jsonResponse.getJSONArray("datos");
-                        for (int i = 0; i < datos.length(); i++) {
-                            JSONObject obj = datos.getJSONObject(i);
-
-                            // Extrae todos los campos que tengas en la tabla diapositivas
-                            int id_diapositiva = obj.getInt("id_diapositiva");
-                            int id_estudio = obj.getInt("id_estudio");
-                            int n_diapositivas = obj.getInt("n_diapositivas");
-                            boolean timer = obj.getBoolean("timer");
-                            int tiempo = obj.getInt("tiempo");
-                            int n_respuestas = obj.getInt("n_respuestas");
-                            int respuesta_correcta = obj.getInt("respuesta_correcta");
-                            String foto = obj.getString("foto");
-
-                            // Crea el objeto Diapositiva
-                            Diapositiva diapositiva = new Diapositiva(
-                                    id_diapositiva,
-                                    id_estudio,
-                                    n_diapositivas,
-                                    timer,
-                                    tiempo,
-                                    n_respuestas,
-                                    respuesta_correcta,
-                                    foto
-                            );
-                            listaDiapositivas.add(diapositiva);
+                                    if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
+                                        title_tutor.setVisibility(View.GONE);
+                                        et_tutor.setVisibility(View.GONE);
+                                        et_tutor.setText(null);
+                                        et_tutor.setEnabled(false);  // Deshabilitar campo tutor si es mayor de edad
+                                        Log.d("Fecha", "Es mayor de edad, se deshabilita el campo tutor");
+                                    } else {
+                                        title_tutor.setVisibility(View.VISIBLE);
+                                        et_tutor.setVisibility(View.VISIBLE);
+                                        et_tutor.setEnabled(true);  // Habilitar campo tutor si es menor de edad
+                                        Log.d("Fecha", "Es menor de edad, se habilita el campo tutor");
+                                    }
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return listaDiapositivas;
+                });
             }
+        });
 
+        bt_modificar_aceptar.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected void onPostExecute(ArrayList<Diapositiva> listaDiapositivas) {
-                if (callback != null) {
-                    callback.onDiapositivasListadas(listaDiapositivas);
+            public void onClick(View view) {
+
+                //Verificar comprobaciones genrales de ingreso de datos
+                if (!comprobación_de_relleno_formulario()) {
+                    return;
+                }
+
+                //Comprobar que los nombres no existen ya en otros clientes
+                if (!nombreYDniNoRepetidos(cliente_selecionado_id, et_name.getText().toString(), et_surname.getText().toString(), et_dni.getText().toString(), lista_clientes)) {
+                    Toast.makeText(Ficha_cliente.this, "Nombre o DNI ya exstentes en la base de datos", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //Si no es mayor de edad aparece campro tuor
+                if (!Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada) &&
+                        (et_tutor.getText().toString().trim().isEmpty() || et_tutor.getText().toString().equalsIgnoreCase(""))) {
+                    Toast.makeText(Ficha_cliente.this, "Es menor de edad, debes incluir un tutor", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //Si no lo es se modifica el contenido del editTest
+                if (Utilidades.esMayorDeEdad(fecha_nacimiento_Seleccionada)) {
+                    et_tutor.setText("");
+                }
+
+                //Recogemos contenido de los editTest
+                String nombre = et_name.getText().toString();
+                String surname = et_surname.getText().toString();
+                String dni = et_dni.getText().toString();
+                int tlf = Integer.parseInt(et_tlf.getText().toString());
+                String email = et_mail.getText().toString();
+                String street = et_street.getText().toString();
+                int cp = Integer.parseInt(et_cp.getText().toString());
+                String city = et_city.getText().toString();
+                String tutor = et_tutor.getText().toString();
+
+                Cliente cli = new Cliente(cliente_selecionado_id, nombre, surname, dni, fecha_nacimiento_Seleccionada, tlf, email, tutor, cp, city, street);
+                modificar_cliente_aqui_BBDD(cli);
+
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    cargar_array_list_BBDD();
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                        cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
+                        campos_ficha_editables(false);
+                        visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
+                        visibilidad_Textviews(true, new TextView[]{title_purebas, title_tutor});
+                        iv_foto.setVisibility(View.VISIBLE);
+                        title_age.setText("Edad:");
+                        et_age.setText(String.valueOf(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).calcularEdad()));
+                        desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
+                    }, 1000); // 5000 milisegundos = 5 segundos
+                }, 1000); // 5000 milisegundos = 5 segundos
+            }
+        });
+
+        bt_modificar_salir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cargar_cliente_en_ficha(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes));
+                title_age.setText("Edad");
+                et_age.setText(String.valueOf(obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).calcularEdad()));
+                visibilidad_botones(false, new Button[]{bt_modificar_aceptar, bt_modificar_salir});
+                iv_foto.setVisibility(View.VISIBLE);
+                desactivar_activar_Botones(true, new Button[]{bt_delete, bt_test, bt_update, bt_insert});
+            }
+        });
+
+
+        //RESTO DE BOTONES
+        bt_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tv_id.getText().toString().isEmpty()) {
+                    Toast.makeText(Ficha_cliente.this, "Debes selecionar un cliente previamente", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //Dialogo que pide ratificacion en los cambios
+                new AlertDialog.Builder(Ficha_cliente.this)
+                        .setTitle("Confirmación")
+                        .setMessage("¿Estás seguro de que uqiere eliminar el cliente " + obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getName() + " " + obtener_cliente_por_id(cliente_selecionado_id, lista_clientes).getSurname() + "?")  // Mensaje que se mostrará
+                        .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                elimnar_cliente_aqui_BBDD();
+                                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                                    cargar_array_list_BBDD();
+                                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                                        actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                                        campos_ficha_visibilidad(false);
+                                        title_age.setText("Edad:");
+                                        desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
+                                        bt_result.setVisibility(View.GONE);
+                                    }, 1000); // 5000 milisegundos = 5 segundos
+                                }, 1000); // 5000 milisegundos = 5 segundos
+                            }
+                        })
+                                .
+
+                        setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Acción a realizar si el usuario presiona "No"
+                                dialog.dismiss();  // Cierra el diálogo
+                            }
+                        })
+                                .
+
+                        show();
+            }
+        });
+
+        bt_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (datos_test_realizado == null) {
+                    abrir_actividad_test_TVPS();
                 } else {
-                    Log.e("Error", "Callback es null en listarDiapositivas");
+                    if (datos_test_realizado.es_posible_realizar_tvps()) {
+                        abrir_actividad_test_TVPS();
+                    } else {
+                        mostrar_dialogo("Todavía no han pasado 6 meses desde la última prueba realizada.\nDebe espeerar a pasr el test hasta despues de la fecha de revisión");
+                    }
                 }
             }
-        }.execute();
-    }
+        });
 
-    @SuppressLint("StaticFieldLeak")
-    public void obtenerTestRealizadoPorId(final Context context, final int idTestRealizado, final TestRealizadoCallback callback) {
-        new AsyncTask<Void, Void, Test_realizado>() {
+        ib_exit.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected Test_realizado doInBackground(Void... voids) {
-                try {
-                    // 1. Construir la URL con el parámetro id_test_realizado
-                    URL url = new URL(BASE_URL + "db_test_realizado.php?id_test_realizado=" + idTestRealizado);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty("Accept", "application/json");
-
-                    // 2. Leer la respuesta JSON
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    br.close();
-
-                    // 3. Parsear el JSON
-                    JSONObject root = new JSONObject(sb.toString());
-                    if (!"correcto".equals(root.getString("estado"))) {
-                        return null;
-                    }
-                    JSONObject obj = root.getJSONObject("dato");
-
-                    // 4. Formateador de fechas
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-                    // 5. Extraer campos
-                    int idTR           = obj.getInt("id_test_realizado");
-                    int idTest         = obj.getInt("id_test");
-
-                    Date fecha = null;
-                    String f1 = obj.optString("fecha", null);
-                    if (f1 != null && !f1.equals("null") && !f1.isEmpty()) {
-                        fecha = sdf.parse(f1);
-                    }
-
-                    Date fechaProx = null;
-                    String f2 = obj.optString("fecha_proxima_revision", null);
-                    if (f2 != null && !f2.equals("null") && !f2.isEmpty()) {
-                        fechaProx = sdf.parse(f2);
-                    }
-
-                    int idCliente     = obj.getInt("id_cliente");
-                    int idEmpleado    = obj.getInt("id_empleado");
-                    String resultado  = obj.getString("resultado");
-
-                    // 6. Instanciar y devolver
-                    return new Test_realizado(
-                            idTR,
-                            idTest,
-                            fecha,
-                            fechaProx,
-                            idCliente,
-                            idEmpleado,
-                            resultado
-                    );
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
+            public void onClick(View view) {
+                Intent intento = new Intent(Ficha_cliente.this, MainActivity.class);
+                startActivity(intento);
             }
-
-            @Override
-            protected void onPostExecute(Test_realizado test) {
-                if (callback != null) {
-                    callback.onTestRealizadoObtenido(test);
-                }
-            }
-        }.execute();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    public void insertarTestRealizado(Context context, Test_realizado test, final insertarTestCallback callback) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                /*
-                 * Realiza la conexión HTTP en segundo plano para insertar un nuevo registro
-                 * de test realizado en la base de datos remota
-                 */
-                try {
-                    Calendar calendar = Calendar.getInstance();
-                    Date fechaActual = new Date();
-                    calendar.setTime(fechaActual);
-                    calendar.add(Calendar.MONTH, 5);
-                    Date fechaProximaRevision = calendar.getTime();
-
-                    // Configuración de la conexión HTTP
-                    URL url = new URL(BASE_URL+"db_test_realizados_insert.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-                    conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
-                    conexion.setDoOutput(true);
-
-                    // Formateo de fechas al estándar ISO para la base de datos
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    String fechaStr = dateFormat.format(fechaActual);
-                    String fechaProximaStr = dateFormat.format(fechaProximaRevision);
-
-
-                    // Construcción del objeto JSON con los datos del test
-                    JSONObject jsonTest = new JSONObject();
-                    jsonTest.put("id_test", test.getId_test());
-                    jsonTest.put("fecha", fechaStr != null ? fechaStr : "");
-                    jsonTest.put("fecha_proxima_revision", fechaProximaStr != null ? fechaProximaStr : "");
-                    jsonTest.put("id_cliente", test.getId_cliente());
-                    jsonTest.put("id_empleado", test.getId_empleado());
-                    jsonTest.put("resultado", test.getResultado() != null ? test.getResultado() : "");
-                    Log.d("INSERT_TEST", "Enviando datos: " + jsonTest.toString());
-
-                    // Envío de los datos a través del stream de salida
-                    OutputStream os = conexion.getOutputStream();
-                    os.write(jsonTest.toString().getBytes("UTF-8"));
-                    os.close();
-
-                    // Lectura de la respuesta del servidor
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    br.close();
-                    return response.toString();
-
-                } catch (Exception e) {
-                    Log.e("INSERT_TEST", "Error al crear JSON: " + e.getMessage());
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(String response) {
-                if (response != null) {
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-
-                        if ("correcto".equals(estado)) {
-                            int idInsertado = jsonResponse.optInt("id_insertado", -1);
-                            if (callback != null) callback.onSuccess(idInsertado);
-                        } else {
-                            String mensaje = jsonResponse.optString("mensaje", "Error desconocido");
-                            if (callback != null) callback.onError(mensaje);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        if (callback != null) callback.onError("Error al procesar la respuesta del servidor");
-                    }
-                } else {
-                    if (callback != null) callback.onError("Error de conexión");
-                }
-            }
-
-        }.execute();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    public void actualizarEstadoTestCliente(Context context, int idCliente, boolean testCompletado, int idTestRealizado, final UpdateCompletadoCallback callback) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                try {
-                    URL url = new URL(BASE_URL + "db_update_test_completado.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-                    conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
-                    conexion.setDoOutput(true);
-
-                    // Crear JSON con los datos a enviar
-                    JSONObject json = new JSONObject();
-                    json.put("id_cliente", idCliente);
-                    json.put("test_completado", testCompletado ? 1 : 0);
-                    json.put("id_test_realizado", idTestRealizado);
-
-                    // Enviar JSON al servidor
-                    OutputStream os = conexion.getOutputStream();
-                    os.write(json.toString().getBytes("UTF-8"));
-                    os.close();
-
-                    // Leer respuesta del servidor
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        response.append(line.trim());
-                    }
-                    br.close();
-
-                    return response.toString();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(String response) {
-                if (response != null) {
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
-
-                        if ("correcto".equals(estado)) {
-                            Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show();
-                            if (callback != null) callback.updateCompletadoCallback(mensaje);
-                        } else {
-                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
-                            if (callback != null) callback.updateCompletadoCallback("Error: " + mensaje);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
-                }
-            }
-        }.execute();
+        });
     }
 
     /**
-     * Obtiene un ArrayList de estudios desde el servidor.
-     *
-     * @param context Contexto de la aplicación
-     * @param callback Callback para manejar la respuesta con la lista de estudios
+     * Abre la actividad para pasar el est TVPS
      */
-    @SuppressLint("StaticFieldLeak")
-    public void listarEstudios(Context context, final ListarEstudiosCallback callback) {
-        new AsyncTask<Void, Void, ArrayList<Estudio>>() {
-            @Override
-            protected ArrayList<Estudio> doInBackground(Void... voids) {
-                ArrayList<Estudio> listaEstudios = new ArrayList<>();
-                HttpURLConnection conexion = null;
-                BufferedReader br = null;
-
-                try {
-                    URL url = new URL(BASE_URL + "db_select_estudios.php");
-                    conexion = (HttpURLConnection) url.openConnection();
-                    conexion.setRequestMethod("GET");
-                    conexion.setRequestProperty("Accept", "application/json");
-
-                    br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "utf-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-
-                    JSONObject jsonObject = new JSONObject(response.toString());
-                    String estado = jsonObject.getString("estado");
-
-                    if (estado.equals("correcto")) {
-                        JSONArray jsonListado = jsonObject.getJSONArray("datos");
-                        for (int i = 0; i < jsonListado.length(); i++) {
-                            JSONObject jsonEstudio = jsonListado.getJSONObject(i);
-
-                            Estudio estudio = new Estudio(
-                                    jsonEstudio.getInt("id_estudio"),
-                                    jsonEstudio.getString("nombre_estudio"),
-                                    jsonEstudio.getString("descripcion_instrucciones")
-                            );
-                            listaEstudios.add(estudio);
-                        }
-                    }
-
-                } catch (Exception e) {
-                    Log.e("Error", "Error al obtener los estudios", e);
-                } finally {
-                    if (conexion != null) {
-                        conexion.disconnect();
-                    }
-                    if (br != null) {
-                        try {
-                            br.close();
-                        } catch (IOException e) {
-                            Log.e("Error", "Error al cerrar BufferedReader", e);
-                        }
-                    }
-                }
-                return listaEstudios;
-            }
-
-            @Override
-            protected void onPostExecute(ArrayList<Estudio> listaEstudios) {
-                if (callback != null) {
-                    callback.onListarEstudiosCallback(listaEstudios);
-                } else {
-                    Log.e("Error", "Callback es null en listarEstudios");
-                    Toast.makeText(context, "Error interno: callback no definido", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }.execute();
+    public void abrir_actividad_test_TVPS() {
+        int idEmpleado = getIntent().getIntExtra("idEmpleado", -1);
+        int edad = Integer.parseInt(et_age.getText().toString());
+        Intent intent = new Intent(Ficha_cliente.this, Actividad_Test_TVPS.class);
+        intent.putExtra("idCliente", cliente_selecionado_id);
+        intent.putExtra("edadCliente", edad);
+        intent.putExtra("idEmpleado", idEmpleado);
+        intent.putExtra("usuario", nombre_empleado);
+        startActivity(intent);
     }
 
+    /**
+     * Muestra un dialogo que hay que aceptar con la frase que se pasa como parámetro
+     *
+     * @param texto
+     */
+    public void mostrar_dialogo(String texto) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Ficha_cliente.this);
+        builder.setTitle("Resultados Finales del Test ")
+                .setMessage(texto)
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    // Puedes cerrar o hacer algo al aceptar
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+
+    //METOOS RELACIONADOS CON LAS CONSULTAS A LA BBDD
+
+    /**
+     * Carga el array con los datos de los clientes mediante la consulta a la BBDD
+     */
+    public void cargar_array_list_BBDD() {
+        // Metodo que carga la lista en el arrayList
+        gestionBBDD.listarClientes(this, new GestionBBDD.ClienteCallback() {
+            @Override
+            public void onClientesListados(ArrayList<Cliente> clientes) {
+                if (clientes != null && !clientes.isEmpty()) {
+                    lista_clientes.clear();
+                    lista_clientes.addAll(clientes);
+
+                    for (Cliente cliente : lista_clientes) {
+                        Log.d("Cliente", "ID: " + cliente.getId() + ", Nombre: " + cliente.getName());
+                    }
+                    // Mostrar mensaje con el número de clientes cargados
+                    Toast.makeText(Ficha_cliente.this, "Clientes cargados: " + lista_clientes.size(), Toast.LENGTH_LONG).show();
+                    actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                } else {
+                    Toast.makeText(Ficha_cliente.this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    /**
+     * Elimina el clinete de la base de datos
+     */
+    public void elimnar_cliente_aqui_BBDD() {
+        gestionBBDD.eliminarCliente(Ficha_cliente.this, cliente_selecionado_id, new GestionBBDD.deleteCallback() {
+            @Override
+            public void onClienteEliminado(String respuesta) {
+
+                try {
+                    JSONObject jsonResponse = new JSONObject(respuesta);
+                    String estado = jsonResponse.getString("estado"); // Extraer el estado
+                    if (!estado.equalsIgnoreCase("correcto")) {
+                        Toast.makeText(getApplicationContext(), "Error al eliminar cliente", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    Log.e("EliminarCliente", "Error al parsear JSON: " + e.getMessage());
+                    runOnUiThread(() ->
+                            Toast.makeText(getApplicationContext(), "Error en la respuesta del servidor", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }
+        });
+    }
+
+    /**
+     * Inserta el nuevo cliente en la base de datos
+     *
+     * @param cli
+     */
+    public void insertar_cliente_aqui_BBDD(Cliente cli) {
+        gestionBBDD.insertarCliente(Ficha_cliente.this, cli, new GestionBBDD.insertCallback() {
+            @Override
+            public void onClienteInsertado(String respuesta) {
+                if (respuesta != null) {
+
+                    gestionBBDD.listarClientes(Ficha_cliente.this, new GestionBBDD.ClienteCallback() {
+                        @Override
+                        public void onClientesListados(ArrayList<Cliente> clientes) {
+                            if (clientes != null) {
+                                lista_clientes.clear();
+                                lista_clientes.addAll(clientes);
+                                //Comprobaciones
+                                Log.d("DEBUG", "Clientes después de insertar: " + clientes.size());
+                                for (Cliente c : clientes) {
+                                    Log.d("DEBUG", "Cliente: " + c.getName() + " " + c.getSurname());
+                                }
+                                // Mostrar mensaje con el número de clientes cargados
+                                Toast.makeText(Ficha_cliente.this, "Clientes cargados: " + lista_clientes.size(), Toast.LENGTH_LONG).show();
+                                actualizar_nombres_buscador(lista_clientes, buscar_clientes);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * Modifica el cliente de la BBDD
+     *
+     * @param cli
+     */
+    public void modificar_cliente_aqui_BBDD(Cliente cli) {
+        gestionBBDD.modificarCliente(Ficha_cliente.this, cli, new GestionBBDD.updateCallback() {
+
+            @Override
+            public void onClienteModificado(String respuesta) {
+
+                try {
+                    JSONObject jsonResponse = new JSONObject(respuesta);
+                    String estado = jsonResponse.getString("estado"); // Extraer el estado
+
+                    if (estado.equalsIgnoreCase("correcto")) {
+                        gestionBBDD.listarClientes(Ficha_cliente.this, new GestionBBDD.ClienteCallback() {
+                            @Override
+                            public void onClientesListados(ArrayList<Cliente> clientes) {
+                                if (clientes != null) {
+                                    lista_clientes.clear();
+                                    lista_clientes.addAll(clientes);
+                                }
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    Log.e("ModificarcCliente", "Error al parsear JSON: " + e.getMessage());
+                    runOnUiThread(() ->
+                            Toast.makeText(getApplicationContext(), "Error en la respuesta del servidor", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }
+        });
+
+    }
+
+    /**
+     * Carga los datos relacionaos con el test realizado TVPS desde la BBDD
+     *
+     * @param id
+     */
+    public void cargar_datos_test_realizado_por_usuario_BBDD(int id) {
+        gestionBBDD.obtenerTestRealizadoPorId(Ficha_cliente.this, id, new GestionBBDD.TestRealizadoCallback() {
+            @Override
+            public void onTestRealizadoObtenido(Test_realizado testRealizado) {
+                if (testRealizado != null) {
+                    datos_test_realizado = testRealizado;
+                    tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
+                    bt_result.setVisibility(View.VISIBLE);
+
+                    Toast.makeText(
+                            Ficha_cliente.this,
+                            "ID Cliente: " + testRealizado.getId_cliente() +
+                                    "\nID Test: " + testRealizado.getId_test_realizado() +
+                                    "\nFecha próxima revisión: " + testRealizado.getFecha_proxima_revision() +
+                                    "\nResultado: " + testRealizado.getResultado(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                } else {
+                    // Si no hay test, ocultamos campos relacionados
+                    visibilidad_Textviews(false, new TextView[]{title_test_TVPS, title_next_date_test, tv_next_text});
+                    bt_result.setVisibility(View.GONE);
+                    Toast.makeText(Ficha_cliente.this, "Este cliente no tiene test TVPS realizado.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+    //MÉTODOS QUE  EJECUTAN ACCIONES CONCRETAS RELACIONADAS CON QUÉ Y COMO SE MUESTRAN LOS COMPONENTES DE LA ACTIVIDAD Y LOS DATOS
+
+    /**
+     * Modifica el cliente modificado en el Arraylist (lista de clientes en memoria)
+     *
+     * @param clienteId
+     * @param nuevoCliente
+     * @return
+     */
+    public static boolean modificar_Cliente_EnLista(int clienteId, Cliente nuevoCliente) {
+
+        boolean ok = false;
+        for (int i = 0; i < lista_clientes.size(); i++) {
+            Cliente cliente = lista_clientes.get(i);
+
+            // Si encontramos al cliente con el ID correspondiente
+            if (cliente.getId() == clienteId) {
+                // Actualizar el cliente con los nuevos datos
+                lista_clientes.set(i, nuevoCliente);  // Reemplazar el cliente en la lista
+                ok = true;
+                break;  // Salir del bucle cuando encontramos al cliente
+            }
+        }
+        return ok;
+    }
+
+    /**
+     * Metodo que muestra los datos de un cliente en la ficha
+     *
+     * @param cli
+     */
+    public void cargar_cliente_en_ficha(Cliente cli) {
+
+        //Los campos de los datos del cliente no se pueden editar
+        campos_ficha_editables(false);
+        //activo botones restantes
+        desactivar_activar_Botones(true, new Button[]{bt_update, bt_delete, bt_test});
+        //Invisibilizo los botones de manipular modificar y de insertar
+        visibilidad_botones(false, new Button[]{bt_modificar_salir, bt_modificar_aceptar, bt_insertar_aceptar, bt_insertar_salir});
+
+        //Cargo los campos báscios
+        if (cli != null) {
+            //Hago visible los campos de la ficha y cargo los datos
+            campos_ficha_visibilidad(true);
+            campos_ficha_editables(false);
+
+            tv_id.setText(String.valueOf(cli.getId()));
+            et_name.setText(cli.getName());
+            et_surname.setText(cli.getSurname());
+            et_dni.setText(cli.getDni());
+            et_city.setText(cli.getCiudad());
+            et_cp.setText(String.valueOf(cli.getCp()));
+            et_tlf.setText(String.valueOf(cli.getTlf()));
+            et_mail.setText(cli.getEmail());
+            et_street.setText(cli.getStreet());
+            et_age.setText(String.valueOf(cli.calcularEdad()));
+
+            //Compruebo si el cliente está graduado
+            if (cli.calcularEdad() < 18){
+                et_tutor.setText(cli.getTutor());
+            }else {
+                et_tutor.setVisibility(View.GONE);
+                title_tutor.setVisibility(View.GONE);
+            }
+            if (cli.getGraduate()) {
+                tv_fecha_gradu.setText(formatear_Fecha_string(cli.getDate_graduacion()));
+                tv_tipo_lente.setText(cli.getTipo_lentes());
+            } else {
+                visibilidad_Textviews(false, new TextView[]{title_graduacion, title_fecha_gradu, title_tipo_lente, tv_fecha_gradu, tv_tipo_lente});//, tv_graduacion
+            }
+            //Compruebo si el cliente ha pasado el TVPS
+            if (cli.getTest_TVPS()) {
+                cargar_datos_test_realizado_por_usuario_BBDD(cli.getId_test_realizado());
+            } else {
+                datos_test_realizado = new Test_realizado();
+                visibilidad_Textviews(false, new TextView[]{title_test_TVPS, title_next_date_test, tv_next_text});
+                bt_result.setVisibility(View.GONE);
+            }
+            //En caso de que no tenga nincuna prueba diagnóstica
+            if (!cli.getGraduate() && !cli.getTest_TVPS()) {
+                tv_fecha_gradu.setVisibility(View.VISIBLE);
+                tv_fecha_gradu.setText("No tiene pruebas diagnósticas todavía");
+                visibilidad_Textviews(false, new TextView[]{title_graduacion, title_test_TVPS});
+            }
+
+            bt_result.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mostrar_dialogo(cargar_datos_en_boton_resultado(cli, datos_test_realizado));
+                }
+            });
+
+        } else {
+            Log.d("cliente nullo", "error cliente nulo - funcion cargar ficha cliente: ");
+        }
+    }
+
+    /**
+     * Método que devuelve un String con la información del test realizado de un cliente en concreto
+     * @param cli
+     * @param testRealizado
+     * @return
+     */
+    public String cargar_datos_en_boton_resultado(Cliente cli, Test_realizado testRealizado) {
+        String fecha_test = formatear_Fecha_string(testRealizado.getFecha());
+        String fecha_prox = formatear_Fecha_string(testRealizado.getFecha_proxima_revision());
+
+        return "ID Test: " + testRealizado.getId_test_realizado() +
+                "\n Cliente: " + cli.getName() + " " + cli.getSurname() +
+                "\nFecha de realización: " + fecha_test +
+                "\nFecha próxima revisión: " + fecha_prox +
+                "\nResultado: \n\n" + testRealizado.getResultado();
+    }
+
+    /**
+     * Modifica los nombres de los clientes en el buscador según se haya actualizado la lista de clientes
+     *
+     * @param lista
+     * @param buscador
+     */
+    public void actualizar_nombres_buscador(ArrayList<Cliente> lista, AutoCompleteTextView buscador) {
+        String[] nombres = new String[lista.size()];
+        for (int i = 0; i < lista.size(); i++) {
+            Cliente cli = lista.get(i);
+            nombres[i] = cli.getName() + " " + cli.getSurname();
+        }
+
+        ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, nombres);
+        buscador.setAdapter(adaptador);
+        buscador.setThreshold(1);
+
+        // Fuerzo redibujado y cierre de dropdown
+        buscador.dismissDropDown();
+        buscador.setText("");
+    }
+
+    /**
+     * Metodo quehace comprobaciones de la insercion de datos por parte del usuario en el formulario
+     *
+     * @return
+     */
+    public boolean comprobación_de_relleno_formulario() {
+
+        // Verificar si hay campos vacíos antes de cualquier validación
+        if (Utilidades.campos_estan_vacios(et_dni, et_age, et_tlf, et_name, et_surname, et_mail, et_street, et_cp, et_city)) {
+            Toast.makeText(Ficha_cliente.this, "Debes rellenar todos los campos editables antes de continuar", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Verificar si el teléfono tiene exactamente 9 dígitos
+        String telefono = et_tlf.getText().toString().trim();
+        if (!telefono.matches("\\d{9}")) {
+            Toast.makeText(Ficha_cliente.this, "El teléfono debe contener exactamente 9 dígitos", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Verificar si el CP tiene exactamente 5 dígitos
+        String codigoPostal = et_cp.getText().toString().trim();
+        if (!codigoPostal.matches("\\d{5}")) {
+            Toast.makeText(Ficha_cliente.this, "El código postal debe contener exactamente 5 dígitos", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Verificar correo electrónico
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(et_mail.getText().toString().trim()).matches()) {
+            Toast.makeText(Ficha_cliente.this, "Introduce un correo electrónico válido", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Verificar si la fecha ha sido seleccionada
+        if (et_age.getText().toString().trim().isEmpty()) {
+            Toast.makeText(Ficha_cliente.this, "Debes seleccionar una fecha de nacimiento", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Verificar formato fecha y modificar la fecha en variable general
+        try {
+            fecha_nacimiento_Seleccionada = formatear_texto_a_fecha(et_age.getText().toString().trim());
+            Log.d("Fecha Nacimiento", "Fecha: " + fecha_nacimiento_Seleccionada.toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(Ficha_cliente.this, "El formato de la fecha es incorrecto", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (fecha_valida(fecha_nacimiento_Seleccionada)) {
+        } else {
+            Toast.makeText(Ficha_cliente.this, "El Cliente debe tener entre 1 y 100 años", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+
+    //MÉTODOS QUE INICIALIZAN LOS COMPONENTES Y MODIFICAN LO QUE SEMUESTRA EN LA VISTA DE LA ACTIVIDAD
+
+    /**
+     * Método que prepara como se muestra el formulario de inserción
+     */
+    public void preparar_formulario_insert() {
+        //1. Pongo los campos visibles
+        campos_ficha_visibilidad(true);
+
+        EditText[] edit = new EditText[]{
+                et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city
+        };
+        // 2. Seteo el texto por defecto
+        for (EditText ed : edit) {
+            ed.setText("");
+        }
+        // Pongo un testo hint a cada campo
+        et_name.setHint("Escribe el nombre");
+        et_surname.setHint("Escribe el nombre");
+        et_dni.setHint("Escriba aquí");
+        et_tlf.setHint("Escriba aquí");
+        et_tutor.setHint("Si es menor de edad");
+        et_mail.setHint("ejemplo@ejemplo.es");
+        et_city.setHint("Escriba aquí");
+        et_cp.setHint("5 dígitos");
+        et_street.setHint("Escriba aquí");
+
+        // EL campo tutor lo hago invisible y lo deshabilito por el moemento
+        et_tutor.setEnabled(false);
+        et_tutor.setVisibility(View.GONE);
+        title_tutor.setVisibility(View.GONE);
+
+        //Cambio el titulo de edad a fecha y hago un listner para que cuando se toque el campo se habra selector y cuando se selecione guardo la variable
+        title_age.setText("Fecha de nacimiento");
+        et_age.setHint("Selecciona una fecha");
+        et_age.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Mostrar el DatePicker y obtener la fecha seleccionada
+                mostrarDatePicker(new DatePickerCallback() {
+                    @Override
+                    public void onDateSelected(Date selectedDate) {
+                        // Guardar la fecha seleccionada en la variable
+                        fecha_nacimiento_Seleccionada = selectedDate;
+                        et_age.setText(formatear_Fecha_string(fecha_nacimiento_Seleccionada));
+                    }
+                });
+            }
+        });
+
+        //Permito que los campos oportunos sean editables
+        campos_ficha_editables(true);
+
+        visibilidad_Textviews(false, new TextView[]{title_purebas, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS,
+                title_next_date_test, title_id, tv_id, tv_fecha_gradu, tv_tipo_lente, tv_next_text, tv_id}); // tv_graduacion,
+        iv_foto.setVisibility(View.GONE);
+    }
+
+    /**
+     * Metodo que inicializa todos los componentes
+     */
+    public void inicializar_componentes() {
+        //Inicializo los componentes parte izquierda
+        buscar_clientes = findViewById(R.id.autoct_buscador);
+        //sp_clientes = findViewById(R.id.sp_clientes);
+        tv_user = findViewById(R.id.tv_user);
+        title_seleciona = findViewById(R.id.textview_10);
+        title_acciones = findViewById(R.id.textview_11);
+        bt_insert = findViewById(R.id.bt_insert);
+        bt_update = findViewById(R.id.bt_update);
+        bt_delete = findViewById(R.id.bt_delete);
+        bt_test = findViewById(R.id.bt_test);
+        ib_exit = findViewById(R.id.ib_exit);
+        desactivar_activar_Botones(false, new Button[]{bt_update, bt_delete, bt_test});
+
+        ib_exit = findViewById(R.id.ib_exit);
+        bt_modificar_aceptar = findViewById(R.id.bt_aceptar);
+        bt_modificar_salir = findViewById(R.id.bt_salir);
+        bt_insertar_aceptar = findViewById(R.id.bt_aceptar_insert);
+        bt_insertar_salir = findViewById(R.id.bt_salir_insertar);
+        bt_modificar_aceptar.setVisibility(View.GONE);
+        bt_modificar_salir.setVisibility(View.GONE);
+        bt_insertar_aceptar.setVisibility(View.GONE);
+        bt_insertar_salir.setVisibility(View.GONE);
+
+        bt_result = findViewById(R.id.bt_resultados);
+        bt_result.setVisibility(View.GONE);
+
+        //Inicializo componentes de la derecha
+        title_datos_person = findViewById(R.id.textView);
+        title_dni = findViewById(R.id.textView_2);
+        title_age = findViewById(R.id.textView_1);
+        title_tlf = findViewById(R.id.textView_3);
+        title_tutor = findViewById(R.id.textView_4);
+        title_mail = findViewById(R.id.textView_5);
+        title_direc = findViewById(R.id.textView_6);
+        title_street = findViewById(R.id.textView_7);
+        title_cp = findViewById(R.id.textView_8);
+        title_city = findViewById(R.id.textView_9);
+        title_purebas = findViewById(R.id.textView_12);
+        title_graduacion = findViewById(R.id.textView_13);
+        title_fecha_gradu = findViewById(R.id.textView_14);
+        title_tipo_lente = findViewById(R.id.textView_15);
+        title_test_TVPS = findViewById(R.id.textView_16);
+        title_next_date_test = findViewById(R.id.textView_18);
+        title_id = findViewById(R.id.textView_19);
+
+        tv_id = findViewById(R.id.tv_id);
+        et_dni = findViewById(R.id.et_dni);
+        et_age = findViewById(R.id.et_age);
+        et_tlf = findViewById(R.id.et_tel);
+        et_tutor = findViewById(R.id.et_tutor);
+        et_surname = findViewById(R.id.et_surname);
+        et_name = findViewById(R.id.et_name);
+        et_mail = findViewById(R.id.et_mail);
+        et_street = findViewById(R.id.et_street);
+        et_cp = findViewById(R.id.et_cp);
+        et_city = findViewById(R.id.et_city);
+        tv_fecha_gradu = findViewById(R.id.tv_fecha_graduacion);
+        tv_tipo_lente = findViewById(R.id.tv_tipo_lente);
+        tv_next_text = findViewById(R.id.tv_fecha_proxTVPS);
+        iv_foto = findViewById(R.id.iv_foto);
+        iv_foto.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.foto));
+
+
+    }
+
+    /**
+     * Metodo para modificar que los campos de la ficha sean visibles o no
+     *
+     * @param mostrar
+     */
+    public void campos_ficha_visibilidad(Boolean mostrar) {
+        int visibility = mostrar ? View.VISIBLE : View.GONE;
+        visibilidad_Textviews(mostrar, new EditText[]{et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city});
+        visibilidad_Textviews(mostrar, new TextView[]{
+                tv_id, tv_fecha_gradu, tv_tipo_lente, tv_next_text, title_datos_person, title_dni, title_age, title_tlf, title_tutor, title_mail, title_direc,
+                title_street, title_cp, title_city, title_purebas, title_id, title_graduacion, title_fecha_gradu, title_tipo_lente, title_test_TVPS, title_next_date_test
+        });
+        iv_foto.setVisibility(visibility);
+    }
+
+    /**
+     * Método que permite que los datos personales sean editables en la ficha
+     *
+     * @param editables
+     */
+    public void campos_ficha_editables(boolean editables) {
+        int tipoinput = editables ? InputType.TYPE_CLASS_TEXT : InputType.TYPE_NULL;
+
+        // Lista de EditText en la actividad
+        EditText[] editTexts = new EditText[]{
+                et_dni, et_age, et_tlf, et_tutor, et_name, et_surname, et_mail, et_street, et_cp, et_city
+        };
+
+        // Iterar sobre cada EditText
+        for (EditText editText : editTexts) {
+            // Establecer tipo de entrada
+            editText.setInputType(tipoinput);
+
+            // Hacer editable o no
+            editText.setFocusable(editables);
+            editText.setTextIsSelectable(editables);
+            editText.setEnabled(editables);
+
+            // Cambiar color de texto y fondo
+            editText.setTextColor(Color.parseColor("#2B2B2B"));
+            //editText.setTextColor(editables ? Color.BLUE : Color.BLACK); // Cambiar a negro
+            //editText.setBackgroundColor(editables ? Color.LTGRAY : Color.WHITE); // Fondo blanco o transparente
+        }
+
+    }
+
+    /**
+     * Método que muestra un desplpigable del campo fecha y guarda la fecha seleccionada en una variable
+     *
+     * @param callback
+     */
+    private void mostrarDatePicker(final DatePickerCallback callback) {
+        // Obtener la fecha actual
+        final Calendar calendario = Calendar.getInstance();
+        int anio = calendario.get(Calendar.YEAR);
+        int mes = calendario.get(Calendar.MONTH);
+        int dia = calendario.get(Calendar.DAY_OF_MONTH);
+
+        // Crear y mostrar el DatePickerDialog
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (DatePicker view, int year, int month, int dayOfMonth) -> {
+                    // Crear una nueva fecha con los valores seleccionados
+                    Calendar selectedDate = Calendar.getInstance();
+                    selectedDate.set(year, month, dayOfMonth);  // Configura el año, mes y día
+
+                    // Obtener la fecha seleccionada como un objeto Date
+                    Date fechaSeleccionada = selectedDate.getTime();
+
+                    // Llamar al callback para devolver la fecha
+                    callback.onDateSelected(fechaSeleccionada);
+
+                    // Mostrar la fecha seleccionada en el EditText
+                    et_age.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+                },
+                anio, mes, dia
+        );
+
+        datePickerDialog.show();
+    }
+
+    /**
+     * Poner el nombre del empleado que está logeado
+     */
+    public void poner_nombre_Empleado() {
+        nombre_empleado = getIntent().getStringExtra("usuario");
+        tv_user.setText(nombre_empleado);
+    }
 
 }
