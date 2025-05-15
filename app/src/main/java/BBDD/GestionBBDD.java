@@ -28,7 +28,7 @@ import Clases.Estudio;
 import Clases.Test_realizado;
 
 public class GestionBBDD {
-    public static final String BASE_URL = "http://192.168.56.1/";
+    public static final String BASE_URL = "http://192.168.1.145/";
 
     /**
      * Valida las credenciales del usuario mediante una petición al servidor.
@@ -85,7 +85,7 @@ public class GestionBBDD {
                         if ("correcto".equals(estado)) {
                             // Extraer el ID devuelto, que en el PHP se envía en el campo "id"
                             int idEmpleado = jsonResponse.getInt("id");
-                            Toast.makeText(context, "Inicio de sesión exitoso. ID: " + idEmpleado, Toast.LENGTH_LONG).show();
+                            //Toast.makeText(context, "Inicio de sesión exitoso. ID: " + idEmpleado, Toast.LENGTH_LONG).show();
 
                             // Crear el Intent para pasar al siguiente Activit
                             Intent intent = new Intent(context, Ficha_cliente.class);
@@ -355,98 +355,6 @@ public class GestionBBDD {
             }
         }.execute();
     }
-
-
-    /*@SuppressLint("StaticFieldLeak")
-    public void modificarCliente(Context context, Cliente cliente, final updateCallback callback) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                try {
-                    // Se establece la URL del servicio que procesará la modificación del cliente
-                    URL url = new URL(BASE_URL + "db_update.php");
-                    HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-
-                    // Se configura la conexión para enviar una solicitud POST con datos en formato JSON
-                    conexion.setRequestMethod("POST");
-                    conexion.setRequestProperty("Content-Type", "application/json; utf-8");
-                    conexion.setDoOutput(true);
-
-                    // Se define un formateador de fechas para convertir objetos Date a cadenas en formato "yyyy-MM-dd"
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-                    // Se crea un objeto JSON con los datos del cliente a modificar
-                    JSONObject jsonModificar = new JSONObject();
-                    jsonModificar.put("id_cliente", cliente.getId());
-                    jsonModificar.put("dni", cliente.getDni());
-                    jsonModificar.put("nombre", cliente.getName());
-                    jsonModificar.put("apellidos", cliente.getSurname());
-                    jsonModificar.put("telefono", cliente.getTlf());
-                    jsonModificar.put("email", cliente.getEmail());
-                    jsonModificar.put("calle", cliente.getStreet());
-                    jsonModificar.put("c_p", cliente.getCp());
-                    jsonModificar.put("ciudad", cliente.getCiudad());
-
-                    // Se convierten las fechas a formato de texto antes de enviarlas, evitando valores nulos
-                    jsonModificar.put("fecha_nacimiento", cliente.getDate_born() != null ? dateFormat.format(cliente.getDate_born()) : JSONObject.NULL);
-                    jsonModificar.put("fecha_ultima_graduacion", cliente.getDate_graduacion() != null ? dateFormat.format(cliente.getDate_graduacion()) : JSONObject.NULL);
-
-                    // Se manejan los valores opcionales, enviando null en caso de que no tengan datos
-                    jsonModificar.put("tutor_legal", cliente.getTutor() != null ? cliente.getTutor() : JSONObject.NULL);
-                    jsonModificar.put("graduado", cliente.getGraduate() ? 1 : 0);
-                    jsonModificar.put("tipo_lente", cliente.getTipo_lentes() != null ? cliente.getTipo_lentes() : JSONObject.NULL);
-                    jsonModificar.put("test_completado", cliente.getTest_TVPS() ? 1 : 0);
-                    jsonModificar.put("id_test_realizado", JSONObject.NULL); // Se deja como null si no hay un resultado disponible
-
-                    // Se envía el objeto JSON en el cuerpo de la solicitud
-                    OutputStream os = conexion.getOutputStream();
-                    os.write(jsonModificar.toString().getBytes("UTF-8"));
-                    os.close();
-
-                    // Se recibe y procesa la respuesta del servidor
-                    BufferedReader br = new BufferedReader(new InputStreamReader(conexion.getInputStream(), "UTF-8"));
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    br.close();
-
-                    // Se retorna la respuesta obtenida del servidor
-                    return response.toString();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(String response) {
-                if (response != null) {
-                    try {
-                        // Se procesa la respuesta del servidor, interpretando los datos en formato JSON
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String estado = jsonResponse.getString("estado");
-                        String mensaje = jsonResponse.getString("mensaje");
-
-                        // Se verifica si la modificación fue exitosa y se muestra un mensaje acorde
-                        if ("correcto".equals(estado)) {
-                            Toast.makeText(context, "Cliente modificado correctamente", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(context, "Error: " + mensaje, Toast.LENGTH_LONG).show();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    // Se muestra un mensaje si hubo un problema con la conexión al servidor
-                    Toast.makeText(context, "Error en la conexión", Toast.LENGTH_LONG).show();
-                }
-            }
-        }.execute();
-    }*/
 
     /**
      * Actualiza los datos de un cliente en la base de datos.

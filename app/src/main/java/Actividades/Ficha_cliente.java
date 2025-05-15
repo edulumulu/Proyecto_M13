@@ -272,7 +272,7 @@ public class Ficha_cliente extends AppCompatActivity {
                             }
                         }
                         cliente_selecionado_id = maxId;
-                        Toast.makeText(Ficha_cliente.this, "el id es : " + maxId, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(Ficha_cliente.this, "el id es : " + maxId, Toast.LENGTH_LONG).show();
                         //int id = maxId + 1;
                         actualizar_nombres_buscador(lista_clientes, buscar_clientes);
 
@@ -289,7 +289,7 @@ public class Ficha_cliente extends AppCompatActivity {
                         title_age.setText("Edad:");
                         desactivar_activar_Botones(true, new Button[]{bt_insert, bt_delete, bt_test, bt_update});
                     }, 1000); // 5000 milisegundos = 5 segundos
-                }, 1500); // 5000 milisegundos = 5 segundos
+                }, 1000); // 5000 milisegundos = 5 segundos
 
 
             }
@@ -576,7 +576,7 @@ public class Ficha_cliente extends AppCompatActivity {
                         Log.d("Cliente", "ID: " + cliente.getId() + ", Nombre: " + cliente.getName());
                     }
                     // Mostrar mensaje con el número de clientes cargados
-                    Toast.makeText(Ficha_cliente.this, "Clientes cargados: " + lista_clientes.size(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(Ficha_cliente.this, "Clientes cargados: " + lista_clientes.size(), Toast.LENGTH_LONG).show();
                     actualizar_nombres_buscador(lista_clientes, buscar_clientes);
                 } else {
                     Toast.makeText(Ficha_cliente.this, "No hay clientes disponibles", Toast.LENGTH_SHORT).show();
@@ -632,7 +632,7 @@ public class Ficha_cliente extends AppCompatActivity {
                                     Log.d("DEBUG", "Cliente: " + c.getName() + " " + c.getSurname());
                                 }
                                 // Mostrar mensaje con el número de clientes cargados
-                                Toast.makeText(Ficha_cliente.this, "Clientes cargados: " + lista_clientes.size(), Toast.LENGTH_LONG).show();
+                                //Toast.makeText(Ficha_cliente.this, "Clientes cargados: " + lista_clientes.size(), Toast.LENGTH_LONG).show();
                                 actualizar_nombres_buscador(lista_clientes, buscar_clientes);
                             }
                         }
@@ -693,14 +693,14 @@ public class Ficha_cliente extends AppCompatActivity {
                     tv_next_text.setText(datos_test_realizado.fecha_proxima_buen_formato());
                     bt_result.setVisibility(View.VISIBLE);
 
-                    Toast.makeText(
+                    /*Toast.makeText(
                             Ficha_cliente.this,
                             "ID Cliente: " + testRealizado.getId_cliente() +
                                     "\nID Test: " + testRealizado.getId_test_realizado() +
                                     "\nFecha próxima revisión: " + testRealizado.getFecha_proxima_revision() +
                                     "\nResultado: " + testRealizado.getResultado(),
                             Toast.LENGTH_LONG
-                    ).show();
+                    ).show();*/
                 } else {
                     // Si no hay test, ocultamos campos relacionados
                     visibilidad_Textviews(false, new TextView[]{title_test_TVPS, title_next_date_test, tv_next_text});

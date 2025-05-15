@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 public class Actividad_Test_TVPS extends AppCompatActivity {
 
-    public static final String BASE_URL = "http://192.168.56.1/";
+    public static final String BASE_URL = "http://192.168.1.145/";
     private int id_empleado;
     private int id_cliente;
     private int edad_cliente;
@@ -56,7 +56,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
     private int cont_aciertos_general, cont_aciertos_1, cont_aciertos_2, cont_aciertos_3, cont_aciertos_4, cont_aciertos_5, cont_aciertos_6, cont_aciertos_7;
 
     private int fallos_permitidos = 2;
-    private int tiempo_diapositiva = 1000;
+    private int tiempo_diapositiva = 2000;
     private int indice_actual = 0;
     private int contador_test_Terminados = 0;
 
@@ -94,7 +94,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        Toast.makeText(Actividad_Test_TVPS.this, "Se ha detenido el test sin guardar los cambios", Toast.LENGTH_LONG).show();
+        //Toast.makeText(Actividad_Test_TVPS.this, "Se ha detenido el test sin guardar los cambios", Toast.LENGTH_LONG).show();
         super.onStop();
     }
 //CONJUNTO DE MÉTODOS QUE HACEN CONSULTAS Y MODIFICACIONES EN LA BBDD
@@ -113,7 +113,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                         Log.d("Cliente", "ID: " + diapositiva.getId_diapositiva() + ", Nombre: " + diapositiva.getId_estudio());
                     }
                     // Mostrar mensaje con el número de clientes cargados
-                    Toast.makeText(Actividad_Test_TVPS.this, "Diapositivas cargadas: " + diapositivas.size(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(Actividad_Test_TVPS.this, "Diapositivas cargadas: " + diapositivas.size(), Toast.LENGTH_LONG).show();
 
                 } else {
                     Toast.makeText(Actividad_Test_TVPS.this, "No hay diapositivs disponibles", Toast.LENGTH_SHORT).show();
@@ -130,13 +130,13 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         gestionBBDD.insertarTestRealizado(Actividad_Test_TVPS.this, test, new GestionBBDD.insertarTestCallback() {
             @Override
             public void onSuccess(int idInsertado) {
-                Toast.makeText(Actividad_Test_TVPS.this, "Insertado con ID: " + idInsertado, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(Actividad_Test_TVPS.this, "Insertado con ID: " + idInsertado, Toast.LENGTH_SHORT).show();
                 actualizar_cliente_BBDD(id_cliente, idInsertado);
             }
 
             @Override
             public void onError(String mensajeError) {
-                Toast.makeText(Actividad_Test_TVPS.this, mensajeError, Toast.LENGTH_LONG).show();
+                //Toast.makeText(Actividad_Test_TVPS.this, mensajeError, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -169,7 +169,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                         Log.d("Estudio", "ID: " + estudio.getIdEstudio()  + ", Instrucciones: " + estudio.getDescripcionInstrucciones());
                     }
                     // Mostrar mensaje con el número de clientes cargados
-                    Toast.makeText(Actividad_Test_TVPS.this , "Estudios cargados: " + lista_estudios.size(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(Actividad_Test_TVPS.this , "Estudios cargados: " + lista_estudios.size(), Toast.LENGTH_LONG).show();
                     mostrar_instrucciones(1);
                     bt_cambio_test.setVisibility(View.VISIBLE);
                 } else {
@@ -314,8 +314,8 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         indice_actual = 0;
 
         //Toast de comprobacion se pueden comentar
-        Toast.makeText(this, "ACIERTOS --> " +cont_aciertos_general + " /  FALLOS --> "+ cont_fallos_general, Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "Fin del test", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "ACIERTOS --> " +cont_aciertos_general + " /  FALLOS --> "+ cont_fallos_general, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Fin del test", Toast.LENGTH_SHORT).show();
 
         contador_fallos(parte_test);
         contador_aciertos(parte_test);
@@ -340,7 +340,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
             public void onClick(View view) {
                 // Si no hemos llegado al final de todos los tests
                 contador_test_Terminados++;
-                Toast.makeText(Actividad_Test_TVPS.this, "Test terminados --> "+contador_test_Terminados, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(Actividad_Test_TVPS.this, "Test terminados --> "+contador_test_Terminados, Toast.LENGTH_SHORT).show();
                 bt_cambio_test.setVisibility(View.GONE);
                 if(contador_test_Terminados < 7){
                     tv_instrucciones.setVisibility(View.GONE);
@@ -356,16 +356,12 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                    guardar_test_realizado_BBDD(resultado_test_resalizado);
                     //actualizar_cliente_BBDD(id_cliente, id_test_Realizado);
 
-                    Intent intent = new Intent(Actividad_Test_TVPS.this, Ficha_cliente.class);
-                    intent.putExtra("idCliente", id_cliente);
-                    intent.putExtra("usuario", nombre_empleado);
 
-                    startActivity(intent);
-                    finish();
 
-                    /*AlertDialog.Builder builder = new AlertDialog.Builder(Actividad_Test_TVPS.this);
-                    builder.setTitle("Resultados Finales del Test")
-                            .setMessage(resultado_test_resalizado.getResultado())
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Actividad_Test_TVPS.this);
+                    builder.setTitle("Test terminado")
+                            //.setMessage(resultado_test_resalizado.getResultado())
+                            .setMessage("Has terminado el test. Devuelve la tablet al óptico")
                             .setPositiveButton("Aceptar", (dialog, which) -> {
                                 dialog.dismiss();
 
@@ -377,7 +373,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
                                 finish();
                             })
                             .setCancelable(false)
-                            .show();*/
+                            .show();
                 }
 
 
@@ -733,7 +729,7 @@ public class Actividad_Test_TVPS extends AppCompatActivity {
         id_empleado = getIntent().getIntExtra("idEmpleado", -1);
         edad_cliente = getIntent().getIntExtra("edadCliente", -1);
         nombre_empleado = getIntent().getStringExtra("usuario");
-        Toast.makeText(Actividad_Test_TVPS.this, "Edad cliente --> " +edad_cliente , Toast.LENGTH_SHORT).show();
+        //Toast.makeText(Actividad_Test_TVPS.this, "Edad cliente --> " +edad_cliente , Toast.LENGTH_SHORT).show();
     }
 
 
